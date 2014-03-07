@@ -5,28 +5,17 @@ source('fun.model_solver_sim.r')
 # SETTIG PARAMETERS
 p <- list()
 
-p$PeriodsToSolve = 21
+p$PeriodsToSolve  = 90-25
 
-p$Rho     = 2                #(* Coefficient of Relative Risk Aversion *)
-p$Beta    = 0.96             #(* Discount factor *)
-p$NumOfThetaShockPoints = 7  #(* Number of points in the discrete approximation to lognormal dist *)
-p$Sigma   = 0.2              #(* Standard deviation of lognormal distribution *)
-p$RFree   = 1.02             #(* Gross interest rate *)
+p$rho     = 2                #(* Coefficient of Relative Risk Aversion *)
+p$Rhat       = 1.03             #(* Gross interest rate *)
+p$beta    = 1/p$R            #(* Discount factor *)
+p$nP      = 6                #(* Permanent shock Number of points in the discrete approximation to lognormal dist *)
+p$nT      = 6                #(* Transitory shock Number of points in the discrete approximation to lognormal dist *)
+p$sigP    = 0.128              #(* Permanent shock Standard deviation of lognormal distribution *)
+p$sigT    = 0.164              #(* Transitory shock Standard deviation of lognormal distribution *)
 
-p$Gamma   = 1.00             # (* Permanent income growth factor *)
-
-p$mMin    = 0                #(* Minimum point in mVec *)
-p$mMax    = 4                #(* Maximum point in mVec *)
-p$mHuge   = 5                #mHuge is a point so that extrapolation is not needed
-p$NumOfmPts = 5              #(* Number of points in mVec *) %Perhaps change back to 5
-
-p$GothicAMin  = 0            #(* Lower bound for GothicAVec *)
-p$GothicAMax  = 4            #(* Maximum point in GothicAVec *)
-p$GothicAHuge = 9000 
-p$NumOfGothicAPts = 5        #(* Number of points in GothicAVec *)
-
-p$PeriodsSolved = 0          #(* Number of periods back from T for which the model has been solved *)
-
-p$Constrained = 0            # Constrained
-
-p$MC = 0                     # Indicates if if is the multicontrol problem
+p$aMin  = 1e-5            #(* Lower bound for GothicAVec *)
+p$aMax  = 4            #(* Maximum point in GothicAVec *)
+p$aHuge = 9000 
+p$n = 20                    #(* Number of points in GothicAVec *)
