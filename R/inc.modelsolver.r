@@ -4,54 +4,58 @@ F  <- function(x, Sigma) {
 	x * dlnorm(x,-1/2*(Sigma)^2,Sigma)
 }	
 
-#CRRA utility function     
-u <- function(c,Rho){
-	if (Rho==1){
-	  u=log(c)
-	}else{
-	  u = (c^(1-Rho))/(1-Rho)
-	}
+DiscreteApproxToMeanOneLogNormal <- function(std,numofshockpoints){
+  LevelAdjustingParameter = -(1/2)*(std)^2
+  ListOfEdgePoints = qlnorm( (0:numofshockpoints)/numofshockpoints,LevelAdjustingParameter,std )
+  ListOfEdgePoints[numofshockpoints+1]=100
+
+  shocklist  = rep(0,numofshockpoints)
+  for (i in 1:numofshockpoints){
+    shocklist[i] = integrate(F,ListOfEdgePoints[i],ListOfEdgePoints[i+1],std)$value * numofshockpoints
+  }
+  return(shocklist)
 }
 
 #CRRA marginal utility function      
 uP <- function(c,Rho){
-	if (Rho==1){
-	  uP = 1/c
-	}else{
-    if(c>0){
-      uP= c^(-Rho)
-    }else{
-      uP= 1e9
+  return(c^(-Rho))
+}
+
+# Gothic V prime function
+GothVP <- function(p, a, G, theta, perm, thetaP, permP, C, M){
+  EUP = rep( 0, length(a) ) 
+  for ( i in 1:length(theta) ){
+    for (j in 1:length(perm) ){
+      mtp = p$R*a/(G*perm[j]) + theta[i]  # money next period
+      EUP = EUP + uP( perm[j]*Cnextp(mtp,C,M),p$rho )*thetaP[i]*permP[j]       
     }
-  }  
+  }
+  EUP = EUP * p$beta * p$R * G^(-p$rho) 
+  return(EUP)
 }
 
+# Ct+1 function 
+Cnextp <- function(m,C,M){
+# Cnextp is constructed by interpolation to be the next-period consumption function Ct+1()
+  mtp1 = M[,ncol(M)]  # data for the next-period consumption function
+  ctp1 = C[,ncol(C)]  # data for the next-period consumption function
 
-# Inverse of the CRRA marginal 
-nP <- function(c,Rho){
-  nP = c^(-1/Rho)
+  c = rep( 0, length(m) ) 
+  end = length(mtp1)
+
+  # extrapolate above maximal m
+  iAbove = m >= mtp1[end]
+  slopeAbove  = ( ctp1[end]-ctp1[end-1] ) / ( mtp1[end]-mtp1[end-1] )
+  c[iAbove]   = ctp1[end] + ( m[iAbove]-mtp1[end] )*slopeAbove
+
+  # extrapolate below minimal m
+  iBelow = m <= mtp1[1]
+  slopeBelow  = 1
+  c[iBelow]   = ctp1[1] + ( m[iBelow]-mtp1[1] )*slopeBelow
+
+  # interpolate
+  iInterp = !(iAbove | iBelow)
+  c[iInterp]  = approx( mtp1,ctp1,m[iInterp] )$y
+  return(c)  
 }
 
-
-
-% GothVP.m
-% Gothic V prime function
-
-function EUP = GothVP(a,rho)
-
-% Another M-file function, Cnextp, is also involved in running this program
-
-global Rhat uP nP ThetaVec ThetaVecProb PermVec PermVecProb Beta R
-
-% EUP is used to take the sum of marginal utilities UP weighted by probabilities
-EUP = zeros(size(a)); 
-
-for i=1:length(ThetaVec)
-  for j=1:length(PermVec)
-    PermVal = PermVec(j);
-    ThetaVal = ThetaVec(i);
-    EUP     = EUP + Beta.*R...
-    .*uP(PermVal.*Cnextp(R.*a./PermVal+ones(1,length(EUP)).*ThetaVal),rho).*ThetaVecProb(i)...
-  .*PermVecProb(j);       
-  end;
-end;

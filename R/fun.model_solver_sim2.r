@@ -84,11 +84,13 @@ comp.moments<- function(p, model) {
 		PermShockDraws = DiscreteApproxToMeanOneLogNormal(sigP,NumOfPeople)
 
 		# Construct income shock lists
-		for (i in 1:NumOfPeriodsToSimulate){
+		for (i in 1:40){
 		  ThetaList[i,] = sample(ThetaDraws)     # List of Theta (tran shock) 
 		  PermList[i,]  = sample(PermShockDraws) # List of perm shock 
 		}
 		Perm[1,] = PermList[1,]
+		PermList[41:66,] = matrix(1,nrow=26,ncol=length(PermShockDraws)) 
+		ThetaList[41:66,]= matrix(1,nrow=26,ncol=length(ThetaDraws)) 
 
 		# Construct wtIndicator (list of indicators for initial wealth)
 		InitialWYRatio     = c(.17, .5, .83)              # Initial wy ratio (from the program on the paper (p.13))
