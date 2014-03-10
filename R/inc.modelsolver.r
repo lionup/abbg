@@ -25,12 +25,11 @@ uP <- function(c,Rho){
 GothVP <- function(p, a, G, theta, perm, thetaP, permP, C, M){
   EUP = rep( 0, length(a) ) 
   for ( i in 1:length(theta) ){
-    for (j in 1:length(perm) ){
+    for ( j in 1:length(perm) ){
       mtp = p$R*a/(G*perm[j]) + theta[i]  # money next period
       EUP = EUP + uP( perm[j]*Cnextp(mtp,C,M),p$rho )*thetaP[i]*permP[j]       
     }
   }
-  EUP = EUP * p$beta * p$R * G^(-p$rho) 
   return(EUP)
 }
 

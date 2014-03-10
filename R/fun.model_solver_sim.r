@@ -32,15 +32,25 @@ comp.solveModel <- function(p) {
 		# Income growth factors
 		GList =  IncomeLevelc[-1]/IncomeLevelc[-length(IncomeLevelc)]
 	
+		# Probability of being alive after retirement 
+		# (1st element is the prob of being alive until age 66)
+		#ProbOfAlive = c(9.8438596e-01,9.8438596e-01,9.8438596e-01,9.8438596e-01,9.8438596e-01,9.7567062e-01,9.7567062e-01,9.7567062e-01,9.7567062e-01,9.7567062e-01,9.6207901e-01,9.6207901e-01,9.6207901e-01,9.6207901e-01,9.6207901e-01,9.3721595e-01,9.3721595e-01,9.3721595e-01,9.3721595e-01,9.3721595e-01,6.3095734e-01,6.3095734e-01,6.3095734e-01,6.3095734e-01,6.3095734e-01)
+		#ProbOfAlive = c(rep(1,PeriodsToSolve-length(ProbOfAlive)),ProbOfAlive)
+
+		# Corrected beta: Exp(dZ(t)*theta)
+	  #Betacorr = c(1.0649141e+00,1.0579968e+00,1.0514217e+00,1.0451790e+00,1.0392591e+00,1.0336529e+00,1.0283519e+00,1.0233477e+00,1.0186323e+00,1.0141979e+00,1.0100373e+00,1.0061433e+00,1.0025092e+00,9.9912824e-01,9.9599427e-01,9.9310116e-01,9.9044306e-01,9.8801430e-01,9.8580946e-01,9.8382325e-01,9.8205060e-01,9.8048658e-01,9.7912645e-01,9.7796558e-01,9.7699952e-01,9.7622393e-01,9.7563459e-01,9.7522741e-01,9.7499842e-01,9.7494373e-01,9.7505955e-01,9.7534220e-01,9.7578805e-01,9.7639357e-01,9.7715529e-01,9.7806981e-01,9.7913379e-01,9.8034393e-01,9.8169700e-01,8.2872135e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01)
 
 		# Construct matrix of interpolation data
 		C = matrix(0:(n+1))
 		M = matrix(0:(n+1))
 
-		for (l in 1:PeriodsToSolve){			
+		for (l in 1:PeriodsToSolve){	
 			# calculate ct from each grid point in AlphaVec
+			#P      =  R * GList[65-l+1]^(-rho) * beta * ProbOfAlive[length(ProbOfAlive)-l+1] * Betacorr[length(Betacorr)-l+1]
+			P      =  R * GList[65-l+1]^(-rho) * beta 
+
 			Vap    = GothVP(p, AlphaVec, GList[65-l+1], ThetaMat[65-l+1,], PermMat[65-l+1,], ThetaVecProb, PermVecProb, C, M )   # Gothic Va prime
-			ChiVec = Vap^(-1/p$rho) # inverse Euler equation
+			ChiVec = (P*Vap)^(-1/rho) # inverse Euler equation
  			MuVec  = AlphaVec+ChiVec
   		M      = cbind(M, c(0,MuVec))                  # Matrix of interpolation data
   		C      = cbind(C, c(0,ChiVec))                 # Matrix of interpolation data
@@ -70,6 +80,7 @@ comp.moments<- function(p, model) {
 		stList   = ThetaList
 		mtList   = ThetaList
 		Perm     = ThetaList
+		Income   = ThetaList
 
 		# Construct income shock draw lists
 		# Tran shock draw list
@@ -88,7 +99,13 @@ comp.moments<- function(p, model) {
 		  ThetaList[i,] = sample(ThetaDraws)     # List of Theta (tran shock) 
 		  PermList[i,]  = sample(PermShockDraws) # List of perm shock 
 		}
-		Perm[1,] = PermList[1,]
+		Perm[1,] = (1.0304073e+001) * PermList[1,]
+		Income[1,]= Perm[1,] * ThetaList[1,]
+
+		if (NumOfPeriodsToSimulate > 40){
+			PermList[41:NumOfPeriodsToSimulate,] = matrix(1,nrow=NumOfPeriodsToSimulate-40,ncol=length(PermShockDraws)) 
+			ThetaList[41:NumOfPeriodsToSimulate,]= matrix(1,nrow=NumOfPeriodsToSimulate-40,ncol=length(ThetaDraws)) 
+		}
 
 		# Construct wtIndicator (list of indicators for initial wealth)
 		InitialWYRatio     = c(.17, .5, .83)              # Initial wy ratio (from the program on the paper (p.13))
@@ -122,6 +139,7 @@ comp.moments<- function(p, model) {
         ctList[t,j] = approx( M[,len-t+1], C[,len-t+1], mtList[t,j] )$y
         if (mtList[t,j] == 0) ctList[t,j] =0                       # ctList      : list of normalized consumption 
 				Perm[t,j]   = Perm[t-1,j] * GList[t-1] * PermList[t,j] # List of perm income
+				Income[t,j] = Perm[t,j] * ThetaList[t,j]
 			}
 		}
 
@@ -131,13 +149,20 @@ comp.moments<- function(p, model) {
 		ctMedianList = apply(ctList, 1, median)
 		Ct           = ctList * Perm
 		CtMean       = rowMeans(Ct)
+		IncomeMean   = rowMeans(Income)
 		
 		model= list(
-		CtMean        = CtMean,
-    stMeanList    = stMeanList,
-    stMedianList  = stMedianList,
-    ctMeanList    = ctMeanList,
-    ctMedianList  = ctMedianList)
+		stList        = stList,
+		stMeanList    = stMeanList,
+		stMedianList  = stMedianList, 
+		ctList        = ctList, 
+		ctMeanList    = ctMeanList,
+		ctMedianList  = ctMedianList,
+		Perm          = Perm,
+		Income        = Income, 
+		IncomeMean    = IncomeMean, 
+		Ct            = Ct, 
+		CtMean        = CtMean)
 	}) 
 
   return(res)
