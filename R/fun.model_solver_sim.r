@@ -6,16 +6,17 @@ comp.solveModel <- function(p) {
 		#Setting up shock values (discrete approximation to log normal)   
 		PermVecProb = rep(1/nP,nP)
 		ThetaVecProb = rep(1/nT,nT)
-		if (pUnemp>0) { # If assume unemployment
-   	 ThetaVecProb = c( pUnemp,ThetaVecProb*(1-pUnemp) )
- 		}
+		#if (pUnemp>0) { # If assume unemployment
+   	# ThetaVecProb = c( pUnemp,ThetaVecProb*(1-pUnemp) )
+ 		#}
 
 		PermVec  = DiscreteApproxToMeanOneLogNormal(sigP,nP)
 		ThetaVec = DiscreteApproxToMeanOneLogNormal(sigT,nT)
 		#if (pUnemp>0){ # If assume unemployment
     #	ThetaVec = c( 0,ThetaVec/(1-pUnemp) )
  		#}
-
+    
+    #Theta for age 26~90
 		ThetaMat = t( replicate(40, ThetaVec) )
 		ThetaMat = rbind( ThetaMat, matrix(1,nrow=25,ncol=length(ThetaVec)) )
 
@@ -31,7 +32,7 @@ comp.solveModel <- function(p) {
 
 		# Income growth factors
 		GList =  IncomeLevelc[-1]/IncomeLevelc[-length(IncomeLevelc)]
-	
+
 		# Probability of being alive after retirement 
 		# (1st element is the prob of being alive until age 66)
 		#ProbOfAlive = c(9.8438596e-01,9.8438596e-01,9.8438596e-01,9.8438596e-01,9.8438596e-01,9.7567062e-01,9.7567062e-01,9.7567062e-01,9.7567062e-01,9.7567062e-01,9.6207901e-01,9.6207901e-01,9.6207901e-01,9.6207901e-01,9.6207901e-01,9.3721595e-01,9.3721595e-01,9.3721595e-01,9.3721595e-01,9.3721595e-01,6.3095734e-01,6.3095734e-01,6.3095734e-01,6.3095734e-01,6.3095734e-01)
@@ -42,8 +43,8 @@ comp.solveModel <- function(p) {
 
 		# Construct matrix of interpolation data
 		#	Period T, min of cash is 0, so min of cons is 0
- 		C = matrix(0:n)
-		M = matrix(0:n)
+ 		C = matrix(0:(n+1))
+		M = matrix(0:(n+1))
 		PDVmwn = 0 # present disc value of next period min wage at T
 
 		# lopp over T-1 ~ 1
@@ -54,13 +55,13 @@ comp.solveModel <- function(p) {
 			ThetaVec = ThetaMat[65-l+1,]
 			PermVec  = PermMat[65-l+1,]
 
-			PDVmwn = (PDVmwn + min(ThetaVec)*G*min(PermVec))/R 
+			PDVmwn = ( PDVmwn + min(ThetaVec)*G*min(PermVec) )/R
 			AlphaVec1=AlphaVec-PDVmwn
 			Vap    = GothVP(p, AlphaVec1, G, ThetaVec, PermVec, ThetaVecProb, PermVecProb, C, M )   # Gothic Va prime
 			ChiVec = (R * beta * G^(-rho) * Vap)^(-1/rho) # inverse Euler equation
- 			MuVec  = AlphaVec+ChiVec
-  		M      = cbind(M, MuVec)                  # Matrix of interpolation data
-  		C      = cbind(C, ChiVec)                 # Matrix of interpolation data
+ 			MuVec  = AlphaVec1+ChiVec
+  		M      = cbind(M, c(-PDVmwn, MuVec))                  # Matrix of interpolation data
+  		C      = cbind(C, c(0,ChiVec))                 # Matrix of interpolation data
 		}
 
 		model= list(
@@ -106,12 +107,10 @@ comp.moments<- function(p, model) {
 		  ThetaList[i,] = sample(ThetaDraws)     # List of Theta (tran shock) 
 		  PermList[i,]  = sample(PermShockDraws) # List of perm shock 
 		}
-		Perm[1,] = (1.0304073e+001) * PermList[1,]
-		Income[1,]= Perm[1,] * ThetaList[1,]
 
-		if (NumOfPeriodsToSimulate > 40){
-			PermList[41:NumOfPeriodsToSimulate,] = matrix(1,nrow=NumOfPeriodsToSimulate-40,ncol=length(PermShockDraws)) 
-			ThetaList[41:NumOfPeriodsToSimulate,]= matrix(1,nrow=NumOfPeriodsToSimulate-40,ncol=length(ThetaDraws)) 
+		if (NumOfPeriodsToSimulate > 41){
+			PermList[42:NumOfPeriodsToSimulate,] = matrix(1,nrow=NumOfPeriodsToSimulate-41,ncol=length(PermShockDraws)) 
+			ThetaList[42:NumOfPeriodsToSimulate,]= matrix(1,nrow=NumOfPeriodsToSimulate-41,ncol=length(ThetaDraws)) 
 		}
 
 		# Construct wtIndicator (list of indicators for initial wealth)
@@ -133,6 +132,25 @@ comp.moments<- function(p, model) {
 		# First period
 		stList[1,] = InitialWYRatio[ stIndicator ] # stList      : list of normalized s (savings at the beginning of age)       
 		mtList[1,] = stList[1,] + ThetaList[1,]      # mtList      : list of normalized m (cash on hand)
+
+		# Construct itIndicator (list of indicators for initial income)
+		InitialIncome     = c(10000, 20000, 40000)              # Initial wy ratio (from the program on the paper (p.13))
+		InitialIncomeProb = c(.3, .4, .3)   # Prob associated with initial wy ratio 
+
+		itIndicator = rep(0, NumOfPeople)
+		for (i in 1:NumOfPeople){
+	    r = runif(1)
+	    if (r < InitialIncomeProb[1]){
+	      itIndicator[i] = 1
+	    }else if (r < InitialIncomeProb[1]+InitialIncomeProb[2]){
+	      itIndicator[i] = 2
+	    }else{
+	      itIndicator[i] = 3
+	    }
+		}
+		
+		Perm[1,] = InitialIncome[ itIndicator ] * PermList[1,]
+		Income[1,]= Perm[1,] * ThetaList[1,]
 
 		len = ncol(M)
 		ctList[1,] =  approx( M[,len], C[,len], mtList[1,] )$y
