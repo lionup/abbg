@@ -2,6 +2,9 @@ setwd('figure')
 require(ggplot2)   
 age = 25:(p$NumOfPeriodsToSimulate+25-1)
 
+#plot(GList,type='l')
+#abline(a=1,b=0)    
+
 plot_mean <- data.frame( cbind(age=age, 
                               income=moments$IncomeMean, 
                               consumption=moments$CtMean) )

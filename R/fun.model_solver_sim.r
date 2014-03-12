@@ -12,9 +12,9 @@ comp.solveModel <- function(p) {
 
 		PermVec  = DiscreteApproxToMeanOneLogNormal(sigP,nP)
 		ThetaVec = DiscreteApproxToMeanOneLogNormal(sigT,nT)
-		if (pUnemp>0){ # If assume unemployment
-    	ThetaVec = c( 0,ThetaVec/(1-pUnemp) )
- 		}
+		#if (pUnemp>0){ # If assume unemployment
+    #	ThetaVec = c( 0,ThetaVec/(1-pUnemp) )
+ 		#}
 
 		ThetaMat = t( replicate(40, ThetaVec) )
 		ThetaMat = rbind( ThetaMat, matrix(1,nrow=25,ncol=length(ThetaVec)) )
@@ -41,19 +41,26 @@ comp.solveModel <- function(p) {
 	  #Betacorr = c(1.0649141e+00,1.0579968e+00,1.0514217e+00,1.0451790e+00,1.0392591e+00,1.0336529e+00,1.0283519e+00,1.0233477e+00,1.0186323e+00,1.0141979e+00,1.0100373e+00,1.0061433e+00,1.0025092e+00,9.9912824e-01,9.9599427e-01,9.9310116e-01,9.9044306e-01,9.8801430e-01,9.8580946e-01,9.8382325e-01,9.8205060e-01,9.8048658e-01,9.7912645e-01,9.7796558e-01,9.7699952e-01,9.7622393e-01,9.7563459e-01,9.7522741e-01,9.7499842e-01,9.7494373e-01,9.7505955e-01,9.7534220e-01,9.7578805e-01,9.7639357e-01,9.7715529e-01,9.7806981e-01,9.7913379e-01,9.8034393e-01,9.8169700e-01,8.2872135e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01,9.9021110e-01)
 
 		# Construct matrix of interpolation data
-		C = matrix(0:(n+1))
-		M = matrix(0:(n+1))
+		#	Period T, min of cash is 0, so min of cons is 0
+ 		C = matrix(0:n)
+		M = matrix(0:n)
+		PDVmwn = 0 # present disc value of next period min wage at T
 
+		# lopp over T-1 ~ 1
 		for (l in 1:PeriodsToSolve){	
 			# calculate ct from each grid point in AlphaVec
 			#P      =  R * GList[65-l+1]^(-rho) * beta * ProbOfAlive[length(ProbOfAlive)-l+1] * Betacorr[length(Betacorr)-l+1]
-			P      =  R * GList[65-l+1]^(-rho) * beta 
+			G      = GList[65-l+1]
+			ThetaVec = ThetaMat[65-l+1,]
+			PermVec  = PermMat[65-l+1,]
 
-			Vap    = GothVP(p, AlphaVec, GList[65-l+1], ThetaMat[65-l+1,], PermMat[65-l+1,], ThetaVecProb, PermVecProb, C, M )   # Gothic Va prime
-			ChiVec = (P*Vap)^(-1/rho) # inverse Euler equation
+			PDVmwn = (PDVmwn + min(ThetaVec)*G*min(PermVec))/R 
+			AlphaVec1=AlphaVec-PDVmwn
+			Vap    = GothVP(p, AlphaVec1, G, ThetaVec, PermVec, ThetaVecProb, PermVecProb, C, M )   # Gothic Va prime
+			ChiVec = (R * beta * G^(-rho) * Vap)^(-1/rho) # inverse Euler equation
  			MuVec  = AlphaVec+ChiVec
-  		M      = cbind(M, c(0,MuVec))                  # Matrix of interpolation data
-  		C      = cbind(C, c(0,ChiVec))                 # Matrix of interpolation data
+  		M      = cbind(M, MuVec)                  # Matrix of interpolation data
+  		C      = cbind(C, ChiVec)                 # Matrix of interpolation data
 		}
 
 		model= list(
@@ -85,11 +92,11 @@ comp.moments<- function(p, model) {
 		# Construct income shock draw lists
 		# Tran shock draw list
 		ThetaDraws = DiscreteApproxToMeanOneLogNormal(sigT,NumOfPeople)
-		if (pUnemp>0){ # If assume unemployment
-			ThetaDraws = DiscreteApproxToMeanOneLogNormal(sigT,NumOfPeople-pUnemp*NumOfPeople)
-			ThetaDraws = ThetaDraws/(1 - pUnemp)
-			ThetaDraws = append(rep(0,pUnemp*NumOfPeople),ThetaDraws)
-		} 
+		#if (pUnemp>0){ # If assume unemployment
+		#	ThetaDraws = DiscreteApproxToMeanOneLogNormal(sigT,NumOfPeople-pUnemp*NumOfPeople)
+		#	ThetaDraws = ThetaDraws/(1 - pUnemp)
+		#	ThetaDraws = append(rep(0,pUnemp*NumOfPeople),ThetaDraws)
+		#} 
 
 		# Perm shock draw list
 		PermShockDraws = DiscreteApproxToMeanOneLogNormal(sigP,NumOfPeople)
@@ -129,7 +136,7 @@ comp.moments<- function(p, model) {
 
 		len = ncol(M)
 		ctList[1,] =  approx( M[,len], C[,len], mtList[1,] )$y
-		ctList[1, mtList[1,] == 0] =0                     
+		#ctList[1, mtList[1,] == 0] =0                     
 
 		# Continue simulstion
 		for (t in 2:NumOfPeriodsToSimulate){
@@ -137,7 +144,7 @@ comp.moments<- function(p, model) {
         stList[t,j] = ( R/GList[t-1]/PermList[t,j] )*( mtList[t-1,j]-ctList[t-1,j] )
         mtList[t,j] = stList[t,j] + ThetaList[t,j]
         ctList[t,j] = approx( M[,len-t+1], C[,len-t+1], mtList[t,j] )$y
-        if (mtList[t,j] == 0) ctList[t,j] =0                       # ctList      : list of normalized consumption 
+        #if (mtList[t,j] == 0) ctList[t,j] =0                       # ctList      : list of normalized consumption 
 				Perm[t,j]   = Perm[t-1,j] * GList[t-1] * PermList[t,j] # List of perm income
 				Income[t,j] = Perm[t,j] * ThetaList[t,j]
 			}
