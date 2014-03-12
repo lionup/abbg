@@ -19,8 +19,8 @@ p$aMin  = 1e-5            #(* Lower bound for GothicAVec *)
 p$aMax  = 4            #(* Maximum point in GothicAVec *)
 p$aHuge = 9000 
 p$n = 20                    #(* Number of points in GothicAVec *)
-p$NumOfPeople  = 1000     # Number of people to simulate
-p$NumOfPeriodsToSimulate = 40   #Length of life in simulation (simulate until age 60)
+p$NumOfPeople  = 10000     # Number of people to simulate
+p$NumOfPeriodsToSimulate = 41   #Length of life in simulation (simulate until age 60)
 
 start_time = proc.time()[3]  
 model  <- comp.solveModel(p)

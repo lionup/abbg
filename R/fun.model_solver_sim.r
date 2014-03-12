@@ -99,12 +99,10 @@ comp.moments<- function(p, model) {
 		  ThetaList[i,] = sample(ThetaDraws)     # List of Theta (tran shock) 
 		  PermList[i,]  = sample(PermShockDraws) # List of perm shock 
 		}
-		Perm[1,] = (1.0304073e+001) * PermList[1,]
-		Income[1,]= Perm[1,] * ThetaList[1,]
 
-		if (NumOfPeriodsToSimulate > 40){
-			PermList[41:NumOfPeriodsToSimulate,] = matrix(1,nrow=NumOfPeriodsToSimulate-40,ncol=length(PermShockDraws)) 
-			ThetaList[41:NumOfPeriodsToSimulate,]= matrix(1,nrow=NumOfPeriodsToSimulate-40,ncol=length(ThetaDraws)) 
+		if (NumOfPeriodsToSimulate > 41){
+			PermList[42:NumOfPeriodsToSimulate,] = matrix(1,nrow=NumOfPeriodsToSimulate-41,ncol=length(PermShockDraws)) 
+			ThetaList[42:NumOfPeriodsToSimulate,]= matrix(1,nrow=NumOfPeriodsToSimulate-41,ncol=length(ThetaDraws)) 
 		}
 
 		# Construct wtIndicator (list of indicators for initial wealth)
@@ -126,6 +124,25 @@ comp.moments<- function(p, model) {
 		# First period
 		stList[1,] = InitialWYRatio[ stIndicator ] # stList      : list of normalized s (savings at the beginning of age)       
 		mtList[1,] = stList[1,] + ThetaList[1,]      # mtList      : list of normalized m (cash on hand)
+
+		# Construct itIndicator (list of indicators for initial income)
+		InitialIncome     = c(10000, 20000, 40000)              # Initial wy ratio (from the program on the paper (p.13))
+		InitialIncomeProb = c(.3, .4, .3)   # Prob associated with initial wy ratio 
+
+		itIndicator = rep(0, NumOfPeople)
+		for (i in 1:NumOfPeople){
+	    r = runif(1)
+	    if (r < InitialIncomeProb[1]){
+	      itIndicator[i] = 1
+	    }else if (r < InitialIncomeProb[1]+InitialIncomeProb[2]){
+	      itIndicator[i] = 2
+	    }else{
+	      itIndicator[i] = 3
+	    }
+		}
+
+		Perm[1,] = InitialIncome[ itIndicator ] * PermList[1,]
+		Income[1,]= Perm[1,] * ThetaList[1,]
 
 		len = ncol(M)
 		ctList[1,] =  approx( M[,len], C[,len], mtList[1,] )$y
