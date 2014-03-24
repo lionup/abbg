@@ -1,5 +1,28 @@
 setwd('figure')
 require(ggplot2)   
+age = 30:(30+p$nt-1)
+plot_mean <- data.frame( cbind(age=age, income=etalong/p$nsim) )
+
+p_mean  <- ggplot(plot_mean, aes(x=age,y=income)) + 
+  geom_line(aes(color='persistent income')) +
+  #geom_line(aes(y=consumption, color='consumption')) +
+  xlab('age') +
+  ylab('persistent income')+
+  labs(colour = NULL) +
+  #ylab('consumption') +
+ # ggtitle('life cycle profile of permanent income with constrained grid upper bound') +
+  theme_bw()
+
+print(p_mean)
+
+ggsave('perm_inc.png',width=10.6, height=5.93)  
+setwd('~/git/abbg/R')
+
+
+
+
+setwd('figure')
+require(ggplot2)   
 age = 25:(p$NumOfPeriodsToSimulate+25-1)
 
 #plot(GList,type='l')
