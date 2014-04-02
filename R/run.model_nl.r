@@ -39,8 +39,8 @@ p$nage  = (60-30)/2 + 1
 p$nbin  = 23
 
 #compute the transition matrix of persistent income
-eta <- comp.eta(p)
-
+#eta <- comp.eta(p)
+load('eta.dat')
 
 p$rho     = 2                #(* Coefficient of Relative Risk Aversion *)
 p$R       = 1.03             #(* Gross interest rate *)
