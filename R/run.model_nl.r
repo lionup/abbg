@@ -37,10 +37,13 @@ detach(data)
 
 p$nage  = (60-30)/2 + 1
 p$nbin  = 23
+p$neps  = 23
+p$aMin  = 1e-6            #(* Lower bound for GothicAVec *)
+p$aMax  = 30            #(* Maximum point in GothicAVec *)
+p$aHuge = 9000 
+p$n = 50  
 
-#compute the transition matrix of persistent income
-#eta <- comp.eta(p)
-load('eta.dat')
+
 
 p$rho     = 2                #(* Coefficient of Relative Risk Aversion *)
 p$R       = 1.03             #(* Gross interest rate *)
@@ -50,10 +53,7 @@ p$nT      = 6                #(* Transitory shock Number of points in the discre
 p$sigP    = 0.1              #(* Permanent shock Standard deviation of lognormal distribution *)
 p$sigT    = 0.2              #(* Transitory shock Standard deviation of lognormal distribution *)
 #p$pUnemp  = 0 #0.5/100      #Probability of unemployment (when unemployed inc level is zero) 
-p$aMin  = 1e-6            #(* Lower bound for GothicAVec *)
-p$aMax  = 30            #(* Maximum point in GothicAVec *)
-p$aHuge = 9000 
-p$n = 50                    #(* Number of points in GothicAVec *)
+                  #(* Number of points in GothicAVec *)
 p$NumOfPeople  = 10000     # Number of people to simulate
 p$NumOfPeriodsToSimulate = 41   #Length of life in simulation (simulate until age 60)
 
