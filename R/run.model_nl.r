@@ -26,6 +26,7 @@ p$bLtrue_eps = bL.eps
 p$K1         = K1
 p$K2         = K2
 p$K3         = K3
+p$K4         = K4
 p$meanAGE    = meanAGE    
 p$stdAGE     = stdAGE
 p$Vectau     = Vectau
@@ -35,19 +36,18 @@ p$stdY       = stdY
 
 detach(data)
 
-p$nage  = (60-30)/2 + 1
+p$nage  = (66-30)/2 + 1
 p$nbin  = 23
 p$neps  = 23
 p$aMin  = 1e-6            #(* Lower bound for GothicAVec *)
 p$aMax  = 30            #(* Maximum point in GothicAVec *)
 p$aHuge = 9000 
 p$n = 50  
-
-
-
+p$R       = 1.06             #(* Gross interest rate *)
+p$beta    = 0.93             #(* Discount factor *)
 p$rho     = 2                #(* Coefficient of Relative Risk Aversion *)
-p$R       = 1.03             #(* Gross interest rate *)
-p$beta    = 0.96             #(* Discount factor *)
+
+
 p$nP      = 6                #(* Permanent shock Number of points in the discrete approximation to lognormal dist *)
 p$nT      = 6                #(* Transitory shock Number of points in the discrete approximation to lognormal dist *)
 p$sigP    = 0.1              #(* Permanent shock Standard deviation of lognormal distribution *)
