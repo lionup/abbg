@@ -46,16 +46,7 @@ p$n = 50
 p$R       = 1.06             #(* Gross interest rate *)
 p$beta    = 0.93             #(* Discount factor *)
 p$rho     = 2                #(* Coefficient of Relative Risk Aversion *)
-
-
-p$nP      = 6                #(* Permanent shock Number of points in the discrete approximation to lognormal dist *)
-p$nT      = 6                #(* Transitory shock Number of points in the discrete approximation to lognormal dist *)
-p$sigP    = 0.1              #(* Permanent shock Standard deviation of lognormal distribution *)
-p$sigT    = 0.2              #(* Transitory shock Standard deviation of lognormal distribution *)
-#p$pUnemp  = 0 #0.5/100      #Probability of unemployment (when unemployed inc level is zero) 
-                  #(* Number of points in GothicAVec *)
-p$NumOfPeople  = 10000     # Number of people to simulate
-p$NumOfPeriodsToSimulate = 41   #Length of life in simulation (simulate until age 60)
+p$nsim  = 10000     # Number of people to simulate
 
 start_time = proc.time()[3]  
 model  <- comp.solveModel(p)

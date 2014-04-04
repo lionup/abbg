@@ -122,10 +122,10 @@ comp.eta <- function(p){
   return(res)
 }
 
-comp.eps <- function(p){ 
-  xeps <- array( 0, dim=c(p$nage, p$neps) ) #income grid
+comp.eps <- function(p, ntra){ 
+  xeps <- array( 0, dim=c(p$nage, ntra) ) #income grid
   VecTau  <- (1:p$Ntau)/(1+p$Ntau) #get the quantile of interpolation node
-  VecTaue <- (1:p$neps)/(1+p$neps) #get the quantile of interpolation node
+  VecTaue <- (1:ntra) / (1+ntra) #get the quantile of interpolation node
 
   # generate the age vector 
   xt  <- seq( 30, (30 + (p$nage-1) * 2 ), by=2 )
