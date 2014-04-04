@@ -4,7 +4,7 @@ require(data.table)
 require(ggplot2)
 
 setwd('~/git/abbg/R')
-source('fun.model_solver_sim.r')
+source('fun.model_solver_nl_sim.r')
 set.seed(123)
 
 # SETTIG PARAMETERS
@@ -36,7 +36,7 @@ p$stdY       = stdY
 
 detach(data)
 
-p$nage  = (66-30)/2 + 1
+p$nage  = (64-30)/2 + 1
 p$nbin  = 23
 p$neps  = 23
 p$aMin  = 1e-6            #(* Lower bound for GothicAVec *)

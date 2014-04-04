@@ -1,11 +1,11 @@
 source('inc.modelsolver_nl.r')
 
-comp.solveModel <- function(p, eta) {
+comp.solveModel <- function(p) {
 	res <- with(p,{
 		
 		#eta: xeta, etaprob, etacontot, etauntot
-		#eta <- comp.eta(p)
-		#with( eta, save(xeta, etaprob, etacontot, etauntot, file='eta.dat') )
+		eta <- comp.eta.prob(p,999999)
+		with( eta, save(xeta, etaprob, etacontot, etauntot, file='eta.dat') )
 		load('eta.dat')
 		ieta = exp(xeta)
 		
@@ -64,20 +64,40 @@ comp.moments<- function(p, model) {
 	  C = model$C
 
 		# declare variable 
-		epslist= matrix(0, nrow=nage, ncol=nsim)
+		epsList= matrix(0, nrow=nage, ncol=nsim)
+		ctList   = epsList
+		stList   = epsList
+		mtList   = epsList
 
 	 	# Construct transitory income shock draw lists
 	  # Construct grid for trans draw
 	  epsdraws = comp.eps(p, nsim)
 
 	  # Sample randomly from the grid to get the distri for each period
-	  for (i in nage){
-	  	epslist[i,] = sampe(epsdraws[i,])
+	  for (i in 1:nage){
+	  	epsList[i,] = sample(epsdraws[i,])
 	  }
 
 		# Construct persistent income shock draw lists
+		etaList = comp.eta.sim(p, nsim)
+
+		# get income
+		yList = exp(etaList + epsList)
 
 		# Construct initial asset
+		# Construct wtIndicator (list of indicators for initial wealth)
+		InitialWYRatio     = c(.17, .5, .83)              # Initial wy ratio (from the program on the paper (p.13))
+
+		stIndicator = rep(3, nsim)
+		rama <- runif(nsim)
+		stIndicator[rama < InitialWYRatioProb[1]] = 1
+		stIndicator[rama < InitialWYRatioProb[1]+InitialWYRatioProb[2]] = 2
+
+		# First period
+		stList[1,] = InitialWYRatio[ stIndicator ] # stList      : list of normalized s (savings at the beginning of age)       
+		mtList[1,] = stList[1,] + yList[1,]      # mtList      : list of normalized m (cash on hand)
+
+		# first period consumption
 
 		# Simulate
 
