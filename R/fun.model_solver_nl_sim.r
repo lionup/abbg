@@ -4,10 +4,9 @@ comp.solveModel <- function(p) {
 	res <- with(p,{
 		
 		#eta: xeta, etaprob, etacontot, etauntot
-		eta <- comp.eta.prob(p,999999)
-		with( eta, save(xeta, etaprob, etacontot, etauntot, file='eta.dat') )
+		#eta <- comp.eta.prob(p,999999)
+		#with( eta, save(ieta, xeta, etaprob, etacontot, etauntot, file='eta.dat') )
 		load('eta.dat')
-		ieta = exp(xeta)
 		
 		#eps: grid and distri 
 		epsprob = rep(1/neps,neps)
@@ -62,46 +61,82 @@ comp.moments<- function(p, model) {
 	  # This file runs simulation
 	  M = model$M
 	  C = model$C
+	  load('eta.dat')
 
 		# declare variable 
-		epsList= matrix(0, nrow=nage, ncol=nsim)
+		epsList  = matrix(0, nrow=nage, ncol=nsim)
+		etaList  = epsList
 		ctList   = epsList
 		stList   = epsList
 		mtList   = epsList
-
-	 	# Construct transitory income shock draw lists
+		ytList   = epsList
+		randeta  = epsList
+		enode    = epsList
+		visite   = array(0, dim=c(nage, nbin))
+	 	
 	  # Construct grid for trans draw
 	  epsdraws = comp.eps(p, nsim)
 
-	  # Sample randomly from the grid to get the distri for each period
-	  for (i in 1:nage){
-	  	epsList[i,] = sample(epsdraws[i,])
-	  }
+		# Construct uniform grid for eta
+		etasim <- (1:nsim) / (1+nsim)
 
-		# Construct persistent income shock draw lists
-		etaList = comp.eta.sim(p, nsim)
+		# Initial wy ratio and prob
+		InitialWYRatio     = c(.17, .5, .83) 
+		InitialWYRatioProb = c(.33333, .33333, .333334)   
 
-		# get income
-		yList = exp(etaList + epsList)
-
-		# Construct initial asset
 		# Construct wtIndicator (list of indicators for initial wealth)
-		InitialWYRatio     = c(.17, .5, .83)              # Initial wy ratio (from the program on the paper (p.13))
-
 		stIndicator = rep(3, nsim)
-		rama <- runif(nsim)
-		stIndicator[rama < InitialWYRatioProb[1]] = 1
-		stIndicator[rama < InitialWYRatioProb[1]+InitialWYRatioProb[2]] = 2
+		randa <- runif(nsim)
+		stIndicator[randa < InitialWYRatioProb[1]] = 1
+		stIndicator[randa >= InitialWYRatioProb[1] & randa < (InitialWYRatioProb[1]+InitialWYRatioProb[2])] = 2   
 
-		# First period
-		stList[1,] = InitialWYRatio[ stIndicator ] # stList      : list of normalized s (savings at the beginning of age)       
-		mtList[1,] = stList[1,] + yList[1,]      # mtList      : list of normalized m (cash on hand)
+		#loop over life cycle
+		for (t in 1:nage) {  
+			# Sample randomly from eps grid to get current eps
+			epsList[t,] = sample(epsdraws[t,]) 
 
-		# first period consumption
+			# generate random draw on unit interval for current eta
+			randeta[t,] = sample(etasim)
 
-		# Simulate
+			#loop for different individuals
+			for (i in 1:nsim){
+				# find persistent income draw
+		  	if(t==1){  
+          enode[1,i] <- which( randeta[1,i] <= etauntot )[1]
+          visite[t,enode[1,i]] = visite[t,enode[1,i]] + 1
+        }else{
+	        enode[t,i] <- which( randeta[t,i] <= etacontot[t,enode[t-1,i],] )[1]
+	        visite[t,enode[t,i]] = visite[t,enode[t,i]] + 1
+        }
+
+		    etaList[t,i] <- xeta[t,enode[t,i]]
+
+		    # get income
+				ytList[t,i] = exp(etaList[t,i] + epsList[t,i])
+
+				if(t==1){
+			  	# Construct initial asset
+					stList[1,i] = InitialWYRatio[ stIndicator[i] ] * exp(etaList[1,i])
+					mtList[1,i] = stList[1,i] + ytList[1,i]      # mtList      : list of normalized m (cash on hand)
+				}else{		
+	        stList[t,i] = R*( mtList[t-1,i]-ctList[t-1,i] )
+	        mtList[t,i] = stList[t,i] + ytList[t,i]
+				}
+        ctList[t,i] = approx( M[t,enode[t,i],], C[t,enode[t,i],], mtList[t,i] )$y
+
+		  } 
+		} 
 
 
+		model= list(
+		epsList    = epsList,
+		etaList    = etaList, 
+		ctList     = ctList ,
+		stList     = stList ,
+		mtList     = mtList , 
+		ytList     = ytList  , 
+		enode      = enode  ,
+		visite     = visite )   
 	}) 
 
   return(res)

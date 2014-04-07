@@ -128,9 +128,12 @@ comp.eta.prob <- function(p, N){
     for(i in 2:nbin){
       etauntot[i] <- etauntot[i-1]  + etauntot[i]  
     }
+    
+    ieta = exp(xeta)
 
     list(
     xeta      = xeta,
+    ieta      = ieta,
     etaprob   = etaprob,
     etacontot = etacontot,
     etauntot  = etauntot)
@@ -142,7 +145,10 @@ comp.eta.prob <- function(p, N){
 comp.eps <- function(p, ntra){ 
   xeps <- array( 0, dim=c(p$nage, ntra) ) #income grid
   VecTau  <- (1:p$Ntau)/(1+p$Ntau) #get the quantile of interpolation node
-  VecTaue <- (1:ntra) / (1+ntra) #get the quantile of interpolation node
+  min <- 1/(1+p$neps)
+  max <- p$neps/(1+p$neps)
+  VecTaue <- seq(min, max, l=ntra)
+  #VecTaue <- (1:ntra) / (1+ntra) #get the quantile of interpolation node
 
   # generate the age vector 
   xt  <- seq( 30, (30 + (p$nage-1) * 2 ), by=2 )
@@ -181,7 +187,7 @@ GothVP <- function(p, a, theta, perm, thetaP, permP, FC, FM){
   EUP = rep( 0, length(a) ) 
   for ( i in 1:p$neps ){
     for ( j in 1:p$nbin ){
-      mtp = p$R*a + perm[j] + theta[i]  # money next period
+      mtp = p$R*a + perm[j] * theta[i]  # money next period
       EUP = EUP + uP( Cnextp(mtp,FC[j,],FM[j,]),p$rho )*thetaP[i]*permP[j]       
     }
   }
