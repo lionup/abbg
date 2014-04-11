@@ -46,7 +46,7 @@ p$n = 50
 p$R       = 1.06             #(* Gross interest rate *)
 p$beta    = 0.93             #(* Discount factor *)
 p$rho     = 2                #(* Coefficient of Relative Risk Aversion *)
-p$nsim  = 99999     # Number of people to simulate
+p$nsim  = 1000     # Number of people to simulate
 
 
 start_time = proc.time()[3]  
@@ -79,7 +79,19 @@ mm <- cbind( mm, data.frame(ct3q = apply(ctList, 1, quantile, 0.75)) )
 mm <- cbind( mm, data.frame(mt3q = apply(mtList, 1, quantile, 0.75)) )
 mm <- cbind( mm, data.frame(yt3q = apply(ytList, 1, quantile, 0.75)) )
 
-detach(moments)
+#income <- t(ytList)
+#consumption <- t(ctList)
+#saving     <- t(stList)
+#eta <- t(etaList)
+#eps <- t(epsList)
+#require(data.table)
+#sim_data <- data.table(id=1:p$nsim, age=rep(age,each=1000),
+#            income=c(income),consumption=c(consumption),
+#            saving=c(saving),eta=c(eta),eps=c(eps))
+#simdata <-data.matrix(sim_data)
+#save(simdata,file='simdata.dat')
+#writeMat('simdata.mat',simdata=simdata)
+#detach(moments)
 
 mmic <- data.frame( age=age, value = mm$yt1q, moment = 'income', quantile='1st' )
 mmic <- rbind(mmic, data.frame( age=age, value = mm$ytMedian, 
