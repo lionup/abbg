@@ -1,3 +1,16 @@
+econdCDF <- function(p, wprob) {
+  QcondCDF <- wprob
+  for (i in 1:p$ne){
+    for (j in 2:p$ne){
+      QcondCDF[i,j] <- QcondCDF[i,j-1] + QcondCDF[i,j]
+    }
+  }
+  # Force QcondCDF[,p$nw] = 1 numerically
+  #QcondCDF <- QcondCDF / QcondCDF[,p$nw]   
+  return(QcondCDF)
+}
+
+
 
 # integrate x  by log normal
 F  <- function(x, Sigma) {
