@@ -16,12 +16,12 @@ econdCDF <- function(ne, wprob) {
   return(QcondCDF)
 }
 
-comp.eta.sim <- function(p, N){
+comp.eta.sim <- function(p, N, age){
   res <- with(p,{  
     # Number of individuals
     #N=999999
     #N=1000
-    aa_ref=30
+    aa_ref=age
     #V_draw <- runif(N)  
     Vgrid<- (1:N) / (1+N)
     V_draw <- array(0, dim = c(nage,N))
