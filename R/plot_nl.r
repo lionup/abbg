@@ -67,4 +67,43 @@ setwd('~/git/abbg/R')
 
 
 
+##data for stephane
+load('even.dat')
+age = seq(p$age_min, p$age_max, 2)
+attach(moments)
+income <- t(ytList)
+consumption <- t(ctList)
+saving     <- t(stList)
+eta <- t(etaList)
+eps <- t(epsList)
+detach(moments)
+require(data.table)
+sim_data <- data.table(id=1:p$nsim, age=rep(age,each=p$nsim),
+            income=c(income),consumption=c(consumption),
+            saving=c(saving),eta=c(eta),eps=c(eps))
+setkey(sim_data,id)
+sub_id <- sample(1:p$nsim,500)
+sim_sub <- sim_data[J(sub_id)]
+rand_age <- sample(seq(30,54,2),500,replace=T)
 
+load('odd.dat')
+age = seq(p$age_min, p$age_max, 2)
+attach(moments)
+income <- t(ytList)
+consumption <- t(ctList)
+saving     <- t(stList)
+eta <- t(etaList)
+eps <- t(epsList)
+detach(moments)
+sim_data2 <- data.table(id=(p$nsim+1):(2*p$nsim), age=rep(age,each=p$nsim),
+            income=c(income),consumption=c(consumption),
+            saving=c(saving),eta=c(eta),eps=c(eps))
+
+sim <- rbind(sim_data,sim_data2)
+setkey(sim,id,age)
+sub_id <- sample(1:(2*p$nsim),1000)
+sim_sub <- sim[J(sub_id)]
+
+#simdata <-data.matrix(sim_data)
+#save(simdata,file='simdata.dat')
+#writeMat('simdata.mat',simdata=simdata)

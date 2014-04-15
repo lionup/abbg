@@ -79,7 +79,11 @@ comp.eta.sim <- function(p, N){
       }
     }
 
-    save(Mateta_true, file='Mateta.dat')
+    if(age_min==30){ 
+      save(Mateta_true, file='Mateta_even.dat')
+    }else{
+      save(Mateta_true, file='Mateta_odd.dat')
+    }  
     Mateta_true
   }) 
   return(res)
@@ -90,7 +94,11 @@ comp.eta.prob <- function(p, N){
 
     # get the simulations of workers
     #Mateta_true <- comp.eta.sim(p,N)
-    load('Mateta.dat')
+    if(age_min==30){ 
+      load('Mateta_even.dat')
+    }else{
+      load('Mateta_odd.dat')
+    }  
 
     # Quantiles of eta and epsilon, by age
     xeta <- array( 0, dim=c(nage+ntr, nbin) )  #23 bin
@@ -102,7 +110,7 @@ comp.eta.prob <- function(p, N){
       xeta[i,] <- quantile( Mateta_true[i,], veta, names=F, na.rm = T )[oddnode]
     }  
 
-    for( i in (nage+1):ntr ){
+    for( i in (nage+1):(nage+ntr) ){
       xeta[i,] <- xeta[nage,]
     }  
 
@@ -121,7 +129,7 @@ comp.eta.prob <- function(p, N){
       etaprob[t+1,,] <- trans.matrix( wide[[x1]], wide[[x2]] )
     }    
 
-    for( t in (nage+1):ntr ){
+    for( t in (nage+1):(nage+ntr) ){
       etaprob[t,,] <- diag(nbin)
     }  
 
@@ -189,11 +197,11 @@ uP <- function(c,Rho){
 }
 
 # Gothic V prime function
-GothVP <- function(p, a, theta, perm, thetaP, permP, FC, FM){
+GothVP <- function(p, a, inc, theta, perm, thetaP, permP, FC, FM){
   EUP = rep( 0, length(a) ) 
   for ( i in 1:p$neps ){
     for ( j in 1:p$nbin ){
-      mtp = p$R*a + perm[j] * theta[i]  # money next period
+      mtp = p$R*a + inc * perm[j] * theta[i]  # money next period
       EUP = EUP + uP( Cnextp(mtp,FC[j,],FM[j,]),p$rho )*thetaP[i]*permP[j]       
     }
   }

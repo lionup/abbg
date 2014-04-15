@@ -5,7 +5,7 @@ require(ggplot2)
 
 setwd('~/git/abbg/R')
 source('fun.model_solver_nl_sim.r')
-set.seed(123)
+set.seed(77)
 
 # SETTIG PARAMETERS
 p <- list()
@@ -36,9 +36,9 @@ p$stdY       = stdY
 
 detach(data)
 #age
-p$age_min = 30
-p$age_re  = 66 #income drop almost half
-p$age_max = 80
+p$age_min = 31
+p$age_re  = p$age_min+36 #income drop almost half
+p$age_max = p$age_min+50
 p$nage  = (p$age_re - p$age_min)/2   #periods before retirement
 p$ntr   = (p$age_max - p$age_re)/2 + 1  #periods after retirement
 
@@ -58,8 +58,9 @@ p$beta    = 0.93             #(* Discount factor *)
 p$rho     = 2                #(* Coefficient of Relative Risk Aversion *)
 
 #sim
-p$nsim  = 1000     # Number of people to simulate
+p$nsim  = 10000     # Number of people to simulate
 
+set.seed(77)
 
 start_time = proc.time()[3]  
 model  <- comp.solveModel(p)
@@ -69,7 +70,7 @@ start_time = proc.time()[3]
 moments <- comp.moments(p, model) 
 cat(paste('\ntotal seconds to compute moments' , proc.time()[3] -  start_time ))
 
-age = seq(30, (30+(p$nage-1)*2), 2)
+age = seq(p$age_min, p$age_max, 2)
 mm <- data.frame( age=age)
 
 attach(moments)
@@ -91,19 +92,7 @@ mm <- cbind( mm, data.frame(ct3q = apply(ctList, 1, quantile, 0.75)) )
 mm <- cbind( mm, data.frame(mt3q = apply(mtList, 1, quantile, 0.75)) )
 mm <- cbind( mm, data.frame(yt3q = apply(ytList, 1, quantile, 0.75)) )
 
-#income <- t(ytList)
-#consumption <- t(ctList)
-#saving     <- t(stList)
-#eta <- t(etaList)
-#eps <- t(epsList)
-#require(data.table)
-#sim_data <- data.table(id=1:p$nsim, age=rep(age,each=1000),
-#            income=c(income),consumption=c(consumption),
-#            saving=c(saving),eta=c(eta),eps=c(eps))
-#simdata <-data.matrix(sim_data)
-#save(simdata,file='simdata.dat')
-#writeMat('simdata.mat',simdata=simdata)
-#detach(moments)
+detach(moments)
 
 mmic <- data.frame( age=age, value = mm$yt1q, moment = 'income', quantile='1st' )
 mmic <- rbind(mmic, data.frame( age=age, value = mm$ytMedian, 
