@@ -35,17 +35,29 @@ p$meanY      = meanY
 p$stdY       = stdY
 
 detach(data)
+#age
+p$age_min = 30
+p$age_re  = 66 #income drop almost half
+p$age_max = 80
+p$nage  = (p$age_re - p$age_min)/2   #periods before retirement
+p$ntr   = (p$age_max - p$age_re)/2 + 1  #periods after retirement
 
-p$nage  = (64-30)/2 + 1
+#income node
 p$nbin  = 23
 p$neps  = 23
+
+#asset
 p$aMin  = 1e-6            #(* Lower bound for GothicAVec *)
 p$aMax  = 30            #(* Maximum point in GothicAVec *)
 p$aHuge = 9000 
 p$n = 50  
+
+#utility
 p$R       = 1.06             #(* Gross interest rate *)
 p$beta    = 0.93             #(* Discount factor *)
 p$rho     = 2                #(* Coefficient of Relative Risk Aversion *)
+
+#sim
 p$nsim  = 1000     # Number of people to simulate
 
 

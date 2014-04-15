@@ -6,17 +6,28 @@ comp.solveModel <- function(p) {
 		#eta: xeta, etaprob, etacontot, etauntot
 		#eta <- comp.eta.prob(p,999999)
 		#with( eta, save(ieta, xeta, etaprob, etacontot, etauntot, file='eta.dat') )
+		#load eta before retirement
 		load('eta.dat')
 		
 		#eps: grid and distri 
 		epsprob = rep(1/neps,neps)
 		xeps = comp.eps(p, neps)	
-		ieps = exp(xeps) 
+		ieps = exp(xeps)
+		#eps after retirement
+		ieps = rbind( ieps,matrix(1,nrow=ntr, ncol=neps) )
+
+		## Profile of income level 
+		Incomec = c(1.0304073e+001,1.0343448e+001,1.0382479e+001,1.0421080e+001,1.0459171e+001,1.0496674e+001,1.0533513e+001,1.0569617e+001,1.0604917e+001,1.0639347e+001,1.0672845e+001,1.0705351e+001,1.0736808e+001,1.0767163e+001,1.0796365e+001,1.0824368e+001,1.0851126e+001,1.0876600e+001,1.0900750e+001,1.0923542e+001,1.0944944e+001,1.0964928e+001,1.0983466e+001,1.1000538e+001,1.1016122e+001,1.1030203e+001,1.1042768e+001,1.1053805e+001,1.1063308e+001,1.1071273e+001,1.1077697e+001,1.1082585e+001,1.1085939e+001,1.1087769e+001,1.1088086e+001,1.1086903e+001,1.1084239e+001,1.1080114e+001,1.1074551e+001,1.1067577e+001,1.1059222e+001,1.0369837e+001,1.0369227e+001,1.0368617e+001,1.0368007e+001,1.0367397e+001,1.0366786e+001,1.0366176e+001,1.0365566e+001,1.0364956e+001,1.0364345e+001,1.0363735e+001,1.0363125e+001,1.0362515e+001,1.0361904e+001,1.0361294e+001,1.0360684e+001,1.0360074e+001,1.0359463e+001,1.0358853e+001,1.0358243e+001,1.0357633e+001,1.0357023e+001,1.0356412e+001,1.0355802e+001,1.0355192e+001)
+		incpro = data.table(age=25:90,income=Incomec)
+		incpro = subset(incpro,age >= age_min & age <= age_max)
+		incpro[,IncomeLevelc := exp(income)]
+		# Income growth factors
+		Glist = with(incpro, { IncomeLevelc[-1]/IncomeLevelc[-length(IncomeLevelc)] })
 
 		#not being able to borrow more than can repay for sure 
 		#this is the lower bound of asset at the end of the period
- 		mininc <- rep(0, nage) # in the last period, end asset is 0
-		for(t in (nage-1):1){
+ 		mininc <- rep(0, nage+ntr) # in the last period, end asset is 0
+		for(t in (nage+ntr-1):1){
 	    mininc[t] = ( mininc[t+1] + ieta[t+1,1] * ieps[t+1,1] ) / R 
 		}	
 

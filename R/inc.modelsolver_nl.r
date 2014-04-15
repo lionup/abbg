@@ -16,12 +16,10 @@ econdCDF <- function(ne, wprob) {
   return(QcondCDF)
 }
 
-comp.eta.sim <- function(p, N, age){
+comp.eta.sim <- function(p, N){
   res <- with(p,{  
-    # Number of individuals
-    #N=999999
-    #N=1000
-    aa_ref=age
+
+    aa_ref=age_min
     #V_draw <- runif(N)  
     Vgrid<- (1:N) / (1+N)
     V_draw <- array(0, dim = c(nage,N))
@@ -95,14 +93,18 @@ comp.eta.prob <- function(p, N){
     load('Mateta.dat')
 
     # Quantiles of eta and epsilon, by age
-    xeta <- array( 0, dim=c(nage, nbin) )  #23 bin
+    xeta <- array( 0, dim=c(nage+ntr, nbin) )  #23 bin
     veta <- seq(1/(2*nbin), (2*nbin-1)/(2*nbin), l=(2*nbin-1)) #45 nodes
     oddnode <- seq(1,(2*nbin-1),2)  #income node is the even node
-    age = seq(30, (30+(nage-1)*2), 2)
+    age = seq(age_min, age_re-2, 2)
 
     for (i in 1:nage){
       xeta[i,] <- quantile( Mateta_true[i,], veta, names=F, na.rm = T )[oddnode]
-    }    
+    }  
+
+    for( i in (nage+1):ntr ){
+      xeta[i,] <- xeta[nage,]
+    }  
 
     long <- data.table( pid = 1:N, age=rep(age, each=N), income = c(t(Mateta_true)) )
     setkey(long, pid, age)
@@ -110,7 +112,7 @@ comp.eta.prob <- function(p, N){
     long$income <- NULL
     wide <- reshape(long, idvar='pid', timevar='age', direction='wide')
 
-    etaprob <- array( 0,dim=c(nage, nbin, nbin) )
+    etaprob <- array( 0,dim=c(nage+ntr, nbin, nbin) )
     etaprob[1,,] <- 1/nbin
 
     for (t in 1:(nage-1)){
@@ -119,8 +121,12 @@ comp.eta.prob <- function(p, N){
       etaprob[t+1,,] <- trans.matrix( wide[[x1]], wide[[x2]] )
     }    
 
+    for( t in (nage+1):ntr ){
+      etaprob[t,,] <- diag(nbin)
+    }  
+
     etacontot <- etaprob
-    for (i in 1:nage) {
+    for ( i in 1:(nage+ntr) ) {
       etacontot[i,,] <- econdCDF( nbin, etaprob[i,,] )
     }  
 
