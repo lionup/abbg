@@ -69,7 +69,9 @@ setwd('~/git/abbg/R')
 
 ##data for stephane
 load('even.dat')
-age = seq(p$age_min, p$age_max, 2)
+age_full = seq(p$age_min, p$age_max, 2)
+last_age = p$age_re - 2*6
+age_nore = seq(p$age_min, last_age, 2)
 attach(moments)
 income <- t(ytList)
 consumption <- t(ctList)
@@ -78,16 +80,26 @@ eta <- t(etaList)
 eps <- t(epsList)
 detach(moments)
 require(data.table)
-sim_data <- data.table(id=1:p$nsim, age=rep(age,each=p$nsim),
+sim_data <- data.table(id=1:p$nsim, age=rep(age_full,each=p$nsim),
             income=c(income),consumption=c(consumption),
             saving=c(saving),eta=c(eta),eps=c(eps))
 setkey(sim_data,id)
-sub_id <- sample(1:p$nsim,500)
-sim_sub <- sim_data[J(sub_id)]
-rand_age <- sample(seq(30,54,2),500,replace=T)
 
+#for each age, randomly pick 40 people
+sub_id <- array( sample(1:p$nsim, length(age_nore)*40), 
+  dim=c(length(age_nore),40) )
+
+sim <- data.table()
+for( t in 1:length(age_nore) ){
+  sim_sub <- sim_data[J(sub_id[t,])]
+  sim_sub <- subset(sim_sub, age>=age_nore[t] & age<=age_nore[t]+10)
+  sim <- rbind(sim,sim_sub)
+}
+#######################################
 load('odd.dat')
-age = seq(p$age_min, p$age_max, 2)
+age_full = seq(p$age_min, p$age_max, 2)
+last_age = p$age_re - 2*6
+age_nore = seq(p$age_min, last_age, 2)
 attach(moments)
 income <- t(ytList)
 consumption <- t(ctList)
@@ -95,15 +107,23 @@ saving     <- t(stList)
 eta <- t(etaList)
 eps <- t(epsList)
 detach(moments)
-sim_data2 <- data.table(id=(p$nsim+1):(2*p$nsim), age=rep(age,each=p$nsim),
+sim_data2 <- data.table(id=(p$nsim+1):(2*p$nsim), age=rep(age_full,each=p$nsim),
             income=c(income),consumption=c(consumption),
             saving=c(saving),eta=c(eta),eps=c(eps))
+setkey(sim_data2,id)
 
-sim <- rbind(sim_data,sim_data2)
+#for each age, randomly pick 40 people
+sub_id <- array( sample((p$nsim+1):(2*p$nsim), length(age_nore)*40), 
+  dim=c(length(age_nore),40) )
+
+for( t in 1:length(age_nore) ){
+  sim_sub <- sim_data2[J(sub_id[t,])]
+  sim_sub <- subset(sim_sub, age>=age_nore[t] & age<=age_nore[t]+10)
+  sim <- rbind(sim,sim_sub)
+}
 setkey(sim,id,age)
-sub_id <- sample(1:(2*p$nsim),1000)
-sim_sub <- sim[J(sub_id)]
 
-#simdata <-data.matrix(sim_data)
-#save(simdata,file='simdata.dat')
-#writeMat('simdata.mat',simdata=simdata)
+simdata <-data.matrix(sim)
+save(simdata,file='simdata.dat')
+require(R.matlab)
+writeMat('simdata.mat',simdata=simdata)
