@@ -65,7 +65,15 @@ ggsave('asset.png',width=10.6, height=12)
 
 setwd('~/git/abbg/R')
 
-
+p_inc <- ggplot(incpro,aes(x=age,y=norminc))+
+  geom_line()+
+  xlab('age') +
+  ylab('value')+
+#  labs(colour = NULL) +
+  ggtitle('deterministic income profile') +
+  theme_bw()
+p_inc
+ggsave('dinc.png',width=10.6, height=5.93)   
 
 ##data for stephane
 load('even.dat')

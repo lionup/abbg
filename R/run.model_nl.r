@@ -5,7 +5,6 @@ require(ggplot2)
 
 setwd('~/git/abbg/R')
 source('fun.model_solver_nl_sim.r')
-set.seed(77)
 
 # SETTIG PARAMETERS
 p <- list()
@@ -36,7 +35,7 @@ p$stdY       = stdY
 
 detach(data)
 #age
-p$age_min = 31
+p$age_min = 30
 p$age_re  = p$age_min+36 #income drop almost half
 p$age_max = p$age_min+50
 p$nage  = (p$age_re - p$age_min)/2   #periods before retirement
@@ -61,7 +60,6 @@ p$rho     = 2                #(* Coefficient of Relative Risk Aversion *)
 p$nsim  = 10000     # Number of people to simulate
 
 set.seed(77)
-
 start_time = proc.time()[3]  
 model  <- comp.solveModel(p)
 cat(paste('\ntotal seconds to compute Cons rule: ' , proc.time()[3] -  start_time ))
@@ -111,4 +109,4 @@ mma <- rbind(mma, data.frame( age=age, asset = mm$stMedian, quantile='Median') )
 mma <- rbind(mma, data.frame( age=age, asset = mm$st3q, quantile='3rd') )
 
 
-save(model, moments,mm,file='1e5.dat')
+#save(model, moments,mm,file='1e5.dat')
