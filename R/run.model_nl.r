@@ -36,7 +36,7 @@ p$stdY       = stdY
 detach(data)
 #age
 p$age_min = 30
-p$age_re  = p$age_min+36 #income drop almost half
+p$age_re  = p$age_min+36 #first period income drop almost half
 p$age_max = p$age_min+50
 p$nage  = (p$age_re - p$age_min)/2   #periods before retirement
 p$ntr   = (p$age_max - p$age_re)/2 + 1  #periods after retirement

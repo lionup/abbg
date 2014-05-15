@@ -1,3 +1,7 @@
+#Initial permanent component: sig2eta1 =  0.1507
+#Permanent shock sig2v =   0.0218
+#Transitory shock: sig2eps =   0.0910
+
 rm(list = ls())
 setwd('~/git/abbg/R')
 source('fun.model_solver_sim.r')

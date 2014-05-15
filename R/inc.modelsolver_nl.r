@@ -46,12 +46,13 @@ comp.eta.sim <- function(p, N){
     Mateta_true[1,]=Mateta_true[1,]+( (1/(b1true_e0)*log(V_draw[1,]/Vectau[1]))*(V_draw[1,]<=Vectau[1]) - 
       (1/bLtrue_e0*log((1-V_draw[1,])/(1-Vectau[Ntau])))*(V_draw[1,]>Vectau[Ntau]))
 
-    for (jj in 1:nage){
+    for (jj in 1:nage){  #periods before retirement
         
-      aa=aa_ref+(jj-1)*2
+      aa=aa_ref+(jj-1)*2 #age last period
        
       # Eta       
-      if (jj <= nage-1){ #this period is jj+1
+      if (jj <= nage-1){ #already have eta at period 1, need eta for the rest nage-1 period
+                         #this period is jj+1
           
         Mat = array( 0, dim=c(N, (K1+1)*(K2+1)) )
         for (kk1 in 0:K1){
@@ -103,25 +104,25 @@ comp.eta.prob <- function(p, N){
     # Quantiles of eta and epsilon, by age
     xeta <- array( 0, dim=c(nage+ntr, nbin) )  #23 bin
     veta <- seq(1/(2*nbin), (2*nbin-1)/(2*nbin), l=(2*nbin-1)) #45 nodes
-    oddnode <- seq(1,(2*nbin-1),2)  #income node is the even node
+    oddnode <- seq(1,(2*nbin-1),2)  #income node is the median in each interval, odd node
     age = seq(age_min, age_re-2, 2)
 
-    for (i in 1:nage){
+    for (i in 1:nage){ #periods before retirement
       xeta[i,] <- quantile( Mateta_true[i,], veta, names=F, na.rm = T )[oddnode]
     }  
 
-    for( i in (nage+1):(nage+ntr) ){
+    for( i in (nage+1):(nage+ntr) ){ #periods after retirement
       xeta[i,] <- xeta[nage,]
     }  
 
     long <- data.table( pid = 1:N, age=rep(age, each=N), income = c(t(Mateta_true)) )
     setkey(long, pid, age)
-    long[, q:=as.numeric(cut_number(income, n = nbin)), age]
+    long[, q:=as.numeric(cut_number(income, n = nbin)), age] #give a bin # for each person each age
     long$income <- NULL
-    wide <- reshape(long, idvar='pid', timevar='age', direction='wide')
+    wide <- reshape(long, idvar='pid', timevar='age', direction='wide') #each person has all age in a row
 
     etaprob <- array( 0,dim=c(nage+ntr, nbin, nbin) )
-    etaprob[1,,] <- 1/nbin
+    etaprob[1,,] <- 1/nbin  #first period, same prob
 
     for (t in 1:(nage-1)){
       x1 <- paste('q',age[t],sep='.')
