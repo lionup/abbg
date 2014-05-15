@@ -143,7 +143,7 @@ comp.moments<- function(p, model) {
 		    etaList[t,i] <- xeta[t,enode[t,i]]
 
 		    # get income
-				ytList[t,i] =  inc[t] * exp(etaList[t,i] + epsList[t,i])
+				ytList[t,i] =  inc[t] * exp( etaList[t,i] + epsList[t,i] )
 
 				if(t==1){
 			  	# Construct initial asset

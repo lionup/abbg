@@ -1,6 +1,46 @@
 setwd('figure')
 require(ggplot2)   
 
+age = seq(p$age_min, p$age_max, 2)
+mm <- data.frame( age=age)
+
+attach(moments)
+#median
+mm <- cbind( mm, data.frame(stMedian = apply(stList, 1, median)) )
+mm <- cbind( mm, data.frame(ctMedian = apply(ctList, 1, median)) )
+mm <- cbind( mm, data.frame(mtMedian = apply(mtList, 1, median)) )
+mm <- cbind( mm, data.frame(ytMedian = apply(ytList, 1, median)) )
+
+#1st quantile
+mm <- cbind( mm, data.frame(st1q = apply(stList, 1, quantile, 0.25)) )
+mm <- cbind( mm, data.frame(ct1q = apply(ctList, 1, quantile, 0.25)) )
+mm <- cbind( mm, data.frame(mt1q = apply(mtList, 1, quantile, 0.25)) )
+mm <- cbind( mm, data.frame(yt1q = apply(ytList, 1, quantile, 0.25)) )
+
+#3st quantil
+mm <- cbind( mm, data.frame(st3q = apply(stList, 1, quantile, 0.75)) )
+mm <- cbind( mm, data.frame(ct3q = apply(ctList, 1, quantile, 0.75)) )
+mm <- cbind( mm, data.frame(mt3q = apply(mtList, 1, quantile, 0.75)) )
+mm <- cbind( mm, data.frame(yt3q = apply(ytList, 1, quantile, 0.75)) )
+
+detach(moments)
+
+mmic <- data.frame( age=age, value = mm$yt1q, moment = 'income', quantile='1st' )
+mmic <- rbind(mmic, data.frame( age=age, value = mm$ytMedian, 
+  moment = 'income', quantile='Median') )
+mmic <- rbind(mmic, data.frame( age=age, value = mm$yt3q, 
+  moment = 'income', quantile='3rd') )
+mmic <- rbind(mmic, data.frame( age=age, value = mm$ct1q, 
+  moment = 'consumption', quantile='1st') )
+mmic <- rbind(mmic, data.frame( age=age, value = mm$ctMedian, 
+  moment = 'consumption', quantile='Median') )
+mmic <- rbind(mmic, data.frame( age=age, value = mm$ct3q, 
+  moment = 'consumption', quantile='3rd') )
+
+mma <- data.frame( age=age, asset = mm$st1q, quantile='1st') 
+mma <- rbind(mma, data.frame( age=age, asset = mm$stMedian, quantile='Median') )
+mma <- rbind(mma, data.frame( age=age, asset = mm$st3q, quantile='3rd') )
+
 p_50  <- ggplot(mm, aes(x=age,y=stMedian)) + 
   geom_line(aes(color='asset')) +
   geom_line(aes(y=ctMedian, color='consumption')) +
@@ -75,63 +115,3 @@ p_inc <- ggplot(incpro,aes(x=age,y=norminc))+
 p_inc
 ggsave('dinc.png',width=10.6, height=5.93)   
 
-##data for stephane
-load('even.dat')
-age_full = seq(p$age_min, p$age_max, 2)
-last_age = p$age_re - 2*6
-age_nore = seq(p$age_min, last_age, 2)
-attach(moments)
-income <- t(ytList)
-consumption <- t(ctList)
-saving     <- t(stList)
-eta <- t(etaList)
-eps <- t(epsList)
-detach(moments)
-require(data.table)
-sim_data <- data.table(id=1:p$nsim, age=rep(age_full,each=p$nsim),
-            income=c(income),consumption=c(consumption),
-            saving=c(saving),eta=c(eta),eps=c(eps))
-setkey(sim_data,id)
-
-#for each age, randomly pick 40 people
-sub_id <- array( sample(1:p$nsim, length(age_nore)*40), 
-  dim=c(length(age_nore),40) )
-
-sim <- data.table()
-for( t in 1:length(age_nore) ){
-  sim_sub <- sim_data[J(sub_id[t,])]
-  sim_sub <- subset(sim_sub, age>=age_nore[t] & age<=age_nore[t]+10)
-  sim <- rbind(sim,sim_sub)
-}
-#######################################
-load('odd.dat')
-age_full = seq(p$age_min, p$age_max, 2)
-last_age = p$age_re - 2*6
-age_nore = seq(p$age_min, last_age, 2)
-attach(moments)
-income <- t(ytList)
-consumption <- t(ctList)
-saving     <- t(stList)
-eta <- t(etaList)
-eps <- t(epsList)
-detach(moments)
-sim_data2 <- data.table(id=(p$nsim+1):(2*p$nsim), age=rep(age_full,each=p$nsim),
-            income=c(income),consumption=c(consumption),
-            saving=c(saving),eta=c(eta),eps=c(eps))
-setkey(sim_data2,id)
-
-#for each age, randomly pick 40 people
-sub_id <- array( sample((p$nsim+1):(2*p$nsim), length(age_nore)*40), 
-  dim=c(length(age_nore),40) )
-
-for( t in 1:length(age_nore) ){
-  sim_sub <- sim_data2[J(sub_id[t,])]
-  sim_sub <- subset(sim_sub, age>=age_nore[t] & age<=age_nore[t]+10)
-  sim <- rbind(sim,sim_sub)
-}
-setkey(sim,id,age)
-
-simdata <-data.matrix(sim)
-save(simdata,file='simdata.dat')
-require(R.matlab)
-writeMat('simdata.mat',simdata=simdata)
