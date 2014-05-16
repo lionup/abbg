@@ -75,7 +75,8 @@ if(p$age_min==30){
 } 
 
 source('fun.sim.data.r')
-simdata <- sim.origin.sample(p)
+sim <- sim.origin.sample(p)
+#simdata <-data.matrix(sim)
 #save(simdata,file='simdata.dat')
 #require(R.matlab)
 #writeMat('simdata.mat',simdata=simdata)
