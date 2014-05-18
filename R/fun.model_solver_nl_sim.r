@@ -4,12 +4,12 @@ comp.solveModel <- function(p) {
 	res <- with(p,{
 		
 		#eta: xeta, etaprob, etacontot, etauntot
-		#eta <- comp.eta.prob(p,999999)
+		eta <- comp.eta.prob(p)
 		if(age_min==30){
-			#with( eta, save(ieta, xeta, etaprob, etacontot, etauntot, file='eta_even.dat') )
+			with( eta, save(ieta, xeta, etaprob, etacontot, etauntot, file='eta_even.dat') )
 			load('eta_even.dat')
 		}else{
-			#with( eta, save(ieta, xeta, etaprob, etacontot, etauntot, file='eta_odd.dat') )
+			with( eta, save(ieta, xeta, etaprob, etacontot, etauntot, file='eta_odd.dat') )
 			load('eta_odd.dat')
 		}	
 

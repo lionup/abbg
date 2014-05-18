@@ -16,7 +16,7 @@ econdCDF <- function(ne, wprob) {
   return(QcondCDF)
 }
 
-comp.eta.sim <- function(p, N){
+comp.eta.sim <- function(p){
   res <- with(p,{  
 
     aa_ref=age_min
@@ -90,11 +90,11 @@ comp.eta.sim <- function(p, N){
   return(res)
 }
 
-comp.eta.prob <- function(p, N){
+comp.eta.prob <- function(p){
   res <- with(p,{ 
 
     # get the simulations of workers
-    #Mateta_true <- comp.eta.sim(p,N)
+    #Mateta_true <- comp.eta.sim(p)
     if(age_min==30){ 
       load('Mateta_even.dat')
     }else{
@@ -102,8 +102,8 @@ comp.eta.prob <- function(p, N){
     }  
 
     # Quantiles of eta and epsilon, by age
-    xeta <- array( 0, dim=c(nage+ntr, nbin) )  #23 bin
-    veta <- seq(1/(2*nbin), (2*nbin-1)/(2*nbin), l=(2*nbin-1)) #45 nodes
+    xeta <- array( 0, dim=c(nage+ntr, nbin) )  #bins
+    veta <- seq(1/(2*nbin), (2*nbin-1)/(2*nbin), l=(2*nbin-1)) #bins and its median
     oddnode <- seq(1,(2*nbin-1),2)  #income node is the median in each interval, odd node
     age = seq(age_min, age_re-2, 2)
 
@@ -166,7 +166,7 @@ comp.eps <- function(p, ntra){
   #VecTaue <- (1:ntra) / (1+ntra) #get the quantile of interpolation node
 
   # generate the age vector 
-  xt  <- seq( 30, (30 + (p$nage-1) * 2 ), by=2 )
+  xt  <- seq( p$age_min, (p$age_min + (p$nage-1) * 2 ), by=2 )
   xtL <- ( xt - data$meanAGE ) / data$stdAGE #standardize AGE
 
   # Create MatAGE which is the hermite of AGE

@@ -32,6 +32,7 @@ p$Vectau     = Vectau
 p$Ntau       = Ntau
 p$meanY      = meanY
 p$stdY       = stdY
+p$T          = T
 
 detach(data)
 #age
@@ -42,7 +43,7 @@ p$nage  = (p$age_re - p$age_min)/2   #periods before retirement
 p$ntr   = (p$age_max - p$age_re)/2 + 1  #periods after retirement
 
 #income node
-p$nbin  = 23
+p$nbin  = 100
 p$neps  = 23
 
 #asset
@@ -57,7 +58,8 @@ p$beta    = 0.93             #(* Discount factor *)
 p$rho     = 2                #(* Coefficient of Relative Risk Aversion *)
 
 #sim
-p$nsim  = 10000     # Number of people to simulate
+p$nsim  = 9750     # Number of people to simulate
+p$N     = 999999
 
 set.seed(77)
 start_time = proc.time()[3]  
@@ -75,8 +77,10 @@ if(p$age_min==30){
 } 
 
 source('fun.sim.data.r')
-sim <- sim.origin.sample(p)
+sim <- sim.origin.sample()
 #simdata <-data.matrix(sim)
 #save(simdata,file='simdata.dat')
 #require(R.matlab)
 #writeMat('simdata.mat',simdata=simdata)
+
+persis <- sim.persis(p,sim)
