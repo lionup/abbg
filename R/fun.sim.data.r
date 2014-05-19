@@ -49,7 +49,10 @@ sim.origin.sample <- function(){
   return(sim)
 }
 
+
+#################################################
 #plot persistent 
+###################################################
 sim.persis <- function(p, sim){
 
   sim$t <-1:p$T
@@ -94,7 +97,7 @@ sim.persis <- function(p, sim){
 
   # Drawing the graph 
   require(plot3D)
-  png('figure/persis_y_50.png',width=10.6, height=5.93, units='in', res=300)
+  png('figure/persis_y_100_nsim1300.png',width=10.6, height=5.93, units='in', res=300)
   persp3D(x=c(p$Vectau),y=c(p$Vectau),z=persis, 
     xlab='percentile initial', ylab='percentile shock', zlab='persistence', 
     ticktype = "detailed")

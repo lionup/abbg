@@ -36,7 +36,7 @@ p$T          = T
 
 detach(data)
 #age
-p$age_min = 30
+p$age_min = 31
 p$age_re  = p$age_min+36 #first period income drop almost half
 p$age_max = p$age_min+50
 p$nage  = (p$age_re - p$age_min)/2   #periods before retirement
@@ -78,9 +78,19 @@ if(p$age_min==30){
 
 source('fun.sim.data.r')
 sim <- sim.origin.sample()
-#simdata <-data.matrix(sim)
-#save(simdata,file='simdata.dat')
-#require(R.matlab)
-#writeMat('simdata.mat',simdata=simdata)
+#log consumption
+sim[,lcon:=log(consumption)] 
+#age category
+sim[,cage:=as.factor(age) ]
+#simc <- sim[,c("id","cage","lcon","consumption"),with=F]
+#create age dummy
+sim[,lconage:=lm(lcon~cage)$residuals]
+#simdum2 <- lm(lcon~cage-1,simc)$residuals
+#simdum3 <- lm(consumption~cage-1,simc)$residuals
+
+simdata <-data.matrix(sim)
+save(simdata,file='simdata.dat')
+require(R.matlab)
+writeMat('simdata.mat',simdata=simdata)
 
 persis <- sim.persis(p,sim)

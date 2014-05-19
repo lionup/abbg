@@ -4,12 +4,12 @@ comp.solveModel <- function(p) {
 	res <- with(p,{
 		
 		#eta: xeta, etaprob, etacontot, etauntot
-		eta <- comp.eta.prob(p)
+		#eta <- comp.eta.prob(p)
 		if(age_min==30){
-			with( eta, save(ieta, xeta, etaprob, etacontot, etauntot, file='eta_even.dat') )
+			#with( eta, save(ieta, xeta, etaprob, mineta, maxeta, etacontot, etauntot, file='eta_even.dat') )
 			load('eta_even.dat')
 		}else{
-			with( eta, save(ieta, xeta, etaprob, etacontot, etauntot, file='eta_odd.dat') )
+			#with( eta, save(ieta, xeta, etaprob, mineta, maxeta, etacontot, etauntot, file='eta_odd.dat') )
 			load('eta_odd.dat')
 		}	
 
@@ -60,8 +60,8 @@ comp.solveModel <- function(p) {
 				# get the distri of eta next period etaprob[l+1,e,]
 				#get eps next period ieps[l+1,]
 				#get the distri of eps next period	epsprob
-				Vap    = GothVP(p, AlphaVec1, inc[l+1], ieps[l+1,], ieta[l+1,], 
-					epsprob, etaprob[l+1,e,], C[l+1,,], M[l+1,,] )   # Gothic Va prime
+				Vap    = GothVP(p, l+1, AlphaVec1, inc[l+1], ieps[l+1,], ieta[l+1,], 
+					epsprob, etaprob[l+1,e,], C[l+1,,], M[l+1,,], mineta[l+1,e], maxeta[l+1,e] )   # Gothic Va prime
 				ChiVec = (R * beta * Vap)^(-1/rho) # inverse Euler equation
 	 			MuVec  = AlphaVec1+ChiVec
 	  		M[l,e,]  = c(-mininc[l], MuVec)    # Matrix of interpolation data

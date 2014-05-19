@@ -121,18 +121,40 @@ comp.eta.prob <- function(p){
     long$income <- NULL
     wide <- reshape(long, idvar='pid', timevar='age', direction='wide') #each person has all age in a row
 
-    etaprob <- array( 0,dim=c(nage+ntr, nbin, nbin) )
+    etaprob <- array( 0,dim=c(nage+ntr, nbin, nbin) ) #last period to this period
     etaprob[1,,] <- 1/nbin  #first period, same prob
 
-    for (t in 1:(nage-1)){
-      x1 <- paste('q',age[t],sep='.')
-      x2 <- paste('q',age[t]+2,sep='.')
-      etaprob[t+1,,] <- trans.matrix( wide[[x1]], wide[[x2]] )
-    }    
+    for (t in 2:nage){ #today
+      x1 <- paste('q',age[t-1],sep='.')
+      x2 <- paste('q',age[t],sep='.')
+      etaprob[t,,] <- trans.matrix( wide[[x1]], wide[[x2]] ) #today
+    }  
 
     for( t in (nage+1):(nage+ntr) ){
       etaprob[t,,] <- diag(nbin)
     }  
+
+    mineta <- array( 0, dim=c(nage+ntr, nbin) ) 
+    maxeta <- array( nbin+1, dim=c(nage+ntr, nbin) )
+    for ( t in 2:(nage+ntr) ){ #today
+      for(w in 1:nbin){   #for yesterday
+        for(ww in 1:nbin){ #for today
+          if (etaprob[t,w,ww] > 0) {
+            break
+          }else{
+            mineta[t,w] = ww
+          }
+        }   
+
+        for(ww in nbin:1){ #for today
+          if (etaprob[t,w,ww] > 0) {
+            break
+          }else{
+            maxeta[t,w] = ww
+          }
+        }   
+      } 
+    }    
 
     etacontot <- etaprob
     for ( i in 1:(nage+ntr) ) {
@@ -150,6 +172,8 @@ comp.eta.prob <- function(p){
     xeta      = xeta,
     ieta      = ieta,
     etaprob   = etaprob,
+    mineta    = mineta,
+    maxeta    = maxeta, 
     etacontot = etacontot,
     etauntot  = etauntot)
   
@@ -198,14 +222,19 @@ uP <- function(c,Rho){
 }
 
 # Gothic V prime function
-GothVP <- function(p, a, inc, theta, perm, thetaP, permP, FC, FM){
+GothVP <- function(p, t, a, inc, theta, perm, thetaP, permP, FC, FM, minperm, maxperm){
   EUP = rep( 0, length(a) ) 
-  for ( i in 1:p$neps ){
-    for ( j in 1:p$nbin ){
-      mtp = p$R*a + inc * perm[j] * theta[i]  # money next period
-      EUP = EUP + uP( Cnextp(mtp,FC[j,],FM[j,]),p$rho )*thetaP[i]*permP[j]       
+  for ( j in (minperm+1):(maxperm-1) ){
+    if (t>p$nage){  #retired no income shock   
+      mtp = p$R*a + inc * perm[j]  # money next period
+      EUP = EUP + uP( Cnextp(mtp,FC[j,],FM[j,]),p$rho )* permP[j]       
+    }else{
+      for ( i in 1:p$neps ){
+        mtp = p$R*a + inc * perm[j] * theta[i]  # money next period
+        EUP = EUP + uP( Cnextp(mtp,FC[j,],FM[j,]),p$rho )*thetaP[i]*permP[j]       
+      }
     }
-  }
+  }  
   return(EUP)
 }
 
