@@ -10,21 +10,21 @@ econdCDF <- function(p, wprob) {
   return(QcondCDF)
 }
 
-
-
 # integrate x  by log normal
-F  <- function(x, Sigma) {
-	x * dlnorm(x,-1/2*(Sigma)^2,Sigma)
+F  <- function(x, level, Sigma) {
+	x * dlnorm(x,level,Sigma)
 }	
 
-DiscreteApproxToMeanOneLogNormal <- function(std,numofshockpoints){
-  LevelAdjustingParameter = -(1/2)*(std)^2
+DiscreteApproxToMeanOneLogNormal <- function(var,numofshockpoints){
+  std = sqrt(var)
+  LevelAdjustingParameter = -(1/2)*var
   ListOfEdgePoints = qlnorm( (0:numofshockpoints)/numofshockpoints,LevelAdjustingParameter,std )
-  ListOfEdgePoints[numofshockpoints+1]=100
+  ListOfEdgePoints[numofshockpoints+1]=100  #change the last point from INF to a big value
 
   shocklist  = rep(0,numofshockpoints)
   for (i in 1:numofshockpoints){
-    shocklist[i] = integrate(F,ListOfEdgePoints[i],ListOfEdgePoints[i+1],std)$value * numofshockpoints
+    #intergration over two points and divide by the prob to get the mid point
+    shocklist[i] = integrate(F,ListOfEdgePoints[i],ListOfEdgePoints[i+1],LevelAdjustingParameter,std)$value * numofshockpoints 
   }
   return(shocklist)
 }

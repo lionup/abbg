@@ -97,7 +97,7 @@ sim.persis <- function(p, sim){
 
   # Drawing the graph 
   require(plot3D)
-  png('figure/persis_y_100_nsim1300.png',width=10.6, height=5.93, units='in', res=300)
+  png('figure/persis_y.png',width=10.6, height=5.93, units='in', res=300)
   persp3D(x=c(p$Vectau),y=c(p$Vectau),z=persis, 
     xlab='percentile initial', ylab='percentile shock', zlab='persistence', 
     ticktype = "detailed")

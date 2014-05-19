@@ -36,9 +36,15 @@ comp.solveModel <- function(p) {
 
 		#not being able to borrow more than can repay for sure 
 		#this is the lower bound of asset at the end of the period
- 		mininc <- rep(0, nage+ntr) # in the last period, end asset is 0
+ 		mininc <- array(0, dim=c(nage+ntr,nbin)) # in the last period, end asset is 0
 		for(t in (nage+ntr-1):1){
-	    mininc[t] = ( mininc[t+1]+inc[t+1]*ieta[t+1,1]*ieps[t+1,1] ) / R 
+			for ( e in 1:nbin){
+				if(t>=nage){
+					mininc[t,e] = ( mininc[t+1,e]+inc[t+1]*ieta[t+1,e]*ieps[t+1,1] ) / R 
+	    	}else{
+	    		mininc[t,e] = ( mininc[t+1,e]+inc[t+1]*ieta[t+1,1]*ieps[t+1,1] ) / R 
+				}
+			}
 		}	
 
 		#asset grid
@@ -53,7 +59,7 @@ comp.solveModel <- function(p) {
 		for ( l in ((nage+ntr)-1):1 ){	
 			for ( e in 1:nbin){
 				# end asset grid this period
-				AlphaVec1 = AlphaVec - mininc[l]
+				AlphaVec1 = AlphaVec - mininc[l,e]
 
 				# eta this period ieta[l,e]
 				# get eta next period ieta[l+1,]
