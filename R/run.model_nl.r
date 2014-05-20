@@ -76,17 +76,18 @@ if(p$age_min==30){
   save(model, moments,p,file='odd.dat') 
 } 
 
-source('fun.sim.data.r')
-sim <- sim.origin.sample()
-sim[,lc:=log(consumption)]  #log consumption
-sim[,cage:=as.factor(age) ] #create age dummy
-sim[,lcr:=lm(lc~cage)$residuals]
-sim$cage <- NULL
-simdata <-data.matrix(sim)
-save(simdata,file='simdata.dat')
-require(R.matlab)
-writeMat('simdata.mat',simdata=simdata)
+
+#source('fun.sim.data.r')
+#sim <- sim.origin.sample()
+#sim[,lc:=log(consumption)]  #log consumption
+#sim[,cage:=as.factor(age) ] #create age dummy
+#sim[,lcr:=lm(lc~cage)$residuals]
+#sim$cage <- NULL
+#simdata <-data.matrix(sim)
+#save(simdata,file='simdata.dat')
+#require(R.matlab)
+#writeMat('simdata.mat',simdata=simdata)
 #require(plyr)
 #ddply(sim, ~age,summarise,meanc=mean(lconage),meany=mean(Y))
 
-persis <- sim.persis(p,sim)
+#persis <- sim.persis(p,sim)

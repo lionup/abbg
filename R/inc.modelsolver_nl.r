@@ -134,7 +134,7 @@ comp.eta.prob <- function(p){
       etaprob[t,,] <- diag(nbin)
     }  
 
-    mineta <- array( 0, dim=c(nage+ntr, nbin) ) 
+    mineta <- array( 0, dim=c(nage+ntr, nbin) ) #this period and last eta
     maxeta <- array( nbin+1, dim=c(nage+ntr, nbin) )
     for ( t in 2:(nage+ntr) ){ #today
       for(w in 1:nbin){   #for yesterday
@@ -225,7 +225,7 @@ uP <- function(c,Rho){
 GothVP <- function(p, t, a, inc, theta, perm, thetaP, permP, FC, FM, minperm, maxperm){
   EUP = rep( 0, length(a) ) 
   for ( j in (minperm+1):(maxperm-1) ){
-    if (t>p$nage){  #retired no income shock   
+    if (t>p$nage){  #next period retired no income shock   
       mtp = p$R*a + inc * perm[j]  # money next period
       EUP = EUP + uP( Cnextp(mtp,FC[j,],FM[j,]),p$rho )* permP[j]       
     }else{

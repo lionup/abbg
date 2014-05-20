@@ -39,11 +39,8 @@ comp.solveModel <- function(p) {
  		mininc <- array(0, dim=c(nage+ntr,nbin)) # in the last period, end asset is 0
 		for(t in (nage+ntr-1):1){
 			for ( e in 1:nbin){
-				if(t>=nage){
-					mininc[t,e] = ( mininc[t+1,e]+inc[t+1]*ieta[t+1,e]*ieps[t+1,1] ) / R 
-	    	}else{
-	    		mininc[t,e] = ( mininc[t+1,e]+inc[t+1]*ieta[t+1,1]*ieps[t+1,1] ) / R 
-				}
+				minetanum <- mineta[t+1,e]+1
+				mininc[t,e] = ( mininc[t+1,minetanum]+inc[t+1]*ieta[t+1,minetanum]*ieps[t+1,1] ) / R 
 			}
 		}	
 
@@ -70,7 +67,7 @@ comp.solveModel <- function(p) {
 					epsprob, etaprob[l+1,e,], C[l+1,,], M[l+1,,], mineta[l+1,e], maxeta[l+1,e] )   # Gothic Va prime
 				ChiVec = (R * beta * Vap)^(-1/rho) # inverse Euler equation
 	 			MuVec  = AlphaVec1+ChiVec
-	  		M[l,e,]  = c(-mininc[l], MuVec)    # Matrix of interpolation data
+	  		M[l,e,]  = c(-mininc[l,e], MuVec)    # Matrix of interpolation data
 	  		C[l,e,]  = c(0,ChiVec)          # Matrix of interpolation data
 			}
 		}
