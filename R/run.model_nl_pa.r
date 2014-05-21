@@ -53,38 +53,42 @@ p$rho     = 2                #(* Coefficient of Relative Risk Aversion *)
 
 #sim
 p$nsim  = 999     # Number of people to simulate
-p$N     = 999999
+p$N     = 999# 999999
 
 #age
 p$ntr   = 8  #periods after retirement
-for (ai in 30:55){
-  p$age_min = ai
-  if(p$age_min %% 2 == 0){
-    p$age_re  = 66 #first period income drop 
-    p$age_max = 80
-  }else{
-    p$age_re  = 67 #first period income drop 
-    p$age_max = 81
-  }
-  p$nage  = (p$age_re - p$age_min)/2   #periods before retirement
 
-  set.seed(77)
-  #start_time = proc.time()[3]  
-  #model  <- comp.solveModel(p)
-  #cat(paste('\ntotal seconds to compute Cons rule: ' , proc.time()[3] -  start_time ))
+require(snow)  
+cl <- makeCluster(type='MPI')
 
-  #start_time = proc.time()[3]  
-  #moments <- comp.moments(p, model) 
-  #cat(paste('\ntotal seconds to compute moments' , proc.time()[3] -  start_time ))
-
-  start_time = proc.time()[3]  
-  etaeps  <- comp.income(p)
-  cat(paste('\ntotal seconds to compute income: ' , proc.time()[3] -  start_time ))
-
-  savename <- paste('cohort',p$age_min,'.dat',sep='')
-  save(etaeps,p,file=savename)  
-
+p$age_min = 35
+if(p$age_min %% 2 == 0){
+  p$age_re  = 66 #first period income drop 
+  p$age_max = 80
+}else{
+  p$age_re  = 67 #first period income drop 
+  p$age_max = 81
 }
+p$nage  = (p$age_re - p$age_min)/2   #periods before retirement
+
+
+
+set.seed(77)
+#start_time = proc.time()[3]  
+#model  <- comp.solveModel(p)
+#cat(paste('\ntotal seconds to compute Cons rule: ' , proc.time()[3] -  start_time ))
+
+#start_time = proc.time()[3]  
+#moments <- comp.moments(p, model) 
+#cat(paste('\ntotal seconds to compute moments' , proc.time()[3] -  start_time ))
+
+start_time = proc.time()[3]  
+etaeps  <- comp.income(p)
+cat(paste('\ntotal seconds to compute income: ' , proc.time()[3] -  start_time ))
+
+savename <- paste('cohort',p$age_min,'.dat',sep='')
+save(etaeps,p,file=savename)  
+
 #source('fun.sim.data.r')
 #sim <- sim.small.sample(p$age_min)
 

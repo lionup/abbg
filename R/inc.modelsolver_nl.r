@@ -80,11 +80,9 @@ comp.eta.sim <- function(p){
       }
     }
 
-    if(age_min==30){ 
-      save(Mateta_true, file='Mateta_even.dat')
-    }else{
-      save(Mateta_true, file='Mateta_odd.dat')
-    }  
+    save_Mateta_name <- paste('Mateta',age_min,'.dat',sep='')
+    save(Mateta_true, file=save_Mateta_name)
+    
     Mateta_true
   }) 
   return(res)
@@ -94,12 +92,9 @@ comp.eta.prob <- function(p){
   res <- with(p,{ 
 
     # get the simulations of workers
-    #Mateta_true <- comp.eta.sim(p)
-    if(age_min==30){ 
-      load('Mateta_even.dat')
-    }else{
-      load('Mateta_odd.dat')
-    }  
+    Mateta_true <- comp.eta.sim(p)
+    save_Mateta_name <- paste('Mateta',age_min,'.dat',sep='')
+    load(save_Mateta_name)
 
     # Quantiles of eta and epsilon, by age
     xeta <- array( 0, dim=c(nage+ntr, nbin) )  #bins

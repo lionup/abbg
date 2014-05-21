@@ -50,6 +50,35 @@ sim.origin.sample <- function(){
 }
 
 
+sim.small.sample <- function(iniage){
+  savename <- paste('cohort',iniage,'.dat',sep='')
+  load(savename)
+  age_full = seq(p$age_min, p$age_max, 2)
+  last_age = p$age_re - 2*p$T  #oldest cohort ini age
+  age_nore = seq(p$age_min, last_age, 2)
+
+  require(data.table)
+  sim_data <- with( etaeps, data.table(id=rep(1:p$nsim,each=p$nage+p$ntr), 
+    age=age_full, eta=c(etaList),eps=c(epsList)) )
+  sim_data[,Y:=eta+eps]
+  setkey(sim_data,id)
+
+  #for each age, randomly pick people
+  nsim_age <- trunc( p$nsim/length(age_nore) )
+  sub_id <- array( sample(1:p$nsim, nsim_age*length(age_nore)), 
+    dim=c(length(age_nore),nsim_age) )
+
+  sim <- data.table()
+  for( t in 1:length(age_nore) ){
+    sim_sub <- sim_data[J(sub_id[t,])]
+    sim_sub <- subset( sim_sub, age>=age_nore[t] & age<=age_nore[t]+2*c(p$T)-2 )
+    sim <- rbind(sim,sim_sub)
+  }
+  return(sim)
+}
+
+
+
 #################################################
 #plot persistent 
 ###################################################
@@ -97,9 +126,9 @@ sim.persis <- function(p, sim){
 
   # Drawing the graph 
   require(plot3D)
-  png('figure/persis_y.png',width=10.6, height=5.93, units='in', res=300)
+  #png('figure/persis_y.png',width=10.6, height=5.93, units='in', res=300)
   persp3D(x=c(p$Vectau),y=c(p$Vectau),z=persis, 
     xlab='percentile initial', ylab='percentile shock', zlab='persistence', 
     ticktype = "detailed")
-  dev.off() 
+  #dev.off() 
 }
