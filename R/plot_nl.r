@@ -115,3 +115,20 @@ p_inc <- ggplot(incpro,aes(x=age,y=norminc))+
 p_inc
 ggsave('dinc.png',width=10.6, height=5.93)   
 
+
+####plot xeta
+age = seq(p$age_min, p$age_max, 2)
+plot_xeta <- data.frame( age=age, value=xeta[,50], moment = 'node50' )
+plot_xeta <- rbind( plot_xeta, data.frame( age=age, value=xeta[,1], moment = 'node1') )
+plot_xeta <- rbind( plot_xeta, data.frame( age=age, value=xeta[,100], moment = 'node100') )
+plot_xeta <- rbind( plot_xeta, data.frame( age=age, value=rowMeans(xeta), moment = 'means') )
+
+p_xeta  <- ggplot(plot_xeta, aes(x=age,y=value)) + 
+  geom_line(aes(color=moment)) +
+  xlab('age') +
+  ylab('value')+
+  labs(colour = NULL) +
+#  ggtitle('life type profile of income and consumption') +
+  theme_bw()
+print(p_xeta)
+ggsave('xeta.png',width=10.6, height=12) 
