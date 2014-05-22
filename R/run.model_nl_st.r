@@ -47,6 +47,9 @@ p$N     = 999999
 p$firstiniage <- 30
 p$lastiniage <- 55
 
+require(snow)  
+cl <- makeCluster(type='MPI')
+
 #age
 #p$ntr   = 8  #periods after retirement
 for (ai in p$firstiniage:p$lastiniage){

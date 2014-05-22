@@ -1,7 +1,11 @@
 source('inc.modelsolver_nl_st.r')
 
-comp.income <- function(p){
-	res <- with(p,{
+comp.income <- function(iniage, p){
+
+	p$age_min = iniage
+	p$age_max = iniage+10
+	
+	etaeps <- with(p,{
 
 		eta <- comp.eta.prob(p)
 		save_eta_name <- paste('eta',age_min,'.dat',sep='')	
@@ -42,10 +46,28 @@ comp.income <- function(p){
 
 		model= list(
 		epsList    = epsList,
-		etaList    = etaList, 
-		enode      = enode )   
+		etaList    = etaList)   
 	}) 
 
-  return(res)
+	savename <- paste('cohort',p$age_min,'.dat',sep='')
+	save(etaeps,p,file=savename)  
 
+  return(etaeps)
+}
+
+runMPI <- function(p){
+
+	require(snow)  
+	cl <- makeCluster(26,type='MPI')
+	chainN = length(cl) 
+	cat('Number of Chains: ',chainN,'\n')
+	
+	ai = p$firstiniage:p$lastiniage
+
+	start_time = proc.time()[3] 
+	vals <- parLapply(cl,ai,comp.income,p)
+	cat(paste('\ntotal seconds to compute income: ' , proc.time()[3] -  start_time ))
+
+	stopCluster(cl)
+	return(vals)
 }
