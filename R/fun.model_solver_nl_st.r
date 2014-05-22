@@ -68,7 +68,8 @@ runMPI <- function(p){
 "econdCDF",
 "comp.eta.sim", 
 "comp.eta.prob", 
-"comp.eps"))
+"comp.eps",
+"hermite"))
 
 	start_time = proc.time()[3] 
 	vals <- parLapply(cl,ai,comp.income,p)

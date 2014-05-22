@@ -18,6 +18,9 @@ econdCDF <- function(ne, wprob) {
 
 comp.eta.sim <- function(p){
   res <- with(p,{  
+    require(EQL)
+require(data.table)
+require(ggplot2)
 
     aa_ref=age_min
     #V_draw <- runif(N)  
@@ -90,6 +93,9 @@ comp.eta.sim <- function(p){
 
 comp.eta.prob <- function(p){
   res <- with(p,{ 
+    require(EQL)
+require(data.table)
+require(ggplot2)
 
     # get the simulations of workers
     Mateta_true <- comp.eta.sim(p)
