@@ -43,10 +43,10 @@ p$neps  = 99
 
 #sim
 p$nsim  = 999     # Number of people to simulate
-p$N     = 999#999999
+p$N     = 999999
 
 p$firstiniage <- 30
-p$lastiniage <- 30 #55
+p$lastiniage <- 55
 p$nage  = 6
 
 #age
