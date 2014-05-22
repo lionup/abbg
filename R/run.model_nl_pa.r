@@ -39,7 +39,7 @@ detach(data)
 
 #income node
 p$nbin  = 100
-p$neps  = 99
+p$neps  = 199
 
 #sim
 p$nsim  = 999     # Number of people to simulate

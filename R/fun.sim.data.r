@@ -68,7 +68,7 @@ sim.small.sample <- function(p){
     setkey(sim_data,ID)
 
     #for each age, randomly pick people)
-    sub_id <- sample(1:p$nsim, 200)
+    sub_id <- sample(1:p$nsim, 300)
 
     sim_sub <- sim_data[J(sub_id)]
     #sim_sub <- sim_data
@@ -131,7 +131,7 @@ sim.persis <- function(p, sim){
 
   # Drawing the graph 
   require(plot3D)
-  png('figure/persis_y_large.png',width=10.6, height=5.93, units='in', res=300)
+  png('figure/persis_y_300.png',width=10.6, height=5.93, units='in', res=300)
   persp3D(x=c(p$Vectau),y=c(p$Vectau),z=persis, 
     xlab='percentile initial', ylab='percentile shock', zlab='persistence', 
     ticktype = "detailed")

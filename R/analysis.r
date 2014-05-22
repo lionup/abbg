@@ -1,7 +1,7 @@
 
 ssh uctprgu@hpc.econ.ucl.ac.uk
 
-scp uctprgu@hpc.econ.ucl.ac.uk:/data/uctprgu/git/abbg2/R/simlarge .
+scp uctprgu@hpc.econ.ucl.ac.uk:/data/uctprgu/git/abbg2/R/cohort* .
 
 scp US.dat uctprgu@hpc.econ.ucl.ac.uk:/data/uctprgu/git/lg2/Stata/result3/cmes2014/
 
