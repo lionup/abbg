@@ -3,7 +3,7 @@ require(EQL)
 require(data.table)
 require(ggplot2)
 
-setwd('~/git/abbg/R')
+#setwd('~/git/abbg/R')
 source('fun.model_solver_nl_st.r')
 set.seed(77)
 
