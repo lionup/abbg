@@ -38,7 +38,7 @@ p$T          = T
 detach(data)
 
 #income node
-p$nbin  = 100
+p$nbin  = 200
 p$neps  = 199
 
 #sim
