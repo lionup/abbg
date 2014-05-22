@@ -68,10 +68,10 @@ sim.small.sample <- function(p){
     setkey(sim_data,ID)
 
     #for each age, randomly pick people)
-    #sub_id <- sample(1:p$nsim, 200)
+    sub_id <- sample(1:p$nsim, 200)
 
-    #sim_sub <- sim_data[J(sub_id)]
-    sim_sub <- sim_data
+    sim_sub <- sim_data[J(sub_id)]
+    #sim_sub <- sim_data
     sim_sub[,id:=ai*1000+ID]
     sim_sub$ID=NULL
     setkey(sim_sub,id,age) 
