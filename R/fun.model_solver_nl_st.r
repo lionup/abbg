@@ -7,9 +7,9 @@ comp.income <- function(iniage, p){
 	
 	etaeps <- with(p,{
 
-		eta = comp.eta.prob(p)
+		#eta = comp.eta.prob(p)
 		save_eta_name <- paste('eta',age_min,'.dat',sep='')	
-		with( eta, save(ieta, xeta, etaprob, etacontot, etauntot, file=save_eta_name) )
+		#with( eta, save(ieta, xeta, etaprob, etacontot, etauntot, file=save_eta_name) )
 		load(save_eta_name)
 
 		epsList  = matrix(0, nrow=nage, ncol=nsim)
