@@ -38,15 +38,18 @@ detach(data)
 
 #income node
 p$nbin  = 100
-p$neps  = 23
+p$neps  = 99
 
 #sim
 p$nsim  = 999     # Number of people to simulate
 p$N     = 999999
 
+p$firstiniage <- 30
+p$lastiniage <- 55
+
 #age
 #p$ntr   = 8  #periods after retirement
-for (ai in 30:55){
+for (ai in p$firstiniage:p$lastiniage){
   p$age_min = ai
   p$age_max = ai+10
   p$nage  = 6
@@ -68,19 +71,29 @@ for (ai in 30:55){
   save(etaeps,p,file=savename)  
 
 }
-#source('fun.sim.data.r')
-#sim <- sim.small.sample(p$age_min)
 
+source('fun.sim.data.r')
+sim <- sim.small.sample(p)
+
+save(sim,file='sim.dat')
 #sim <- sim.origin.sample()
 #sim[,lc:=log(consumption)]  #log consumption
 #sim[,cage:=as.factor(age) ] #create age dummy
 #sim[,lcr:=lm(lc~cage)$residuals]
 #sim$cage <- NULL
+#require(plyr)
+#medeta <- ddply(sim, ~age,summarise,medeta=median(eta))
+
 #simdata <-data.matrix(sim)
 #save(simdata,file='simdata.dat')
 #require(R.matlab)
 #writeMat('simdata.mat',simdata=simdata)
-#require(plyr)
-#medeta <- ddply(sim, ~age,summarise,medeta=median(eta))
+
+#sim$t <-1:p$T
+#sim_y <- sim[,c("id","t","Y"),with=F]
+#wide_y <- reshape(sim_y, idvar='id', timevar='t', direction='wide') #each person has all age in a row
+#Y <-data.matrix(wide_y[,-1,with=F])
+#writeMat('Y.mat',Y=Y)
+
 
 #persis <- sim.persis(p,sim)

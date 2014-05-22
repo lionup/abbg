@@ -50,17 +50,36 @@ sim.origin.sample <- function(){
 }
 
 
-sim.small.sample <- function(iniage){
-  savename <- paste('cohort',iniage,'.dat',sep='')
-  load(savename)
-  age_full = seq(p$age_min, p$age_max, 2)
+sim.small.sample <- function(p){
+  sim <- data.table()
 
-  require(data.table)
-  sim_data <- with( etaeps, data.table(id=rep(1:p$nsim,each=p$nage), 
-    age=age_full, eta=c(etaList),eps=c(epsList)) )
-  sim_data[,Y:=eta+eps]
-  setkey(sim_data,id)
-  return(sim_data)
+  for (ai in p$firstiniage:p$lastiniage){
+    p$age_min = ai
+    p$age_max = ai+10
+    p$nage  = 6
+    age_full = seq(p$age_min, p$age_max, 2)
+
+    savename <- paste('cohort',p$age_min,'.dat',sep='')
+    load(savename)
+    
+    sim_data <- with( etaeps, data.table(ID=rep(1:p$nsim,each=p$nage), 
+      age=age_full, eta=c(etaList),eps=c(epsList)) )
+    sim_data[,Y:=eta+eps]
+    setkey(sim_data,ID)
+
+    #for each age, randomly pick people)
+    #sub_id <- sample(1:p$nsim, 200)
+
+    #sim_sub <- sim_data[J(sub_id)]
+    sim_sub <- sim_data
+    sim_sub[,id:=ai*1000+ID]
+    sim_sub$ID=NULL
+    setkey(sim_sub,id,age) 
+    sim <- rbind(sim,sim_sub)
+  }  
+
+  setkey(sim,id,age) 
+  return(sim)
 }
 
 
@@ -112,9 +131,11 @@ sim.persis <- function(p, sim){
 
   # Drawing the graph 
   require(plot3D)
-  #png('figure/persis_y.png',width=10.6, height=5.93, units='in', res=300)
+  png('figure/persis_y_35_large.png',width=10.6, height=5.93, units='in', res=300)
   persp3D(x=c(p$Vectau),y=c(p$Vectau),z=persis, 
     xlab='percentile initial', ylab='percentile shock', zlab='persistence', 
     ticktype = "detailed")
-  #dev.off() 
+  dev.off() 
+
+  return(persis)
 }
