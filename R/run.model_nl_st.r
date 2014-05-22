@@ -5,6 +5,7 @@ require(ggplot2)
 
 setwd('~/git/abbg/R')
 source('fun.model_solver_nl_st.r')
+set.seed(77)
 
 # SETTIG PARAMETERS
 p <- list()
@@ -42,37 +43,18 @@ p$neps  = 99
 
 #sim
 p$nsim  = 999     # Number of people to simulate
-p$N     = 999999
+p$N     = 999#999999
 
 p$firstiniage <- 30
-p$lastiniage <- 55
-
-require(snow)  
-cl <- makeCluster(type='MPI')
+p$lastiniage <- 30 #55
+p$nage  = 6
 
 #age
 #p$ntr   = 8  #periods after retirement
 for (ai in p$firstiniage:p$lastiniage){
-  p$age_min = ai
-  p$age_max = ai+10
-  p$nage  = 6
-
-  set.seed(77)
-  #start_time = proc.time()[3]  
-  #model  <- comp.solveModel(p)
-  #cat(paste('\ntotal seconds to compute Cons rule: ' , proc.time()[3] -  start_time ))
-
-  #start_time = proc.time()[3]  
-  #moments <- comp.moments(p, model) 
-  #cat(paste('\ntotal seconds to compute moments' , proc.time()[3] -  start_time ))
-
   start_time = proc.time()[3]  
-  etaeps  <- comp.income(p)
-  cat(paste('\ntotal seconds to compute income: ' , proc.time()[3] -  start_time ))
-
-  savename <- paste('cohort',p$age_min,'.dat',sep='')
-  save(etaeps,p,file=savename)  
-
+  etaeps  <- comp.income(ai,p)
+  cat(paste('\ntotal seconds to compute income: ' , proc.time()[3] -  start_time )) 
 }
 
 source('fun.sim.data.r')

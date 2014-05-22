@@ -7,7 +7,7 @@ comp.income <- function(iniage, p){
 	
 	etaeps <- with(p,{
 
-		eta <- comp.eta.prob(p)
+		eta = comp.eta.prob(p)
 		save_eta_name <- paste('eta',age_min,'.dat',sep='')	
 		with( eta, save(ieta, xeta, etaprob, etacontot, etauntot, file=save_eta_name) )
 		load(save_eta_name)
@@ -57,12 +57,12 @@ comp.income <- function(iniage, p){
 
 runMPI <- function(p){
 
+	ai = p$firstiniage:p$lastiniage
+
 	require(snow)  
-	cl <- makeCluster(26,type='MPI')
+	cl <- makeCluster(length(ai),type='MPI')
 	chainN = length(cl) 
 	cat('Number of Chains: ',chainN,'\n')
-	
-	ai = p$firstiniage:p$lastiniage
 
 	start_time = proc.time()[3] 
 	vals <- parLapply(cl,ai,comp.income,p)
