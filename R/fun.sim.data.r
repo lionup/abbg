@@ -129,12 +129,14 @@ sim.persis <- function(p, sim){
   # Matrix of persistence
   persis <- Mat3 %*% ResP_data
 
-  # Drawing the graph 
   require(plot3D)
-  png('figure/persis_y_300.png',width=10.6, height=5.93, units='in', res=300)
+  png('figure/persis_y_data.png',width=10.6, height=5.93, units='in', res=300)
+  
   persp3D(x=c(p$Vectau),y=c(p$Vectau),z=persis, 
     xlab='percentile initial', ylab='percentile shock', zlab='persistence', 
-    ticktype = "detailed")
+    ticktype = "detailed",theta=-60, phi=30)
+
+
   dev.off() 
 
   return(persis)
