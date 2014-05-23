@@ -24,6 +24,7 @@ comp.income <- function(iniage, p){
   epsdraws = comp.eps(p, p$nsim)
 	etasim <- (1:p$nsim) / (1+p$nsim)
 
+ 	cat('\n before loop')
 	#loop over life cycle
 	for (t in 1:p$nage) {  
 		# Sample randomly from eps grid to get current eps
@@ -31,6 +32,8 @@ comp.income <- function(iniage, p){
 
 		# generate random draw on unit interval for current eta
 		randeta[t,] = sample(etasim)
+
+		cat('\n before inner loop',t)
 
 		#loop for different individuals
 		for (i in 1:p$nsim){
@@ -44,6 +47,8 @@ comp.income <- function(iniage, p){
 	    etaList[t,i] <- xeta[t,enode[t,i]]
 	  } 
 	} 
+
+	cat('\n after loop')
 
 	model= list(epsList = epsList, etaList = etaList)   
 
