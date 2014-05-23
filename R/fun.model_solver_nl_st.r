@@ -61,12 +61,12 @@ runMPI <- function(p){
 		chainN = length(cl) 
 		cat('Number of Chains: ',chainN,'\n')
 
-		#	clusterExport(cl, list("trans.matrix", 
-		#	"econdCDF",
-		#	"comp.eta.sim", 
-		#	"comp.eta.prob", 
-		#	"comp.eps",
-		#	"hermite"))
+			clusterExport(cl, list("trans.matrix", 
+			"econdCDF",
+			"comp.eta.sim", 
+			"comp.eta.prob", 
+			"comp.eps",
+			"hermite"))
 
 		start_time = proc.time()[3] 
 		vals <- parSapply(cl,ai,comp.income,p)
