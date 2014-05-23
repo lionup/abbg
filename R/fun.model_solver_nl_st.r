@@ -9,7 +9,7 @@ comp.income <- function(iniage, p){
 	p$age_min = iniage
 	p$age_max = iniage+10
 
-	cat('\n start',iniage)
+	cat('\n start',iniage,file="help.txt",append=T)
 
 	#eta = comp.eta.prob(p)
 	save_eta_name <- paste('eta',p$age_min,'.dat',sep='')	
