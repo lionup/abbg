@@ -83,7 +83,7 @@ runMPI <- function(p){
 			"hermite"))
 
 		start_time = proc.time()[3] 
-		vals <- parSapply(cl,ai,comp.income,p)
+		vals <- parallel::parSapply(cl,ai,comp.income,p)
 		cat(paste('\ntotal seconds to compute cohort: ' , proc.time()[3] -  start_time ))
 		stopCluster(cl)
 
