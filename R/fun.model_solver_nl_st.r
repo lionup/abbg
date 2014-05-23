@@ -2,6 +2,10 @@ source('inc.modelsolver_nl_st.r')
 
 comp.income <- function(iniage, p){
 
+	require(EQL)
+	require(data.table)
+	require(ggplot2)
+
 	p$age_min = iniage
 	p$age_max = iniage+10
 
