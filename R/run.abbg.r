@@ -6,5 +6,5 @@ res <- runMPI(p)
 cat('\n',res,'\n')
 source('fun.sim.data.r')
 sim <- sim.small.sample(p)
-save(sim,file='sim_100_99.dat')
+save(sim,file='sim_200_399.dat')
 
