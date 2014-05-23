@@ -14,8 +14,6 @@ comp.income <- function(iniage, p){
 	#with( eta, save(ieta, xeta, etaprob, etacontot, etauntot, file=save_eta_name) )
 	load(save_eta_name)
 
-	cat('\n after load',iniage,file="help.txt",append=T)
-
 	epsList  = matrix(0, nrow=p$nage, ncol=p$nsim)
 	etaList  = epsList
 	randeta  = epsList
@@ -23,10 +21,13 @@ comp.income <- function(iniage, p){
  	
  	set.seed(77)
   # Construct grid for draw
-  epsdraws = comp.eps(p, p$nsim)
-	etasim <- (1:p$nsim) / (1+p$nsim)
 
+  cat('\n after load',iniage,file="help.txt",append=T)
+  epsdraws = comp.eps(p, p$nsim)
+  
  	cat('\n before loop',iniage,file="help.txt",append=T)
+
+	etasim <- (1:p$nsim) / (1+p$nsim)
 
 	#loop over life cycle
 	for (t in 1:p$nage) {  
