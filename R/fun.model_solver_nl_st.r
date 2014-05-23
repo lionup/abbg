@@ -11,9 +11,9 @@ comp.income <- function(iniage, p){
 
 	cat('\n start',iniage)
 
-	eta = comp.eta.prob(p)
+	#eta = comp.eta.prob(p)
 	save_eta_name <- paste('eta',p$age_min,'.dat',sep='')	
-	with( eta, save(ieta, xeta, etaprob, etacontot, etauntot, file=save_eta_name) )
+	#with( eta, save(ieta, xeta, etaprob, etacontot, etauntot, file=save_eta_name) )
 	load(save_eta_name)
 
 	cat('\n after save',iniage)
