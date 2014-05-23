@@ -9,14 +9,12 @@ comp.income <- function(iniage, p){
 	p$age_min = iniage
 	p$age_max = iniage+10
 
-	cat('\n start',iniage,file="help.txt",append=T)
-
 	#eta = comp.eta.prob(p)
 	save_eta_name <- paste('eta',p$age_min,'.dat',sep='')	
 	#with( eta, save(ieta, xeta, etaprob, etacontot, etauntot, file=save_eta_name) )
 	load(save_eta_name)
 
-	cat('\n after save',iniage)
+	cat('\n after load',iniage,file="help.txt",append=T)
 
 	epsList  = matrix(0, nrow=p$nage, ncol=p$nsim)
 	etaList  = epsList
@@ -28,7 +26,7 @@ comp.income <- function(iniage, p){
   epsdraws = comp.eps(p, p$nsim)
 	etasim <- (1:p$nsim) / (1+p$nsim)
 
- 	cat('\n before loop',iniage)
+ 	cat('\n before loop',iniage,file="help.txt",append=T)
 
 	#loop over life cycle
 	for (t in 1:p$nage) {  
@@ -38,7 +36,7 @@ comp.income <- function(iniage, p){
 		# generate random draw on unit interval for current eta
 		randeta[t,] = sample(etasim)
 
-		cat('\n before inner loop',t,iniage)
+		cat('\n before inner loop time',t,'age',iniage,file="help.txt",append=T)
 
 		#loop for different individuals
 		for (i in 1:p$nsim){
@@ -53,7 +51,7 @@ comp.income <- function(iniage, p){
 	  } 
 	} 
 
-	cat('\n after loop',iniage)
+	cat('\n after loop',iniage,file="help.txt",append=T)
 
 	model= list(epsList = epsList, etaList = etaList)   
 
@@ -83,7 +81,7 @@ runMPI <- function(p){
 			"hermite"))
 
 		start_time = proc.time()[3] 
-		vals <- parallel::parSapply(cl,ai,comp.income,p)
+		vals <- parSapply(cl,ai,comp.income,p)
 		cat(paste('\ntotal seconds to compute cohort: ' , proc.time()[3] -  start_time ))
 		stopCluster(cl)
 
