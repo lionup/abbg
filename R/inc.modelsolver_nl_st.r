@@ -142,15 +142,12 @@ comp.eta.prob <- function(p){
 
 comp.eps <- function(p, ntra){ 
   xeps <- array( 0, dim=c(p$nage, ntra) ) #income grid
-  VecTau  <- (1:p$Ntau)/(1+p$Ntau) #get the quantile of interpolation node
-  min <- 1/(1+p$neps)
-  max <- p$neps/(1+p$neps)
-  VecTaue <- seq(min, max, l=ntra)
+  VecTaue <- seq(1/(1+p$neps), p$neps/(1+p$neps), l=ntra)
   #VecTaue <- (1:ntra) / (1+ntra) #get the quantile of interpolation node
 
   # generate the age vector 
   xt  <- seq( p$age_min, (p$age_min + (p$nage-1) * 2 ), by=2 )
-  xtL <- ( xt - data$meanAGE ) / data$stdAGE #standardize AGE
+  xtL <- ( xt - p$meanAGE ) / p$stdAGE #standardize AGE
 
   # Create MatAGE which is the hermite of AGE
   MatAGE <- array( 0,dim=c(p$K4+1, p$nage) )
@@ -159,18 +156,18 @@ comp.eps <- function(p, ntra){
   }
 
   for (l in 1:p$nage){
-    xeps[l,] = ( t(MatAGE[,l]) %*% p$Resqtrue_eps[,1] )*( VecTaue <= VecTau[1] )
+    xeps[l,] = ( t(MatAGE[,l]) %*% p$Resqtrue_eps[,1] )*( VecTaue <= p$Vectau[1] )
     for (jtau in 2:p$Ntau){
         xeps[l,] = xeps[l,] + ( (t(MatAGE[,l]) %*% (p$Resqtrue_eps[,jtau] - p$Resqtrue_eps[,jtau-1])) / 
-          (VecTau[jtau] - VecTau[jtau-1]) * (VecTaue - VecTau[jtau-1]) + 
-          t(MatAGE[,l]) %*% p$Resqtrue_eps[,jtau-1] ) * (VecTaue > VecTau[jtau-1]) * (VecTaue <= VecTau[jtau])
+          (p$Vectau[jtau] - p$Vectau[jtau-1]) * (VecTaue - p$Vectau[jtau-1]) + 
+          t(MatAGE[,l]) %*% p$Resqtrue_eps[,jtau-1] ) * (VecTaue > p$Vectau[jtau-1]) * (VecTaue <= p$Vectau[jtau])
     }
     #Last quantile.
-    xeps[l,] = xeps[l,] + ( t(MatAGE[,l]) %*% p$Resqtrue_eps[,p$Ntau] )*( VecTaue > VecTau[p$Ntau] )
+    xeps[l,] = xeps[l,] + ( t(MatAGE[,l]) %*% p$Resqtrue_eps[,p$Ntau] )*( VecTaue > p$Vectau[p$Ntau] )
 
     # Laplace tails
-    xeps[l,] = xeps[l,] + ( (1 / p$b1true_eps * log(VecTaue / VecTau[1])) * (VecTaue <= VecTau[1]) ) - 
-      ( 1 / p$bLtrue_eps * log((1-VecTaue) / (1-VecTau[p$Ntau])) * (VecTaue > VecTau[p$Ntau]) )
+    xeps[l,] = xeps[l,] + ( (1 / p$b1true_eps * log(VecTaue / p$Vectau[1])) * (VecTaue <= p$Vectau[1]) ) - 
+      ( 1 / p$bLtrue_eps * log((1-VecTaue) / (1-p$Vectau[p$Ntau])) * (VecTaue > p$Vectau[p$Ntau]) )
   }   
   return(xeps)
 }
