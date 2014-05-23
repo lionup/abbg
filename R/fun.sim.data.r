@@ -62,7 +62,7 @@ sim.small.sample <- function(p){
     savename <- paste('cohort',p$age_min,'.dat',sep='')
     load(savename)
     
-    sim_data <- with( etaeps, data.table(ID=rep(1:p$nsim,each=p$nage), 
+    sim_data <- with( model, data.table(ID=rep(1:p$nsim,each=p$nage), 
       age=age_full, eta=c(etaList),eps=c(epsList)) )
     sim_data[,Y:=eta+eps]
     setkey(sim_data,ID)

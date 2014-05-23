@@ -22,11 +22,8 @@ comp.income <- function(iniage, p){
  	set.seed(77)
   # Construct grid for draw
 
-  cat('\n after load',iniage,file="help.txt",append=T)
+  #cat('\n after load',iniage,file="help.txt",append=T)
   epsdraws = comp.eps(p, p$nsim)
-  
- 	cat('\n before loop',iniage,file="help.txt",append=T)
-
 	etasim <- (1:p$nsim) / (1+p$nsim)
 
 	#loop over life cycle
@@ -36,8 +33,6 @@ comp.income <- function(iniage, p){
 
 		# generate random draw on unit interval for current eta
 		randeta[t,] = sample(etasim)
-
-		cat('\n before inner loop time',t,'age',iniage,file="help.txt",append=T)
 
 		#loop for different individuals
 		for (i in 1:p$nsim){
@@ -51,8 +46,6 @@ comp.income <- function(iniage, p){
 	    etaList[t,i] <- xeta[t,enode[t,i]]
 	  } 
 	} 
-
-	cat('\n after loop',iniage,file="help.txt",append=T)
 
 	model= list(epsList = epsList, etaList = etaList)   
 
@@ -74,12 +67,12 @@ runMPI <- function(p){
 		chainN = length(cl) 
 		cat('Number of Chains: ',chainN,'\n')
 
-			clusterExport(cl, list("trans.matrix", 
-			"econdCDF",
-			"comp.eta.sim", 
-			"comp.eta.prob", 
-			"comp.eps",
-			"hermite"))
+		clusterExport(cl, list("trans.matrix", 
+		"econdCDF",
+		"comp.eta.sim", 
+		"comp.eta.prob", 
+		"comp.eps",
+		"hermite"))
 
 		start_time = proc.time()[3] 
 		vals <- parSapply(cl,ai,comp.income,p)
