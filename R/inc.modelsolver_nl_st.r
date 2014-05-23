@@ -1,7 +1,7 @@
 trans.matrix <- function(x1, x2, prob=T){
-    tt <- table( x1, x2 )
-    if(prob) tt <- tt / rowSums(tt)
-    tt
+  tt <- table( x1, x2 )
+  if(prob) tt <- tt / rowSums(tt)
+  tt
 }
 
 econdCDF <- function(ne, wprob) {
@@ -17,137 +17,127 @@ econdCDF <- function(ne, wprob) {
 }
 
 comp.eta.sim <- function(p){
-  res <- with(p,{  
-    require(EQL)
-require(data.table)
-require(ggplot2)
 
-    aa_ref=age_min
-    #V_draw <- runif(N)  
-    Vgrid<- (1:N) / (1+N)
-    V_draw <- array(0, dim = c(nage,N))
+  aa_ref = p$age_min
+  #V_draw <- runif(N)  
+  Vgrid<- (1:p$N) / (1+p$N)
+  V_draw <- array(0, dim = c(p$nage,p$N))
 
-    for (i in 1:nage){
-      V_draw[i,] = sample(Vgrid)
-    }
+  for (i in 1:p$nage){
+    V_draw[i,] = sample(Vgrid)
+  }
 
-    MatAGE1 <- rep(0, K3+1)
-    for (kk3 in 0:K3){    
-      MatAGE1[kk3+1]=hermite( (aa_ref-meanAGE)/stdAGE, kk3 )
-    }
-    Mateta_true = array(0, dim = c(nage,N))
+  MatAGE1 <- rep(0, p$K3+1)
+  for (kk3 in 0:p$K3){    
+    MatAGE1[kk3+1]=hermite( (aa_ref-p$meanAGE)/p$stdAGE, kk3 )
+  }
+  Mateta_true = array(0, dim = c(p$nage,p$N))
 
-    Mateta_true[1,] = (MatAGE1 %*% Resqtrue_e0[,1]) * (V_draw[1,] <= Vectau[1])
-    for (jtau in 2:Ntau){
-      Mateta_true[1,] = Mateta_true[1,] + ( (MatAGE1 %*% 
-        (Resqtrue_e0[,jtau]-Resqtrue_e0[,jtau-1]))/(Vectau[jtau]-Vectau[jtau-1]) *
-        (V_draw[1,]-Vectau[jtau-1]) + MatAGE1 %*% Resqtrue_e0[,jtau-1] ) * 
-        (V_draw[1,]>Vectau[jtau-1]) * (V_draw[1,]<=Vectau[jtau])
-    }
-    Mateta_true[1,]=Mateta_true[1,]+(MatAGE1 %*% Resqtrue_e0[,Ntau])*(V_draw[1,] > Vectau[Ntau])
+  Mateta_true[1,] = (MatAGE1 %*% p$Resqtrue_e0[,1]) * (V_draw[1,] <= p$Vectau[1])
+  for (jtau in 2:p$Ntau){
+    Mateta_true[1,] = Mateta_true[1,] + ( (MatAGE1 %*% 
+      (p$Resqtrue_e0[,jtau]-p$Resqtrue_e0[,jtau-1]))/(p$Vectau[jtau]-p$Vectau[jtau-1]) *
+      (V_draw[1,]-p$Vectau[jtau-1]) + MatAGE1 %*% p$Resqtrue_e0[,jtau-1] ) * 
+      (V_draw[1,]>p$Vectau[jtau-1]) * (V_draw[1,]<=p$Vectau[jtau])
+  }
+  Mateta_true[1,] = Mateta_true[1,] +
+    (MatAGE1 %*% p$Resqtrue_e0[,p$Ntau])*(V_draw[1,] > p$Vectau[p$Ntau])
 
-    Mateta_true[1,]=Mateta_true[1,]+( (1/(b1true_e0)*log(V_draw[1,]/Vectau[1]))*(V_draw[1,]<=Vectau[1]) - 
-      (1/bLtrue_e0*log((1-V_draw[1,])/(1-Vectau[Ntau])))*(V_draw[1,]>Vectau[Ntau]))
+  Mateta_true[1,]=Mateta_true[1,]+( (1/p$b1true_e0*log(V_draw[1,]/p$Vectau[1]))*(V_draw[1,]<=p$Vectau[1]) - 
+    (1/p$bLtrue_e0*log((1-V_draw[1,])/(1-p$Vectau[p$Ntau]))) * (V_draw[1,]>p$Vectau[p$Ntau]))
 
-    for (jj in 1:nage){  #periods before retirement
+  for (jj in 1:p$nage){  #periods before retirement
+      
+    aa=aa_ref+(jj-1)*2 #age last period
+     
+    # Eta       
+    if (jj <= p$nage-1){ #already have eta at period 1, need eta for the rest nage-1 period
+                       #this period is jj+1
         
-      aa=aa_ref+(jj-1)*2 #age last period
-       
-      # Eta       
-      if (jj <= nage-1){ #already have eta at period 1, need eta for the rest nage-1 period
-                         #this period is jj+1
-          
-        Mat = array( 0, dim=c(N, (K1+1)*(K2+1)) )
-        for (kk1 in 0:K1){
-          for (kk2 in 0:K2) {
-            Mat[,kk1*(K2+1)+kk2+1] = hermite( (Mateta_true[jj,]-meanY)/stdY, kk1 ) * 
-              hermite( ((aa+2)-meanAGE)/stdAGE, kk2 )
-          }
+      Mat = array( 0, dim=c(p$N, (p$K1+1)*(p$K2+1)) )
+      for (kk1 in 0:p$K1){
+        for (kk2 in 0:p$K2) {
+          Mat[,kk1*(p$K2+1)+kk2+1] = hermite( (Mateta_true[jj,]-p$meanY)/p$stdY, kk1 ) * 
+            hermite( ((aa+2)-p$meanAGE)/p$stdAGE, kk2 )
         }
-          
-        #V_draw <- runif(N) 
-        #First quantile
-        Mateta_true[jj+1,] = ( Mat %*% Resqtrue[,1] ) * ( V_draw[jj+1,] <= Vectau[1] )
-
-        for (jtau in 2:Ntau){
-          Mateta_true[jj+1,] = Mateta_true[jj+1,] + 
-            ( (Mat %*% (Resqtrue[,jtau]-Resqtrue[,jtau-1])) / 
-            (Vectau[jtau]-Vectau[jtau-1]) *
-            (V_draw[jj+1,] - Vectau[jtau-1]) + Mat %*% Resqtrue[,jtau-1] ) * 
-            (V_draw[jj+1,] > Vectau[jtau-1]) * (V_draw[jj+1,] <= Vectau[jtau])
-        }
-        Mateta_true[jj+1,]=Mateta_true[jj+1,] + (Mat %*% Resqtrue[,Ntau]) * (V_draw[jj+1,]>Vectau[Ntau])
-
-        Mateta_true[jj+1,]=Mateta_true[jj+1,] + ( (1 / b1true * log(V_draw[jj+1,]/Vectau[1])) * (V_draw[jj+1,] <= Vectau[1]) - 
-            (1 / bLtrue * log((1-V_draw[jj+1,])/(1-Vectau[Ntau]))) * (V_draw[jj+1,] > Vectau[Ntau]) )
       }
-    }
+        
+      #V_draw <- runif(N) 
+      #First quantile
+      Mateta_true[jj+1,] = ( Mat %*% p$Resqtrue[,1] ) * ( V_draw[jj+1,] <= p$Vectau[1] )
 
-    save_Mateta_name <- paste('Mateta',age_min,'.dat',sep='')
-    save(Mateta_true, file=save_Mateta_name)
-    
-    Mateta_true
-  }) 
-  return(res)
+      for (jtau in 2:p$Ntau){
+        Mateta_true[jj+1,] = Mateta_true[jj+1,] + 
+          ( (Mat %*% (p$Resqtrue[,jtau]-p$Resqtrue[,jtau-1])) / 
+          (p$Vectau[jtau]-p$Vectau[jtau-1]) *
+          (V_draw[jj+1,] - p$Vectau[jtau-1]) + Mat %*% p$Resqtrue[,jtau-1] ) * 
+          (V_draw[jj+1,] > p$Vectau[jtau-1]) * (V_draw[jj+1,] <= p$Vectau[jtau])
+      }
+      Mateta_true[jj+1,]=Mateta_true[jj+1,] + (Mat %*% p$Resqtrue[,p$Ntau]) * (V_draw[jj+1,]>p$Vectau[p$Ntau])
+
+      Mateta_true[jj+1,]=Mateta_true[jj+1,] + ( (1 / p$b1true * log(V_draw[jj+1,]/p$Vectau[1])) * (V_draw[jj+1,] <= p$Vectau[1]) - 
+          (1 / p$bLtrue * log((1-V_draw[jj+1,])/(1-p$Vectau[p$Ntau]))) * (V_draw[jj+1,] > p$Vectau[p$Ntau]) )
+    }
+  }
+
+  save_Mateta_name <- paste('Mateta',aa_ref,'.dat',sep='')
+  save(Mateta_true, file=save_Mateta_name)
+
+  return(Mateta_true)
 }
 
 comp.eta.prob <- function(p){
-  res <- with(p,{ 
-    require(EQL)
-require(data.table)
-require(ggplot2)
 
-    # get the simulations of workers
-    Mateta_true <- comp.eta.sim(p)
-    save_Mateta_name <- paste('Mateta',age_min,'.dat',sep='')
-    load(save_Mateta_name)
+  # get the simulations of workers
+  Mateta_true <- comp.eta.sim(p)
+  save_Mateta_name <- paste('Mateta',p$age_min,'.dat',sep='')
+  load(save_Mateta_name)
 
-    # Quantiles of eta and epsilon, by age
-    xeta <- array( 0, dim=c(nage, nbin) )  #bins
-    veta <- seq(1/(2*nbin), (2*nbin-1)/(2*nbin), l=(2*nbin-1)) #bins and its median
-    oddnode <- seq(1,(2*nbin-1),2)  #income node is the median in each interval, odd node
-    age = seq(age_min, age_max, 2)
+  # Quantiles of eta and epsilon, by age
+  xeta <- array( 0, dim=c(p$nage, p$nbin) )  #bins
+  veta <- seq(1/(2*p$nbin), (2*p$nbin-1)/(2*p$nbin), l=(2*p$nbin-1)) #bins and its median
+  oddnode <- seq(1,(2*p$nbin-1),2)  #income node is the median in each interval, odd node
+  age = seq(p$age_min, p$age_max, 2)
 
-    for (i in 1:nage){ #periods before retirement
-      xeta[i,] <- quantile( Mateta_true[i,], veta, names=F, na.rm = T )[oddnode]
-    }  
+  for (i in 1:p$nage){ #periods before retirement
+    xeta[i,] <- quantile( Mateta_true[i,], veta, names=F, na.rm = T )[oddnode]
+  }  
 
-    long <- data.table( pid = 1:N, age=rep(age, each=N), income = c(t(Mateta_true)) )
-    setkey(long, pid, age)
-    long[, q:=as.numeric(cut_number(income, n = nbin)), age] #give a bin # for each person each age
-    long$income <- NULL
-    wide <- reshape(long, idvar='pid', timevar='age', direction='wide') #each person has all age in a row
+  long <- data.table( pid = 1:p$N, age=rep(age, each=p$N), income = c(t(Mateta_true)) )
+  setkey(long, pid, age)
+  long[, q:=as.numeric(cut_number(income, n = p$nbin)), age] #give a bin # for each person each age
+  long$income <- NULL
+  wide <- reshape(long, idvar='pid', timevar='age', direction='wide') #each person has all age in a row
 
-    etaprob <- array( 0,dim=c(nage, nbin, nbin) ) #last period to this period
-    etaprob[1,,] <- 1/nbin  #first period, same prob
+  etaprob <- array( 0,dim=c(p$nage, p$nbin, p$nbin) ) #last period to this period
+  etaprob[1,,] <- 1/p$nbin  #first period, same prob
 
-    for (t in 2:nage){ #today
-      x1 <- paste('q',age[t-1],sep='.')
-      x2 <- paste('q',age[t],sep='.')
-      etaprob[t,,] <- trans.matrix( wide[[x1]], wide[[x2]] ) #today
-    }     
+  for (t in 2:p$nage){ #today
+    x1 <- paste('q',age[t-1],sep='.')
+    x2 <- paste('q',age[t],sep='.')
+    etaprob[t,,] <- trans.matrix( wide[[x1]], wide[[x2]] ) #today
+  }     
 
-    etacontot <- etaprob
-    for ( i in 1:nage ) {
-      etacontot[i,,] <- econdCDF( nbin, etaprob[i,,] )
-    }  
+  etacontot <- etaprob
+  for ( i in 1:p$nage ) {
+    etacontot[i,,] <- econdCDF( p$nbin, etaprob[i,,] )
+  }  
 
-    etauntot <- etaprob[1,1,]
-    for(i in 2:nbin){
-      etauntot[i] <- etauntot[i-1]  + etauntot[i]  
-    }
-    
-    ieta = exp(xeta)
-
-    list(
-    xeta      = xeta,
-    ieta      = ieta,
-    etaprob   = etaprob,
-    etacontot = etacontot,
-    etauntot  = etauntot)
+  etauntot <- etaprob[1,1,]
+  for(i in 2:p$nbin){
+    etauntot[i] <- etauntot[i-1]  + etauntot[i]  
+  }
   
-  }) 
-  return(res)
+  ieta = exp(xeta)
+
+  eta = list(
+  xeta      = xeta,
+  ieta      = ieta,
+  etaprob   = etaprob,
+  etacontot = etacontot,
+  etauntot  = etauntot)
+  
+  return(eta)
 }
 
 comp.eps <- function(p, ntra){ 

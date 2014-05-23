@@ -1,4 +1,4 @@
-rm(list = ls())
+#rm(list = ls())
 require(EQL)
 require(data.table)
 require(ggplot2)
@@ -38,7 +38,7 @@ p$T          = T
 detach(data)
 
 #income node
-p$nbin  = 100
+p$nbin  = 200
 p$neps  = 199
 
 #sim
@@ -49,18 +49,12 @@ p$firstiniage <- 30
 p$lastiniage <- 55
 p$nage  = 6
 
-#age
-#p$ntr   = 8  #periods after retirement
-for (ai in p$firstiniage:p$lastiniage){
-  start_time = proc.time()[3]  
-  etaeps  <- comp.income(ai,p)
-  cat(paste('\ntotal seconds to compute income: ' , proc.time()[3] -  start_time )) 
-}
+p$mode = 'mpi'
+#p$mode = 'serial'
 
-source('fun.sim.data.r')
-sim <- sim.small.sample(p)
-
-save(sim,file='sim.dat')
+#source('fun.sim.data.r')
+#sim <- sim.small.sample(p)
+#save(sim,file='sim.dat')
 #sim <- sim.origin.sample()
 #sim[,lc:=log(consumption)]  #log consumption
 #sim[,cage:=as.factor(age) ] #create age dummy
@@ -69,16 +63,14 @@ save(sim,file='sim.dat')
 #require(plyr)
 #medeta <- ddply(sim, ~age,summarise,medeta=median(eta))
 
-simdata <-data.matrix(sim)
-save(simdata,file='simdata.dat')
-require(R.matlab)
-writeMat('simdata.mat',simdata=simdata)
+#simdata <-data.matrix(sim)
+#save(simdata,file='simdata.dat')
+#require(R.matlab)
+#writeMat('simdata.mat',simdata=simdata)
 
-sim$t <-1:p$T
-sim_y <- sim[,c("id","t","Y"),with=F]
-wide_y <- reshape(sim_y, idvar='id', timevar='t', direction='wide') #each person has all age in a row
-Y <-data.matrix(wide_y[,-1,with=F])
-writeMat('Y.mat',Y=Y)
-
-
+#sim$t <-1:p$T
+#sim_y <- sim[,c("id","t","Y"),with=F]
+#wide_y <- reshape(sim_y, idvar='id', timevar='t', direction='wide') #each person has all age in a row
+#Y <-data.matrix(wide_y[,-1,with=F])
+#writeMat('Y.mat',Y=Y)
 #persis <- sim.persis(p,sim)
