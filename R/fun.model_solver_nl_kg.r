@@ -128,16 +128,17 @@ comp.solveModel <- function(p) {
 		}
 	}		
 
-	res= list(
+	model= list(
 	  ygrid = ygrid,
 	  mgrid = mgrid,
 	  pgrid = pgrid,
+    agrid = agrid,
 	  Mret  = Mret,
 	  Cret  = Cret,  
     M    = M,
     C    = C) 
 
-  return(res)
+  return(model)
 }
 
 comp.moments<- function(p, model) {
@@ -145,6 +146,7 @@ comp.moments<- function(p, model) {
 	ygrid = model$ygrid
   mgrid = model$mgrid
   pgrid = model$pgrid
+  agrid = model$agrid
   Mret  = model$Mret
   Cret  = model$Cret 
   M = model$M
@@ -152,151 +154,98 @@ comp.moments<- function(p, model) {
 
 	save_eta_name <- paste('eta',p$age_min,'.dat',sep='')	
 	load(save_eta_name)
+  set.seed(77)
 
 	# declare variable 
-	epsList  = matrix(0, nrow=p$nage, ncol=p$nsim)
-	etaList  = epsList
-	ctList   = epsList
-	stList   = epsList
-	mtList   = epsList
-	ytList   = epsList
-	randeta  = epsList
-	enode    = epsList
- 	
- 	set.seed(77)
-  # Construct grid for trans draw
-  epsdraws = comp.eps(p, p$nsim)
-	etasim <- (1:p$nsim) / (1+p$nsim)
-
 	etasimI <- array( 0,dim=c(p$nsim,p$nage) )
   epssimI <- etasimI
-  ysim  	<- etasimI
+  etasim  <- etasimI
+  epssim  <- etasimI
   yavsim	<- etasimI
+  msimI   <- etasimI
+  msim    <- etasimI
+  ysim    <- array( 0,dim=c(p$nsim,p$nage+p$Tret) )
+  asim    <- ysim
+  xsim    <- ysim
+  csim    <- ysim
   #simulate to get distribution of average pre-tax incomes
   etasimI[,1] = sample(1:p$nbin,p$nsim,replace=T)
   epssimI[,1] = sample(1:p$neps,p$nsim,replace=T)
 
 	for (i in 1:p$nsim){
-		ysim[i,1] = ygrid[ 1,zsimI[i,1],esimI[i,1] ]
+    etasim[i,1] = xeta[ 1,etasimI[i,1] ]
+    epssim[i,1] = xeps[ 1,epssimI[i,1] ]
+		ysim[i,1] = ygrid[ 1,etasimI[i,1],epssimI[i,1] ]
 		yavsim[i,1]= ysim[i,1] 
 		im2 = FindLinProb1(yavsim[i,1],mgrid[1,])
+    msimI[i,1] = sample(c(im2[1],im2[1]+1),1,prob=im2[2:3])
+    msim[i,1] = mgrid[1,msimI[i,1]]
 	}
 
+  #initial assets
+  initwealthdist=read.table("old/Kaplan\ and\ Giovanni/Input/initwealthdist.txt")
+  itemp <- 1-sum(initwealthdist[11:75,2])
+  initwealthdist <- rbind(matrix(c(0,itemp),nrow=1),initwealthdist[11:75,])
+  rownames(initwealthdist) = 1:66
 
+  for(i in 1:p$nsim){
+    itemp = sample(1:66,1,prob=initwealthdist[,2])
+    asim[i,1] = initwealthdist[itemp,1]*ysim[i,1]
+    asim[i,1] = max(asim[i,1], agrid[1])
+  }
 
-	# Initial wy ratio and prob
-	InitialWYRatio     = c(.17, .5, .83) 
-	InitialWYRatioProb = c(.33333, .33333, .333334)   
-
-	# Construct wtIndicator (list of indicators for initial wealth)
-	stIndicator = rep(3, nsim)
-	randa <- runif(nsim)
-	stIndicator[randa < InitialWYRatioProb[1]] = 1
-	stIndicator[randa >= InitialWYRatioProb[1] & randa < (InitialWYRatioProb[1]+InitialWYRatioProb[2])] = 2   
-
+  xsim[,1] = asim[,1] + ysim[,1]
+  for (i in 1:p$nsim){
+    csim[i,1] = approx( M[1,msimI[i,1],etasimI[i,1],], 
+                        C[1,msimI[i,1],etasimI[i,1],], 
+                        xsim[i,1] )$y
+  }
+    
 	#loop over life cycle
-	for (t in 1:p$nage) {  
-		# Sample randomly from eps grid to get current eps
-		epsList[t,] = sample(epsdraws[t,]) 
+	for (it in 2:p$nage) {  
+    epssimI[,it] = sample(1:p$neps,p$nsim,replace=T)
+    for (i in 1:p$nsim){
 
-		# generate random draw on unit interval for current eta
-		randeta[t,] = sample(etasim)
+      etasimI[i,it] = sample( 1:p$nbin,1,prob=etaprob[it,etasimI[i,it-1],] )
+      etasim[i,it] = xeta[ it,etasimI[i,it] ]
+      epssim[i,it] = xeps[ it,epssimI[i,it] ]
+      ysim[i,it]  = ygrid[ it, etasimI[i,it], epssimI[i,it] ]
+      yavsim[i,it]= ( (it-1)*yavsim[i,it-1] + ysim[i,it] )/it
+      im2 = FindLinProb1(yavsim[i,it],mgrid[it,])
+      msimI[i,it] = sample(c(im2[1],im2[1]+1),1,prob=im2[2:3])
+      msim[i,it] = mgrid[it,msimI[i,it]]
+      asim[i,it] = p$R*( xsim[i,it-1] - csim[i,it-1] )
+      xsim[i,it] = asim[i,it] + ysim[i,it]
+      csim[i,it] = approx( M[it,msimI[i,it],etasimI[i,it],], 
+                           C[it,msimI[i,it],etasimI[i,it],], 
+                           xsim[i,it] )$y     
+    }  
+  }
 
-		#loop for different individuals
-		for (i in 1:p$nsim){
-			# find persistent income draw
-	  	if(t==1){  
-        enode[1,i] <- which( randeta[t,i] <= etauntot )[1]
-      }else{
-        enode[t,i] <- which( randeta[t,i] <= etacontot[t,enode[t-1,i],] )[1]
-      }
+##RETIRE####
+  for (it in 1:p$Tret) {  
+    for (i in 1:p$nsim){
+      im = msimI[i,p$nage] 
+      ysim[i,p$nage+it]  = pgrid[im]
+      asim[i,p$nage+it] = p$R*( xsim[i,p$nage+it-1] - csim[i,p$nage+it-1] )
+      xsim[i,p$nage+it] = asim[i,p$nage+it] + ysim[i,p$nage+it]
+      csim[i,p$nage+it] = approx( Mret[it,im,], 
+                                  Cret[it,im,], 
+                                  xsim[i,p$nage+it] )$y
+    }  
+  }
 
-	    etaList[t,i] <- xeta[t,enode[t,i]]
 
-	    # get income
-			ytList[t,i] =  inc[t] * exp( etaList[t,i] + epsList[t,i] )
-
-			if(t==1){
-		  	# Construct initial asset
-				stList[1,i] = InitialWYRatio[ stIndicator[i] ] * inc[1] * exp(etaList[1,i])
-				mtList[1,i] = stList[1,i] + ytList[1,i]      # mtList      : list of normalized m (cash on hand)
-			}else{		
-        stList[t,i] = R*( mtList[t-1,i]-ctList[t-1,i] )
-        mtList[t,i] = stList[t,i] + ytList[t,i]
-			}
-      ctList[t,i] = approx( M[t,enode[t,i],], C[t,enode[t,i],], mtList[t,i] )$y
-
-	  } 
-	} 
-
-	model= list(
-	epsList    = epsList,
-	etaList    = etaList, 
-	ctList     = ctList ,
-	stList     = stList ,
-	mtList     = mtList , 
-	ytList     = ytList  , 
-	enode      = enode )   
+	moments= list(
+	etasim    = etasim,
+	epssim    = epssim, 
+	ysim      = ysim ,
+	asim      = asim ,
+	xsim      = xsim , 
+	csim      = csim)   
 
 	savename <- paste('cohort',p$age_min,'.dat',sep='')
-	save(model,p,file=savename)  
+	save(model,moments,p,file=savename)  
 
-  return(model)
-}
-
-comp.income <- function(p){
-	res <- with(p,{
-
-		eta <- comp.eta.prob(p)
-		save_eta_name <- paste('eta',age_min,'.dat',sep='')	
-		with( eta, save(ieta, xeta, etaprob, mineta, maxeta, etacontot, etauntot, file=save_eta_name) )
-		load(save_eta_name)
-
-		epsList  = matrix(0, nrow=(nage+ntr), ncol=nsim)
-		etaList  = epsList
-		randeta  = epsList
-		enode    = epsList
-		visite   = array(0, dim=c((nage+ntr), nbin))
-	 	
-	 	set.seed(77)
-	  # Construct grid for trans draw
-	  epsdraws = comp.eps(p, nsim)
-		#eps after retirement
-		epsdraws = rbind( epsdraws,matrix(0,nrow=ntr, ncol=nsim) )
-
-		etasim <- (1:nsim) / (1+nsim)
-
-		#loop over life cycle
-		for (t in 1:(nage+ntr)) {  
-			# Sample randomly from eps grid to get current eps
-			epsList[t,] = sample(epsdraws[t,]) 
-
-			# generate random draw on unit interval for current eta
-			randeta[t,] = sample(etasim)
-
-			#loop for different individuals
-			for (i in 1:nsim){
-				# find persistent income draw
-		  	if(t==1){  
-          enode[1,i] <- which( randeta[1,i] <= etauntot )[1]
-          visite[t,enode[1,i]] = visite[t,enode[1,i]] + 1
-        }else{
-	        enode[t,i] <- which( randeta[t,i] <= etacontot[t,enode[t-1,i],] )[1]
-	        visite[t,enode[t,i]] = visite[t,enode[t,i]] + 1
-        }
-
-		    etaList[t,i] <- xeta[t,enode[t,i]]
-		  } 
-		} 
-
-
-		model= list(
-		epsList    = epsList,
-		etaList    = etaList, 
-		enode      = enode  ,
-		visite     = visite )   
-	}) 
-
-  return(res)
-
+  return(moments)
 }

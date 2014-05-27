@@ -38,11 +38,10 @@ p$T          = T
 detach(data)
 
 #grid dimension
-p$nbin  = 50    #permanent component
-p$neps  = 49     #transitory component
+p$nbin  = 23#50    #permanent component
+p$neps  = 23#49     #transitory component
 p$ngpa  = 50     #asset
-p$ngpm  = 49     #average earnings points
-p$ngpp  = p$ngpm * p$nbin * p$neps      #pension points
+p$ngpm  = 23#49     #average earnings points
 
 #asset     
 p$amax = 300000   
@@ -65,19 +64,10 @@ p$age_max = 90
 p$nage  = (p$age_re - p$age_min)/2
 p$Tret   = (p$age_max - p$age_re)/2 +1 #periods after retirement
 
-  #start_time = proc.time()[3]  
-  #model  <- comp.solveModel(p)
-  #cat(paste('\ntotal seconds to compute Cons rule: ' , proc.time()[3] -  start_time ))
+start_time = proc.time()[3]  
+model  <- comp.solveModel(p)
+cat(paste('\ntotal seconds to compute Cons rule: ' , proc.time()[3] -  start_time ))
 
-  #start_time = proc.time()[3]  
-  #moments <- comp.moments(p, model) 
-  #cat(paste('\ntotal seconds to compute moments' , proc.time()[3] -  start_time ))
-
-  start_time = proc.time()[3]  
-  etaeps  <- comp.income(p)
-  cat(paste('\ntotal seconds to compute income: ' , proc.time()[3] -  start_time ))
-
-  savename <- paste('cohort',p$age_min,'.dat',sep='')
-  save(etaeps,p,file=savename)  
-
-}
+start_time = proc.time()[3]  
+moments <- comp.moments(p, model) 
+cat(paste('\ntotal seconds to compute moments' , proc.time()[3] -  start_time ))
