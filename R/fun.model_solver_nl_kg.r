@@ -237,8 +237,13 @@ comp.moments<- function(p, model) {
 
 
 	moments= list(
+  etasimI   = etasimI,
+  epssimI   = epssimI,
 	etasim    = etasim,
 	epssim    = epssim, 
+  msimI     = msimI,
+  msim      = msim,
+  yavsim    = yavsim,
 	ysim      = ysim ,
 	asim      = asim ,
 	xsim      = xsim , 

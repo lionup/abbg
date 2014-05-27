@@ -6,22 +6,22 @@ mm <- data.frame( age=age)
 
 attach(moments)
 #median
-mm <- cbind( mm, data.frame(stMedian = apply(asim, 2, median)) )
-mm <- cbind( mm, data.frame(ctMedian = apply(csim, 2, median)) )
-mm <- cbind( mm, data.frame(mtMedian = apply(xsim, 2, median)) )
-mm <- cbind( mm, data.frame(ytMedian = apply(ysim, 2, median)) )
+mm <- cbind( mm, data.frame(stMedian = apply(asim, 2, median,na.rm=T)) )
+mm <- cbind( mm, data.frame(ctMedian = apply(csim, 2, median,na.rm=T)) )
+mm <- cbind( mm, data.frame(mtMedian = apply(xsim, 2, median,na.rm=T)) )
+mm <- cbind( mm, data.frame(ytMedian = apply(ysim, 2, median,na.rm=T)) )
 
 #1st quantile
-mm <- cbind( mm, data.frame(st1q = apply(asim, 2, quantile, 0.25)) )
-mm <- cbind( mm, data.frame(ct1q = apply(csim, 2, quantile, 0.25)) )
-mm <- cbind( mm, data.frame(mt1q = apply(xsim, 2, quantile, 0.25)) )
-mm <- cbind( mm, data.frame(yt1q = apply(ysim, 2, quantile, 0.25)) )
+mm <- cbind( mm, data.frame(st1q = apply(asim, 2, quantile, 0.25,na.rm=T)) )
+mm <- cbind( mm, data.frame(ct1q = apply(csim, 2, quantile, 0.25,na.rm=T)) )
+mm <- cbind( mm, data.frame(mt1q = apply(xsim, 2, quantile, 0.25,na.rm=T)) )
+mm <- cbind( mm, data.frame(yt1q = apply(ysim, 2, quantile, 0.25,na.rm=T)) )
 
 #3st quantil
-mm <- cbind( mm, data.frame(st3q = apply(asim, 2, quantile, 0.75)) )
-mm <- cbind( mm, data.frame(ct3q = apply(csim, 2, quantile, 0.75)) )
-mm <- cbind( mm, data.frame(mt3q = apply(xsim, 2, quantile, 0.75)) )
-mm <- cbind( mm, data.frame(yt3q = apply(ysim, 2, quantile, 0.75)) )
+mm <- cbind( mm, data.frame(st3q = apply(asim, 2, quantile, 0.75,na.rm=T)) )
+mm <- cbind( mm, data.frame(ct3q = apply(csim, 2, quantile, 0.75,na.rm=T)) )
+mm <- cbind( mm, data.frame(mt3q = apply(xsim, 2, quantile, 0.75,na.rm=T)) )
+mm <- cbind( mm, data.frame(yt3q = apply(ysim, 2, quantile, 0.75,na.rm=T)) )
 
 detach(moments)
 
