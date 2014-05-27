@@ -4,14 +4,11 @@ comp.solveModel <- function(p) {
 	res <- with(p,{
 		
 		#eta: xeta, etaprob, etacontot, etauntot
-		#eta <- comp.eta.prob(p)
-		if(age_min==30){
-			#with( eta, save(ieta, xeta, etaprob, mineta, maxeta, etacontot, etauntot, file='eta_even.dat') )
-			load('eta_even.dat')
-		}else{
-			#with( eta, save(ieta, xeta, etaprob, mineta, maxeta, etacontot, etauntot, file='eta_odd.dat') )
-			load('eta_odd.dat')
-		}	
+		eta <- comp.eta.prob(p)
+		save_eta_name <- paste('eta',age_min,'.dat',sep='')
+		
+		with( eta, save(ieta, xeta, etaprob, mineta, maxeta, etacontot, etauntot, file=save_eta_name) )
+		load(save_eta_name)
 
 		#eps: grid and distri 
 		epsprob = rep(1/neps,neps)
@@ -88,11 +85,8 @@ comp.moments<- function(p, model) {
 	  M = model$M
 	  C = model$C
 
-		if(age_min==30){ 
-			load('eta_even.dat')
-		}else{
-			load('eta_odd.dat')
-		}
+		save_eta_name <- paste('eta',age_min,'.dat',sep='')
+		load(save_eta_name)
 
 		# declare variable 
 		epsList  = matrix(0, nrow=(nage+ntr), ncol=nsim)
@@ -174,4 +168,61 @@ comp.moments<- function(p, model) {
 	}) 
 
   return(res)
+}
+
+comp.income <- function(p){
+	res <- with(p,{
+
+		eta <- comp.eta.prob(p)
+		save_eta_name <- paste('eta',age_min,'.dat',sep='')	
+		with( eta, save(ieta, xeta, etaprob, mineta, maxeta, etacontot, etauntot, file=save_eta_name) )
+		load(save_eta_name)
+
+		epsList  = matrix(0, nrow=(nage+ntr), ncol=nsim)
+		etaList  = epsList
+		randeta  = epsList
+		enode    = epsList
+		visite   = array(0, dim=c((nage+ntr), nbin))
+	 	
+	 	set.seed(77)
+	  # Construct grid for trans draw
+	  epsdraws = comp.eps(p, nsim)
+		#eps after retirement
+		epsdraws = rbind( epsdraws,matrix(0,nrow=ntr, ncol=nsim) )
+
+		etasim <- (1:nsim) / (1+nsim)
+
+		#loop over life cycle
+		for (t in 1:(nage+ntr)) {  
+			# Sample randomly from eps grid to get current eps
+			epsList[t,] = sample(epsdraws[t,]) 
+
+			# generate random draw on unit interval for current eta
+			randeta[t,] = sample(etasim)
+
+			#loop for different individuals
+			for (i in 1:nsim){
+				# find persistent income draw
+		  	if(t==1){  
+          enode[1,i] <- which( randeta[1,i] <= etauntot )[1]
+          visite[t,enode[1,i]] = visite[t,enode[1,i]] + 1
+        }else{
+	        enode[t,i] <- which( randeta[t,i] <= etacontot[t,enode[t-1,i],] )[1]
+	        visite[t,enode[t,i]] = visite[t,enode[t,i]] + 1
+        }
+
+		    etaList[t,i] <- xeta[t,enode[t,i]]
+		  } 
+		} 
+
+
+		model= list(
+		epsList    = epsList,
+		etaList    = etaList, 
+		enode      = enode  ,
+		visite     = visite )   
+	}) 
+
+  return(res)
+
 }

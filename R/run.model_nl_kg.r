@@ -4,7 +4,8 @@ require(data.table)
 require(ggplot2)
 
 setwd('~/git/abbg/R')
-source('fun.model_solver_nl_sim.r')
+source('fun.model_solver_nl_kg.r')
+set.seed(77)
 
 # SETTIG PARAMETERS
 p <- list()
@@ -36,39 +37,34 @@ p$T          = T
 
 detach(data)
 
-#income node
-p$nbin  = 100
-p$neps  = 23
+#grid dimension
+p$nbin  = 50    #permanent component
+p$neps  = 49     #transitory component
+p$ngpa  = 50     #asset
+p$ngpm  = 49     #average earnings points
+p$ngpp  = p$ngpm * p$nbin * p$neps      #pension points
 
-#asset
-p$aMin  = 1e-6            #(* Lower bound for GothicAVec *)
-p$aMax  = 30            #(* Maximum point in GothicAVec *)
-p$aHuge = 9000 
-p$n = 50  
-
+#asset     
+p$amax = 300000   
+p$pexpgrid = 0.18  #approaches linear as goes to 0, approaches L shaped as goes to Inf
+              
 #utility
 p$R       = 1.06             #(* Gross interest rate *)
 p$beta    = 0.93             #(* Discount factor *)
 p$rho     = 2                #(* Coefficient of Relative Risk Aversion *)
+p$cfloor = -100000000000
 
 #sim
-p$nsim  = 999     # Number of people to simulate
+p$nsim  = 50000     # Number of people to simulate
 p$N     = 999999
 
 #age
-p$ntr   = 8  #periods after retirement
-for (ai in 30:55){
-  p$age_min = ai
-  if(p$age_min %% 2 == 0){
-    p$age_re  = 66 #first period income drop 
-    p$age_max = 80
-  }else{
-    p$age_re  = 67 #first period income drop 
-    p$age_max = 81
-  }
-  p$nage  = (p$age_re - p$age_min)/2   #periods before retirement
+p$age_min = 30
+p$age_re  = 66
+p$age_max = 90
+p$nage  = (p$age_re - p$age_min)/2
+p$Tret   = (p$age_max - p$age_re)/2 +1 #periods after retirement
 
-  set.seed(77)
   #start_time = proc.time()[3]  
   #model  <- comp.solveModel(p)
   #cat(paste('\ntotal seconds to compute Cons rule: ' , proc.time()[3] -  start_time ))
@@ -85,19 +81,3 @@ for (ai in 30:55){
   save(etaeps,p,file=savename)  
 
 }
-#source('fun.sim.data.r')
-#sim <- sim.small.sample(p$age_min)
-
-#sim <- sim.origin.sample()
-#sim[,lc:=log(consumption)]  #log consumption
-#sim[,cage:=as.factor(age) ] #create age dummy
-#sim[,lcr:=lm(lc~cage)$residuals]
-#sim$cage <- NULL
-#simdata <-data.matrix(sim)
-#save(simdata,file='simdata.dat')
-#require(R.matlab)
-#writeMat('simdata.mat',simdata=simdata)
-#require(plyr)
-#medeta <- ddply(sim, ~age,summarise,medeta=median(eta))
-
-#persis <- sim.persis(p,sim)

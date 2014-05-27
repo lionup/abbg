@@ -117,10 +117,10 @@ ggsave('dinc.png',width=10.6, height=5.93)
 
 
 ####plot xeta
-age = seq(p$age_min, p$age_max, 2)
-plot_xeta <- data.frame( age=age, value=xeta[,50], moment = 'node50' )
+age = seq(p$age_min, p$age_re-2, 2)
+plot_xeta <- data.frame( age=age, value=xeta[,25], moment = 'node50' )
 plot_xeta <- rbind( plot_xeta, data.frame( age=age, value=xeta[,1], moment = 'node1') )
-plot_xeta <- rbind( plot_xeta, data.frame( age=age, value=xeta[,100], moment = 'node100') )
+plot_xeta <- rbind( plot_xeta, data.frame( age=age, value=xeta[,50], moment = 'node100') )
 plot_xeta <- rbind( plot_xeta, data.frame( age=age, value=rowMeans(xeta), moment = 'means') )
 
 p_xeta  <- ggplot(plot_xeta, aes(x=age,y=value)) + 
