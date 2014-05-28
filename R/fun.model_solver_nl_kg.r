@@ -142,7 +142,7 @@ comp.solveModel <- function(p) {
 		p$l <- l
 
 		start_time = proc.time()[3] 
-		vals <- parSapply(cl,ai,comp.ngpm,p,model,simplify ="array")
+		vals <- parSapply(cl,ai,comp.ngpm,p,model)
 		cat(paste('\ntotal seconds age ', l, ' is', proc.time()[3] -  start_time ))
 		#model$M[]
 	}	
