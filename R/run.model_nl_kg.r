@@ -38,10 +38,10 @@ p$T          = T
 detach(data)
 
 #grid dimension
-p$nbin  = 50    #permanent component
-p$neps  = 49     #transitory component
+p$nbin  = 100#50    #permanent component
+p$neps  = 99#49     #transitory component
 p$ngpa  = 50     #asset
-p$ngpm  = 50     #average earnings points
+p$ngpm  = 100#50     #average earnings points
 
 #asset
 p$amax  = 3e5
@@ -68,8 +68,9 @@ start_time = proc.time()[3]
 model  <- comp.solveModel(p)
 cat(paste('\ntotal seconds to compute Cons rule: ' , proc.time()[3] -  start_time ))
 
-save(model,file='only_model2.dat')
+save(model,file='only_model_100gp.dat')
 
-#start_time = proc.time()[3]  
-#moments <- comp.moments(p, model) 
-#cat(paste('\ntotal seconds to compute moments' , proc.time()[3] -  start_time ))
+#load('only_model2.dat')
+start_time = proc.time()[3]  
+moments <- comp.moments(p, model) 
+cat(paste('\ntotal seconds to compute moments' , proc.time()[3] -  start_time ))

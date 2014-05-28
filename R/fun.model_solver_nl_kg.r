@@ -26,14 +26,13 @@ comp.ngpm <- function(im, p, model){
 }
 
 comp.solveModel <- function(p) {
-	#eta = comp.eta.prob(p)
+	eta = comp.eta.prob(p)
 	save_eta_name <- paste('eta',p$age_min,'.dat',sep='')	
 		
-	#with( eta, save(xeta, etaprob, mineta, maxeta, etacontot, etauntot, file=save_eta_name) )
+	with( eta, save(xeta, etaprob, mineta, maxeta, etacontot, etauntot, file=save_eta_name) )
 	load(save_eta_name)
 
-	#eps: grid and distri 
-	epsprob = rep(1/p$neps,p$neps)
+	#eps: grid and distri = 1/neps
 	xeps = comp.eps(p, p$neps)	
 
 	## Profile of income level 
@@ -121,6 +120,7 @@ comp.solveModel <- function(p) {
 		mineta= mineta,
 		maxeta= maxeta,
 		etaprob=etaprob,
+		xeps  = xeps,
 	  ygrid = ygrid,
 	  mgrid = mgrid,
 	  pgrid = pgrid,
@@ -166,6 +166,7 @@ comp.moments<- function(p, model) {
   Cret  = model$Cret 
   M = model$M
   C = model$C
+  xeps  = model$xeps
 
 	save_eta_name <- paste('eta',p$age_min,'.dat',sep='')	
 	load(save_eta_name)
@@ -187,27 +188,21 @@ comp.moments<- function(p, model) {
   etasimI[,1] = sample(1:p$nbin,p$nsim,replace=T)
   epssimI[,1] = sample(1:p$neps,p$nsim,replace=T)
 
-	for (i in 1:p$nsim){
-    etasim[i,1] = xeta[ 1,etasimI[i,1] ]
-    epssim[i,1] = xeps[ 1,epssimI[i,1] ]
-		ysim[i,1] = ygrid[ 1,etasimI[i,1],epssimI[i,1] ]
-		yavsim[i,1]= ysim[i,1] 
+  etasim[,1] = xeta[ cbind(1,etasimI[,1]) ]
+  epssim[,1] = xeps[ cbind(1,epssimI[,1]) ]
+  ysim[,1]   = ygrid[cbind(1,etasimI[,1],epssimI[,1]) ]
+  yavsim[,1]= ysim[,1] 
+
+	for (i in 1:p$nsim){	
 		im2 = FindLinProb1(yavsim[i,1],mgrid[1,])
-    msimI[i,1] = sample(c(im2[1],im2[1]+1),1,prob=im2[2:3])
-    msim[i,1] = mgrid[1,msimI[i,1]]
+    msimI[i,1] = sample( c(im2[1],im2[1]+1), 1, prob=im2[2:3] )
 	}
+	msim[,1] = mgrid[ cbind(1,msimI[,1]) ]
 
   #initial assets
-  initwealthdist=read.table("old/Kaplan\ and\ Giovanni/Input/initwealthdist.txt")
-  itemp <- 1-sum(initwealthdist[11:75,2])
-  initwealthdist <- rbind(matrix(c(0,itemp),nrow=1),initwealthdist[11:75,])
-  rownames(initwealthdist) = 1:66
-
-  for(i in 1:p$nsim){
-    itemp = sample(1:66,1,prob=initwealthdist[,2])
-    asim[i,1] = initwealthdist[itemp,1]*ysim[i,1]
-    asim[i,1] = max(asim[i,1], agrid[1])
-  }
+	InitialWYRatio     = c(.17, .5, .83) 
+	itemp = sample(1:3,p$nsim,replace=T)
+	asim[,1] = InitialWYRatio[itemp] * ysim[,1]
 
   xsim[,1] = asim[,1] + ysim[,1]
   for (i in 1:p$nsim){
@@ -219,33 +214,35 @@ comp.moments<- function(p, model) {
 	#loop over life cycle
 	for (it in 2:p$nage) {  
     epssimI[,it] = sample(1:p$neps,p$nsim,replace=T)
-    for (i in 1:p$nsim){
+    epssim[,it]  = xeps[ cbind(it,epssimI[,it]) ]
 
-      etasimI[i,it] = sample( 1:p$nbin,1,prob=etaprob[it,etasimI[i,it-1],] )
-      etasim[i,it] = xeta[ it,etasimI[i,it] ]
-      epssim[i,it] = xeps[ it,epssimI[i,it] ]
-      ysim[i,it]  = ygrid[ it, etasimI[i,it], epssimI[i,it] ]
-      yavsim[i,it]= ( (it-1)*yavsim[i,it-1] + ysim[i,it] )/it
-      im2 = FindLinProb1(yavsim[i,it],mgrid[it,])
-      msimI[i,it] = sample(c(im2[1],im2[1]+1),1,prob=im2[2:3])
-      msim[i,it] = mgrid[it,msimI[i,it]]
+    etasimI[,it] = sapply(1:p$nsim, function(x)
+    	sample(1:p$nbin, 1, prob=etaprob[it, etasimI[x,it-1],]) )
+    etasim[,it]  = xeta[ cbind(it,etasimI[,it]) ]
+    ysim[,it]    = ygrid[cbind(it,etasimI[,it],epssimI[,it]) ]
+    yavsim[,it]  = ( (it-1)*yavsim[,it-1] + ysim[,it] )/it
+
+    for (i in 1:p$nsim){
+      im2 = FindLinProb1(yavsim[i,it], mgrid[it,])
+      msimI[i,it] = sample( c(im2[1],im2[1]+1), 1, prob=im2[2:3] )
+      msim[i,it] = mgrid[it, msimI[i,it]]
       asim[i,it] = p$R*( xsim[i,it-1] - csim[i,it-1] )
       xsim[i,it] = asim[i,it] + ysim[i,it]
-      csim[i,it] = approx( M[it,msimI[i,it],etasimI[i,it],], 
-                           C[it,msimI[i,it],etasimI[i,it],], 
+      csim[i,it] = approx( M[it, msimI[i,it], etasimI[i,it],], 
+                           C[it, msimI[i,it], etasimI[i,it],], 
                            xsim[i,it] )$y     
     }  
   }
 
 ##RETIRE####
   for (it in 1:p$Tret) {  
+  	ysim[,p$nage+it]  = pgrid[ msimI[,p$nage] ]
+  	asim[,p$nage+it]  = p$R * ( xsim[,p$nage+it-1] - csim[,p$nage+it-1] )
+  	xsim[,p$nage+it]  = asim[,p$nage+it] + ysim[,p$nage+it]
+
     for (i in 1:p$nsim){
-      im = msimI[i,p$nage] 
-      ysim[i,p$nage+it]  = pgrid[im]
-      asim[i,p$nage+it] = p$R*( xsim[i,p$nage+it-1] - csim[i,p$nage+it-1] )
-      xsim[i,p$nage+it] = asim[i,p$nage+it] + ysim[i,p$nage+it]
-      csim[i,p$nage+it] = approx( Mret[it,im,], 
-                                  Cret[it,im,], 
+      csim[i,p$nage+it] = approx( Mret[it, msimI[i,p$nage],], 
+                                  Cret[it, msimI[i,p$nage],], 
                                   xsim[i,p$nage+it] )$y
     }  
   }

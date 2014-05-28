@@ -102,3 +102,16 @@ mgrid = array(0,dim=c(p$nage,p$ngpm))
 	  Cret  = Cret,  
     M    = M,
     C    = C) 
+
+
+  #initial assets
+  initwealthdist=read.table("old/Kaplan\ and\ Giovanni/Input/initwealthdist.txt")
+  itemp <- 1-sum(initwealthdist[11:75,2])
+  initwealthdist <- rbind(matrix(c(0,itemp),nrow=1),initwealthdist[11:75,])
+  rownames(initwealthdist) = 1:66
+
+  for(i in 1:p$nsim){
+    itemp = sample(1:66,1,prob=initwealthdist[,2])
+    asim[i,1] = initwealthdist[itemp,1]*ysim[i,1]
+    asim[i,1] = max(asim[i,1], agrid[1])
+  }
