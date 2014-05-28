@@ -68,7 +68,7 @@ start_time = proc.time()[3]
 model  <- comp.solveModel(p)
 cat(paste('\ntotal seconds to compute Cons rule: ' , proc.time()[3] -  start_time ))
 
-save(model,file='only_model.dat')
+save(model,file='only_model2.dat')
 
 #start_time = proc.time()[3]  
 #moments <- comp.moments(p, model) 

@@ -142,12 +142,12 @@ comp.solveModel <- function(p) {
 		p$l <- l
 
 		start_time = proc.time()[3] 
-		vals <- parLapply(cl,ai,comp.ngpm,p,model)
+		vals <- parSapply(cl,ai,comp.ngpm,p,model,simplify ="array")
 		cat(paste('\ntotal seconds age ', l, ' is', proc.time()[3] -  start_time ))
+		#model$M[]
 	}	
 
 	stopCluster(cl)
-	save.image('parlapply.RData')
 
 	model[[length(model)+1]] <- vals 
 
