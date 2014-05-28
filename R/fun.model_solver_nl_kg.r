@@ -138,9 +138,8 @@ comp.solveModel <- function(p) {
 	cat('Number of Chains: ',chainN,'\n')
 	ai = 1:p$ngpm
 	
-	for ( l in (p$nage-1):1 ){
+	for ( l in (p$nage-1):(p$nage-1) ){
 		p$l <- l
-		cat('start loop',p$l,'\n')
 
 		start_time = proc.time()[3] 
 		vals <- parLapply(cl,ai,comp.ngpm,p,model)
