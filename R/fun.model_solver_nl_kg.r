@@ -138,18 +138,20 @@ comp.solveModel <- function(p) {
 	cat('Number of Chains: ',chainN,'\n')
 	ai = 1:p$ngpm
 	
-	for ( l in (p$nage-1):(p$nage-1) ){
+	for ( l in (p$nage-1):1 ){
 		p$l <- l
 
 		start_time = proc.time()[3] 
-		vals <- parSapply(cl,ai,comp.ngpm,p,model)
-		cat(paste('\ntotal seconds age ', l, ' is', proc.time()[3] -  start_time ))
-		#model$M[]
+		vals <- parLapply(cl,ai,comp.ngpm,p,model)
+		cat(paste('\ntotal seconds for age ', l, ' is', proc.time()[3] -  start_time ))
+		
+		for(im in ai){
+			model$M[l,im,,] <- vals[[im]][ai,]
+			model$C[l,im,,] <- vals[[im]][ai+p$ngpm,]
+		}	
 	}	
 
 	stopCluster(cl)
-
-	model[[length(model)+1]] <- vals 
 
   return(model)
 }

@@ -1,7 +1,7 @@
 
 ssh uctprgu@hpc.econ.ucl.ac.uk
 
-scp uctprgu@hpc.econ.ucl.ac.uk:/data/uctprgu/git/abbg/R/*30.dat .
+scp uctprgu@hpc.econ.ucl.ac.uk:/data/uctprgu/git/abbg/R/only_model2.dat .
 
 scp US.dat uctprgu@hpc.econ.ucl.ac.uk:/data/uctprgu/git/lg2/Stata/result3/cmes2014/
 
