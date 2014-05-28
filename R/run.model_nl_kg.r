@@ -3,7 +3,7 @@ require(EQL)
 require(data.table)
 require(ggplot2)
 
-setwd('~/git/abbg/R')
+#setwd('~/git/abbg/R')
 source('fun.model_solver_nl_kg.r')
 set.seed(77)
 
@@ -38,20 +38,20 @@ p$T          = T
 detach(data)
 
 #grid dimension
-p$nbin  = 23#50    #permanent component
-p$neps  = 23#49     #transitory component
+p$nbin  = 50    #permanent component
+p$neps  = 49     #transitory component
 p$ngpa  = 50     #asset
-p$ngpm  = 23#49     #average earnings points
+p$ngpm  = 50     #average earnings points
 
-#asset     
-p$amax = 300000   
+#asset
+p$amax  = 3e5
+p$aHuge = 3e7 
 p$pexpgrid = 0.18  #approaches linear as goes to 0, approaches L shaped as goes to Inf
               
 #utility
 p$R       = 1.06             #(* Gross interest rate *)
 p$beta    = 0.93             #(* Discount factor *)
 p$rho     = 2                #(* Coefficient of Relative Risk Aversion *)
-p$cfloor = -100000000000
 
 #sim
 p$nsim  = 50000     # Number of people to simulate
@@ -68,6 +68,8 @@ start_time = proc.time()[3]
 model  <- comp.solveModel(p)
 cat(paste('\ntotal seconds to compute Cons rule: ' , proc.time()[3] -  start_time ))
 
-start_time = proc.time()[3]  
-moments <- comp.moments(p, model) 
-cat(paste('\ntotal seconds to compute moments' , proc.time()[3] -  start_time ))
+save(model,file='only_model.dat')
+
+#start_time = proc.time()[3]  
+#moments <- comp.moments(p, model) 
+#cat(paste('\ntotal seconds to compute moments' , proc.time()[3] -  start_time ))

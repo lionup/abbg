@@ -95,12 +95,11 @@ comp.eta.prob <- function(p){
 
   # Quantiles of eta and epsilon, by age
   xeta <- array( 0, dim=c(p$nage, p$nbin) )  #bins
-  veta <- seq(1/(2*p$nbin), (2*p$nbin-1)/(2*p$nbin), l=(2*p$nbin-1)) #bins and its median
-  oddnode <- seq(1,(2*p$nbin-1),2)  #income node is the median in each interval, odd node
+  veta <- seq(1/(2*p$nbin), (2*p$nbin-1)/(2*p$nbin), l=p$nbin) #median of each bin
   age = seq(p$age_min, p$age_re-2, 2)
 
   for (i in 1:p$nage){ #periods before retirement
-    xeta[i,] <- quantile( Mateta_true[i,], veta, names=F, na.rm = T )[oddnode]
+    xeta[i,] <- quantile( Mateta_true[i,], veta, names=F, na.rm = T )
   }  
 
   long <- data.table( pid = 1:p$N, age=rep(age, each=p$N), income = c(t(Mateta_true)) )

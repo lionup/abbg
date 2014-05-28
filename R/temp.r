@@ -41,3 +41,64 @@
     }
 	}
 
+smalli=18
+smallj=1
+for (j in 1:p$nsim){
+	everyi = which(is.na(csim[j,]))[1]
+	everyi = ifelse(is.na(everyi),32,everyi)
+	if(asim[j,1]==0 & everyi<smalli){
+		smalli=everyi
+		smallj=j
+	}
+}
+
+mgrid = array(0,dim=c(p$nage,p$ngpm))        
+	#equally spaced between 5th perc and median, and median and 95th perc
+	for (it in 1:p$nage){
+    lysim = quantile( yavsim[,it], c(0.05,0.5,0.95), names=F, na.rm = T )  
+    midm = (1+p$ngpm)/2
+    mgrid[it,1]    = lysim[1] 
+    mgrid[it,midm] = lysim[2] 
+    mgrid[it,p$ngpm] = lysim[3] 
+
+    lwidth1 = (mgrid[it,midm]  - mgrid[it,1])   /(midm-1)
+    lwidth2 = (mgrid[it,p$ngpm]- mgrid[it,midm])/(midm-1)
+    
+    for(im in 2:(midm-1)){
+      mgrid[it,im] = mgrid[it,im-1] +lwidth1
+    }
+    for( im in (midm+1):(p$ngpm-1) ) {
+      mgrid[it,im] = mgrid[it,im-1] +lwidth2
+    }
+	}
+
+		for ( l in (p$nage-1):1 ){
+		for ( im in 1:p$ngpm){	
+			for ( e in 1:p$nbin){
+				Vap=0
+    		for ( i in 1:p$neps ){
+    			for ( j in (mineta[l+1,e]+1):(maxeta[l+1,e]-1) ){
+    				lnextm = (l*mgrid[l,im] + ygrid[l+1,j,i])/(l+1)
+    				im2 = FindLinProb1(lnextm,mgrid[l+1,])
+						Vap  = Vap + epsprob[i] * etaprob[l+1,e,j] * 
+							( GothVP(p, agrid, ygrid[l+1,j,i], C[l+1,im2[1],  j,], M[l+1,im2[1],  j,]) * im2[2] + 
+							  GothVP(p, agrid, ygrid[l+1,j,i], C[l+1,im2[1]+1,j,], M[l+1,im2[1]+1,j,]) * im2[3] )  # Gothic Va prime	
+					}
+				}			
+				ChiVec = (p$R * p$beta * Vap)^(-1/p$rho) # inverse Euler equation
+	 			MuVec  = agrid+ChiVec
+	  		M[l,im,e,]  = c(0, MuVec)    # Matrix of interpolation data
+	  		C[l,im,e,]  = c(0,ChiVec)          # Matrix of interpolation data
+			}
+		}
+	}		
+
+	model= list(
+	  ygrid = ygrid,
+	  mgrid = mgrid,
+	  pgrid = pgrid,
+    agrid = agrid,
+	  Mret  = Mret,
+	  Cret  = Cret,  
+    M    = M,
+    C    = C) 
