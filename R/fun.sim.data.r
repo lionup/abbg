@@ -82,6 +82,35 @@ sim.small.sample <- function(p){
   return(sim)
 }
 
+##data for stephane
+sim.even.sample <- function(){
+  load('cohort30.dat')
+  age_full = seq(p$age_min, p$age_re-2, 2)
+  last_age = p$age_re - 2*p$T  #oldest cohort ini age
+  age_nore = seq(p$age_min, last_age, 2)
+
+  require(data.table)
+  sim_data <- with( moments, data.table(id=1:p$nsim, 
+    age=rep(age_full,each=p$nsim), eta=c(etasim),eps=c(epssim)) )
+  sim_data[,Y:=eta+eps]
+  setkey(sim_data,id)
+
+  #for each age, randomly pick people
+  nsim_age <- trunc( p$nsim/length(age_nore) )
+  sub_id <- array( sample(1:p$nsim, nsim_age*length(age_nore)), 
+    dim=c(length(age_nore),nsim_age) )
+
+  sim <- data.table()
+  for( t in 1:length(age_nore) ){
+    sim_sub <- sim_data[J(sub_id[t,])]
+    sim_sub <- subset( sim_sub, age>=age_nore[t] & age<=age_nore[t]+2*c(p$T)-2 )
+    sim <- rbind(sim,sim_sub)
+  }
+  
+  setkey(sim,id,age) 
+  return(sim)
+}
+
 
 
 #################################################
