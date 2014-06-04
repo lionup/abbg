@@ -39,11 +39,15 @@ p$T          = T
 detach(data)
 
 #grid dimension
-#p$nbin  = 100#50    #permanent component
+p$nbin  = 100#50    #permanent component
 #p$neps  = 99#49     #transitory component
 p$ngpa  = 50     #asset
 #p$ngpm  = 100#50     # average earnings points
 p$nc    = 40          # degree for chebychev polynomial    
+Q  = cc.quad(p$nc,0,1)
+p$Qn = Q$nodes 
+p$Qw = array(Q$weights)
+
 
 #asset
 p$amax  = 3e5

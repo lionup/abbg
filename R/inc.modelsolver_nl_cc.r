@@ -89,7 +89,7 @@ comp.eta.sim <- function(p){
 comp.eta.prob <- function(p){
   
   # get the simulations of workers
-  Mateta_true <- comp.eta.sim(p)
+  #Mateta_true <- comp.eta.sim(p)
   save_Mateta_name <- paste('Mateta',p$age_min,'.dat',sep='')
   load(save_Mateta_name)
 
