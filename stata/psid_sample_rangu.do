@@ -14,7 +14,7 @@
 	6. Note that  topcoding is not an issue (only 2 top coded observations in the cleaned sample) for both constumption income and assets) 
 	*/
 	
-cd "$output"
+*cd "$output"
 clear all
 set mem 100m
 set more off
