@@ -50,7 +50,7 @@ gen extra=(tyoth)>0           /* dummy for income recipient other than h/w */
    ====================
    1)male: educ * year of birth dummies 2)female: educ * year of birth dummies
 */	
-xi	i.yb i.wyb i.educ*yb i.weduc*wyb i.state i.fsize i.kids i.race i.wrace
+xi	i.educ*i.yb i.weduc*i.wyb i.state i.fsize i.kids i.race i.wrace
 
 * consumption regression 
 reg log_cons kidsout bigcity extra _I*
@@ -100,15 +100,15 @@ gen mua = ua/sqrt(ua2_yhat)
 sum uc muc utoty mutoty ua mua
 drop uc2* utoty2* ua2*
 
-* construct balanced sample
-*drop if muc == . | mutoty==. | mua==.
-*by person, sort: gen numwav= _N
-*keep if numwav == 6
-*drop numwav
-*codebook person
+* drop missing after standardization and construct balanced sample
+drop if muc == . | mutoty==. | mua==.
+by person, sort: gen numwav= _N
+keep if numwav == 6
+drop numwav
+codebook person
 
 log close
 
-saveold first_stage_resid, replace 
+*saveold first_stage_resid, replace 
 
 
