@@ -5,17 +5,18 @@ clear mata
 cap log close
 set more off
 set mem 200m
-u totcons5_rhs1_part0,clear
+u select,clear
+log using first_stage_regs, replace
 
 ************************************
 *** Balanced subsample N=749 T=6 ***
 ************************************
-*gen log_ass = log(tot_assets3)/* log asset */
-gen log_cons = log(totcons)	  /* log consumption */
-gen totly = ly+wly			  /* total family income */
-gen log_totly  = log(totly)  /* log total family income */
+gen log_ass = log(tot_assets3)/* log asset */
+*gen log_cons = log(totcons)	  /* log consumption */
+*gen totly = ly+wly			  /* total family income */
+*gen log_totly  = log(totly)  /* log total family income */
 
-*drop if log_ass == .		  /* drop if asset <= 0 or missing */
+drop if log_ass == .		  /* drop if asset <= 0 or missing */
 drop if log_cons == .         /* drop if consumption missing */
 drop if log_totly == .		  /* drop if labor income missing */
 drop if educ==. | weduc==.    /* drop if either male or female has education missing */
@@ -39,9 +40,6 @@ gen kidsout	= outkid==1       /* dummy for kids out*/
 gen bigcity	= smsa==1|smsa==2 /* dummy for big city */
 gen extra=(tyoth)>0           /* dummy for income recipient other than h/w */
 
-cap log close
-log using first_stage_regs, replace
-
 /* Controls present:	
    ================
    year of birth dummies, education dummies, race dummies, # of kids dummies, 
@@ -63,7 +61,8 @@ reg log_totly kidsout bigcity extra _I*
 predict utoty if e(sample),res
 
 * asset regression 
-reg tot_assets3 kidsout bigcity extra _I*
+*reg tot_assets3 kidsout bigcity extra _I*
+reg log_ass kidsout bigcity extra _I*
 predict ua if e(sample),res
 
 * account for covariates effects in variances
@@ -79,13 +78,29 @@ reg utoty2 kidsout bigcity extra _I*
 predict double utoty2_yhat if e(sample)
 gen mutoty = utoty/sqrt(utoty2_yhat)
 
-* asset has a lot of negative values, so use nonlinear least square
+* total asset
 gen double ua2 =ua^2
-nl (ua2 = {b0} * exp({xb: kidsout bigcity extra _I*}))
+reg ua2 kidsout bigcity extra _I*
 predict double ua2_yhat if e(sample)
 gen mua = ua/sqrt(ua2_yhat)
 
-*drop uc2* utoty2* ua2*
+sum uc muc utoty mutoty ua mua
+
+* asset has a lot of negative values, so use nonlinear least square
+*gen double ua2 =ua^2
+*nl (ua2 = {b0} * exp({xb: kidsout bigcity extra _I*}))
+*predict double ua2_yhat if e(sample)
+*gen mua = ua/sqrt(ua2_yhat)
+
+drop uc2* utoty2* ua2*
+
+*drop if muc == . | mutoty==. | mua==.
+* construct balanced sample
+*by person, sort: gen numwav= _N
+*keep if numwav == 6
+*drop numwav
+*codebook person
+
 log close
 
 save first_stage_resid, replace 
