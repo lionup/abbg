@@ -65,7 +65,9 @@ predict utoty if e(sample),res
 reg log_ass kidsout bigcity extra _I*
 predict ua if e(sample),res
 
+************************************
 * account for covariates effects in variances
+* use method one with linear regression
 * consumption
 gen double uc2 = uc^2
 reg uc2 kidsout bigcity extra _I*
@@ -84,18 +86,23 @@ reg ua2 kidsout bigcity extra _I*
 predict double ua2_yhat if e(sample)
 gen mua = ua/sqrt(ua2_yhat)
 
-sum uc muc utoty mutoty ua mua
+************************************
+* if method one generate many negative values, 
+* use nonlinear least square
+nl (utoty2 = {b0} * exp({xb: kidsout bigcity extra _I*}))
+predict double utoty2_yhat_nl if e(sample)
+gen mutoty_nl = utoty/sqrt(utoty2_yhat_nl)
 
-* asset has a lot of negative values, so use nonlinear least square
-*gen double ua2 =ua^2
 *nl (ua2 = {b0} * exp({xb: kidsout bigcity extra _I*}))
-*predict double ua2_yhat if e(sample)
-*gen mua = ua/sqrt(ua2_yhat)
+*predict double ua2_yhat_nl if e(sample)
+*gen mua_nl = ua/sqrt(ua2_yhat_nl)
 
+sum uc muc utoty mutoty mutoty_nl ua mua
 drop uc2* utoty2* ua2*
 
-*drop if muc == . | mutoty==. | mua==.
 * construct balanced sample
+*drop if muc == . | mutoty==. | mua==.
+*drop if muc == . | mutoty_nl==. | mua==.
 *by person, sort: gen numwav= _N
 *keep if numwav == 6
 *drop numwav
