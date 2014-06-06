@@ -1,9 +1,9 @@
 {smcl}
 {com}{sf}{ul off}{txt}{.-}
       name:  {res}<unnamed>
-       {txt}log:  {res}D:\GU\git\abbg\stata\select.smcl
+       {txt}log:  {res}/data/uctprgu/git/abbg/stata/select.smcl
   {txt}log type:  {res}smcl
- {txt}opened on:  {res} 6 Jun 2014, 09:13:49
+ {txt}opened on:  {res} 6 Jun 2014, 13:54:36
 {txt}
 {com}.  
 . /*** Merge with welfare simulation data
@@ -29,9 +29,13 @@
 . sort year
 {txt}
 {com}. merge m:1 year using price_indices
-{res}{txt}year was {res}int{txt} now {res}float
+{res}{txt}{p 0 7 2}
+(note: variable
+year was 
+int, now float to accommodate using data's values)
+{p_end}
 
-{txt}{col 5}Result{col 38}# of obs.
+{col 5}Result{col 38}# of obs.
 {col 5}{hline 41}
 {col 5}not matched{col 30}{res}               0
 {txt}{col 5}matched{col 30}{res}          19,305{txt}  (_merge==3)
@@ -117,34 +121,23 @@
 .  
 . /* dependant variables and covariates for the estimation of the predicted part of wages, earnings and consumption as well as for selection equation */
 .  
-. *gen log_y  = log(ly) - log(price)
-. *gen log_yw = log(wly) - log(price)
-. *gen log_c  = log(totcons) - log(price)
+. gen log_ly  = log(ly) - log(price)
+{txt}(1247 missing values generated)
+
+{com}. gen log_wly = log(wly) - log(price)
+{txt}(3494 missing values generated)
+
+{com}. *gen log_c  = log(totcons) - log(price)
 . *gen log_w  = log(ly/hours) - log(price)
 . *gen log_ww = log(wly/hourw) - log(price)
 . *gen log_toty= log(ly + wly) - log(price)                   /* This is only used to track inequality over time not in estimation */
-. 
-. gen totly = (ly+wly)/price    /* total family income */
-{txt}(550 missing values generated)
-
-{com}. gen log_totly  = log(totly)  /* log total family income */
-{txt}(908 missing values generated)
-
-{com}.  
 . replace totcons = totcons/price 
 {txt}(13203 real changes made)
 
-{com}. gen log_cons = log(totcons)       /* log consumption */ 
+{com}. gen log_totcons = log(totcons)    /* log consumption */ 
 {txt}(8 missing values generated)
 
-{com}.  
-. gen wife_employed = (hourw>0 & hourw!=.)
-{txt}
-{com}. gen mort1_dum = (mortgage1>0 & mortgage1!=.)
-{txt}
-{com}. gen mort2_dum = (mortgage2>0 & mortgage2!=.)
-{txt}
-{com}.  
+{com}. 
 . if $pec_drop>0 {c -(}
 .  
 .   *** Use raw moments (not residual moments) that are associated with measurement error
@@ -162,8 +155,10 @@
 {txt}  2{com}.     gen d_`var' = `var' - l2.`var'
 {txt}  3{com}.     gen d_`var'_lag = d_`var'*l2.d_`var'
 {txt}  4{com}.   {c )-}
-{txt}(5206 missing values generated)
-(8487 missing values generated)
+{txt}(5430 missing values generated)
+(8622 missing values generated)
+(7518 missing values generated)
+(10304 missing values generated)
 (4219 missing values generated)
 (7593 missing values generated)
 {com}. 
@@ -171,50 +166,50 @@
 .   foreach var of varlist d_*_lag {c -(}
 {txt}  2{com}.     egen pec_`var'=  xtile(`var'), by(year) n(`npec')
 {txt}  3{com}.   {c )-}
-{txt}(8487 missing values generated)
+{txt}(8622 missing values generated)
+(10304 missing values generated)
 (7593 missing values generated)
 {com}. 
 .   /* Assign missing values for the variable with the potential measurement error  */
-.   foreach var of varlist log_*  {c -(}
-{txt}  2{com}.     replace `var'=. if f2.pec_d_`var'_lag==1  /* Note that we are only assinging missing values to the year with the jump */
+.   foreach var of varlist ly wly totcons {c -(}
+{txt}  2{com}.     replace `var'=. if f2.pec_d_log_`var'_lag==1  /* Note that we are only assinging missing values to the year with the jump */
 {txt}  3{com}.   {c )-}
 {txt}(20 real changes made, 20 to missing)
+(16 real changes made, 16 to missing)
 (24 real changes made, 24 to missing)
 {com}. 
-.   /* Check the new distribution of the interacted lag */
-.   foreach var of varlist log_* {c -(}
-{txt}  2{com}.     gen d_`var'_trunc = `var' - l2.`var'
-{txt}  3{com}.     gen d_`var'_trunc_lag = d_`var'_trunc*l2.d_`var'_trunc
-{txt}  4{com}.   {c )-}
-{txt}(5245 missing values generated)
-(8528 missing values generated)
-(4265 missing values generated)
-(7640 missing values generated)
-{com}.   su d_*_lag
-
-{txt}    Variable {c |}       Obs        Mean    Std. Dev.       Min        Max
-{hline 13}{c +}{hline 56}
-d_log_~y_lag {c |}{res}      7302   -.0691325    .5083341  -16.24719   7.617527
-{txt}d_log_~s_lag {c |}{res}      8196   -.0349893    .2925492  -19.84639   2.415004
-{txt}~y_trunc_lag {c |}{res}      7261   -.0517277    .3597106  -5.226136   7.617527
-{txt}~s_trunc_lag {c |}{res}      8149   -.0262716    .1260956  -1.334781   .9768296
-{com}.   drop d_* pec_*
-. 
-.   *replace log_w = . if log_y==.
-.   *replace log_y = . if log_w==.
-. 
-.   *replace log_ww = . if log_yw==.
-.   *replace log_yw = . if log_ww==.
-.  
+.   /* Check the new distribution of the interacted lag
+>   foreach var of varlist log_* {c -(}
+>     gen d_`var'_trunc = `var' - l2.`var'
+>     gen d_`var'_trunc_lag = d_`var'_trunc*l2.d_`var'_trunc
+>   {c )-}
+>   su d_*_lag */
+.   drop d_* pec_* log_*
 . {c )-}
 {txt}
 {com}.  
-. *drop if educ==. | weduc==.
+. gen totly = (ly+wly)/price    /* total family income */
+{txt}(586 missing values generated)
+
+{com}. gen log_totly  = log(totly)  /* log total family income */
+{txt}(944 missing values generated)
+
+{com}. gen log_cons = log(totcons)       /* log consumption */ 
+{txt}(32 missing values generated)
+
+{com}.  
+. gen wife_employed = (hourw>0 & hourw!=.)
+{txt}
+{com}. gen mort1_dum = (mortgage1>0 & mortgage1!=.)
+{txt}
+{com}. gen mort2_dum = (mortgage2>0 & mortgage2!=.)
+{txt}
+{com}.  
 . log close
       {txt}name:  {res}<unnamed>
-       {txt}log:  {res}D:\GU\git\abbg\stata\select.smcl
+       {txt}log:  {res}/data/uctprgu/git/abbg/stata/select.smcl
   {txt}log type:  {res}smcl
- {txt}closed on:  {res} 6 Jun 2014, 09:14:19
+ {txt}closed on:  {res} 6 Jun 2014, 13:54:41
 {txt}{.-}
 {smcl}
 {txt}{sf}{ul off}

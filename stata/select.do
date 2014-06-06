@@ -158,6 +158,6 @@ if $pec_drop>0 {
  
 *drop if educ==. | weduc==.
 log close
-save select, replace 
+saveold select, replace 
 
 
