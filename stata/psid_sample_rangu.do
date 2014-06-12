@@ -19,6 +19,7 @@ clear all
 set mem 100m
 set more off
 cap log close
+log using notsampled, replace 
 
 u psid_cons_notsampled,clear
 drop pid
@@ -29,7 +30,6 @@ tsset id year
 drop vet
 gen avhy=ly/hours 					/* 	avhy is not reported by PSID starting the files of 1993. 
 									    Before it is topcoded at 99.99 therefore I recalculte for all years */ 
-
 
 * Makes the variable race consistent over the years
 * Now 1 is white, 2 black, 3 others
@@ -232,5 +232,18 @@ merge state_st year using min_wage
 drop if _merge!=3
 drop _merge
 
+*** merge prices
+sort year
+merge m:1 year using price_indices
+keep if _m==3
+drop _m
+
 /* counting the number of observation for baseline sample */
 drop if age<25 | age>65 
+ 
+log close
+saveold data3_2, replace 
+
+
+
+

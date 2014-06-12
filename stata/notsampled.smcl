@@ -1,0 +1,451 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}D:\GU\git\abbg\stata\notsampled.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 7 Jun 2014, 21:26:05
+{txt}
+{com}. 
+. u psid_cons_notsampled,clear
+{txt}
+{com}. drop pid
+{txt}
+{com}. 
+. /* update info which was not asked in all years */ 
+. tsset id year
+{res}{txt}{col 8}panel variable:  {res}id (unbalanced)
+{txt}{col 9}time variable:  {res}{col 25}year, 98 to 108, but with gaps
+{txt}{col 17}delta:  {res}1 unit
+{txt}
+{com}. * replace vet = L1.vet if newhd==5 & year>=94 & vet==.
+. drop vet
+{txt}
+{com}. gen avhy=ly/hours                                       /*      avhy is not reported by PSID starting the files of 1993. 
+>                                                                             Before it is topcoded at 99.99 therefore I recalculte for all years */ 
+{txt}(8706 missing values generated)
+
+{com}. 
+. * Makes the variable race consistent over the years
+. * Now 1 is white, 2 black, 3 others
+. forvalues i=1/4 {c -(}
+{txt}  2{com}.         gen     rc=race`i' if race`i'<=2
+{txt}  3{com}.         replace rc=3    if race`i'>=3 & race`i'<=7
+{txt}  4{com}.         drop race`i'
+{txt}  5{com}.         ren rc race`i'
+{txt}  6{com}. 
+.         gen     wrc=wrace`i' if wrace`i'<=2
+{txt}  7{com}.         replace wrc=3    if wrace`i'>=3 & wrace`i'<=7
+{txt}  8{com}.         drop wrace`i'
+{txt}  9{com}.         ren wrc wrace`i'
+{txt} 10{com}. {c )-}
+{txt}(3547 missing values generated)
+(2988 real changes made)
+{res}{txt}(23527 missing values generated)
+(2010 real changes made)
+{res}{txt}(46933 missing values generated)
+(927 real changes made)
+{res}{txt}(47075 missing values generated)
+(457 real changes made)
+{res}{txt}(47182 missing values generated)
+(64 real changes made)
+{res}{txt}(47199 missing values generated)
+(44 real changes made)
+{res}{txt}(47206 missing values generated)
+(6 real changes made)
+{res}{txt}(47206 missing values generated)
+(3 real changes made)
+{res}{txt}
+{com}. 
+. /*
+> Note: Reported switch in race across panel years is common. At least one reason is that there 
+> ----  is an option to mention more than one race, and the respondants reverse the order of the mentions.
+>       This is especially true when there is a slight change in the categories. In 2005 survey for example, 
+>           the 3rd category was change from "Native American" to "American Indian or Alaska Native". We deal 
+>           with that by assuming that the clearest (and most stable) categories are white (1) and african-
+>           american(2). Whenever a respondant mentions in any year an additional category he is assigned to the 
+>           third category (other). 
+> 
+> */
+. 
+. gen race=race1
+{txt}(559 missing values generated)
+
+{com}. replace race=3 if race2!=.              /* Any case of more than one reported race is also considered "other" */ 
+{txt}(1091 real changes made)
+
+{com}. egen race_temp = max(race), by(person)
+{txt}(196 missing values generated)
+
+{com}. replace race=race_temp
+{txt}(1832 real changes made)
+
+{com}. 
+. gen wrace=wrace1
+{txt}(21517 missing values generated)
+
+{com}. replace wrace=3 if wrace2!=.
+{txt}(541 real changes made)
+
+{com}. egen wrace_temp = max(wrace), by(person)
+{txt}(18536 missing values generated)
+
+{com}. replace wrace = wrace_temp
+{txt}(3803 real changes made)
+
+{com}. 
+. drop *temp wrace1 wrace2 wrace3 wrace4 race1 race2 race3 race4
+{txt}
+{com}. 
+. /*
+> Replaces educ with educ from individual file when missing. 
+> Makes the variable education consistent over the years
+> Now 1 is 0-11 grades (includes those with no schooling, i.e. can't read/write people); 
+>     2 is 12 grades, i.e. high school w or w/o nonacademic training;
+>     3 is college dropout, college degree, or collage & advanced/professional degree;
+>     a missing point denotes na/dk.
+> */
+. 
+. replace educ_ind =. if educ_ind==99
+{txt}(2632 real changes made, 2632 to missing)
+
+{com}. replace weduc_ind=. if weduc_ind==99
+{txt}(10156 real changes made, 10156 to missing)
+
+{com}. replace educ = educ_ind if educ==.
+{txt}(1608 real changes made)
+
+{com}. replace weduc = weduc_ind if weduc==.
+{txt}(12876 real changes made)
+
+{com}. 
+. gen sc=1 if educ>=0  & educ<=11                 /* 0-11  grades*/
+{txt}(38322 missing values generated)
+
+{com}. replace sc=2 if educ==12                        /* High school or 12 grades+nonacademic training*/
+{txt}(15199 real changes made)
+
+{com}. replace sc=3 if educ>=13 & educ<=17             /* College dropout, BA degree, or collage & adv./prof. degree*/
+{txt}(20912 real changes made)
+
+{com}. replace sc=. if educ>17                                 /* Missing, NA, DK*/
+{txt}(0 real changes made)
+
+{com}. drop educ
+{txt}
+{com}. ren sc educ
+{res}{txt}
+{com}. 
+. gen sc=1 if weduc>=0  & weduc<=11           /* 0-11  grades*/
+{txt}(43074 missing values generated)
+
+{com}. replace sc=2 if weduc==12                       /* High school or 12 grades+nonacademic training*/
+{txt}(11368 real changes made)
+
+{com}. replace sc=3 if weduc>=13 & weduc<=17           /* College dropout, BA degree, or collage & adv./prof. degree*/
+{txt}(21341 real changes made)
+
+{com}. replace sc=. if weduc>17                        /* Missing, NA, DK*/
+{txt}(0 real changes made)
+
+{com}. drop weduc
+{txt}
+{com}. ren sc weduc
+{res}{txt}
+{com}. 
+. egen maxed=max(educ),by(person)
+{txt}(1328 missing values generated)
+
+{com}. gen educ2=educ
+{txt}(2211 missing values generated)
+
+{com}. replace educ=maxed
+{txt}(1562 real changes made)
+
+{com}. drop maxed educ2
+{txt}
+{com}. 
+. egen maxed=max(weduc),by(person)
+{txt}(6133 missing values generated)
+
+{com}. gen educ2=weduc
+{txt}(10365 missing values generated)
+
+{com}. replace weduc=maxed
+{txt}(6773 real changes made)
+
+{com}. drop maxed educ2 
+{txt}
+{com}. 
+. 
+. * Design a demographically unstable household as one where some family composition change (apart from changes in
+. * people other than head-wife takes place).
+. * Then drop the years after the change for households with unstable demographical pattern
+. 
+. /*
+> fchg=0 (No change), 1 (Change in members other than Head or Wife), 2 (Head same, wife left,die, or is new)
+> 3 (wife is now head), 4 (ex female head married and huisband is now head), 5 (some sample member other than 
+> ex Head or Wife is now head)
+> 7 (ex wife head because husband in inst., now husband back and is head), 8 (Other) 
+> */
+. 
+. ******PAY ATTENTION TO MARITAL STATUS ETC
+. sort person year
+{txt}
+{com}. egen miny               = min(year),by(person)
+{txt}
+{com}. gen break_d     = (fchg>1 & year>98)
+{txt}
+{com}. replace break_d = 0 if year==miny & break_d==1
+{txt}(5250 real changes made)
+
+{com}. drop if break_d == 1
+{txt}(2527 observations deleted)
+
+{com}. drop miny break_d
+{txt}
+{com}. 
+. /* dropped the non-married heads */ 
+. drop if marit!=1 | agew==0
+{txt}(22027 observations deleted)
+
+{com}. 
+. /* drop if state is missing */ 
+. drop if state==.|state==0|state==99
+{txt}(122 observations deleted)
+
+{com}. 
+. # delimit;
+{txt}delimiter now ;
+{com}. gen     region=1 if state==6  | state==18 | state==20 | state==28 | state==29 | state==31 
+>                               | state==37 | state==38 | state==44;
+{txt}(19109 missing values generated)
+
+{com}.                                                  /* North East*/
+> replace region=2 if state==12 | state==13 | state==14 | state==15 | state==21 | state==22
+>                               | state==24 | state==26 | state==33 | state==34 | state==40 | state==48;
+{txt}(5773 real changes made)
+
+{com}.  /*Midwest*/
+> replace region=3 if state==1  | state==3  | state==7  | state==8  | state==9  | state==10 | state==16  
+>                               | state==17 | state==19 | state==23 | state==32 | state==35 
+>                               | state==39 | state==41 | state==42 | state==45 | state==47;
+{txt}(8894 real changes made)
+
+{com}.                  /*South*/
+> replace region=4 if state==2  | state==4  | state==5  | state==11 | state==25 | state==27 | state==30 
+>                               | state==36 | state==43 | state==46 | state==49 | state==50 | state==51;
+{txt}(4442 real changes made)
+
+{com}.  /*West*/                              
+> #delimit cr
+{txt}delimiter now cr
+{com}. 
+. /* Drop female household heads*/
+. drop if sex==2
+{txt}(0 observations deleted)
+
+{com}. 
+. /* Recode age so that there is no gap or jump*/
+. /* FIrst drop those with always missing info on age */
+. 
+. egen n=sum(person!=.),by(person)
+{txt}
+{com}. egen na=sum(age==.),by(person)
+{txt}
+{com}. drop if n==na
+{txt}(2 observations deleted)
+
+{com}. drop n na
+{txt}
+{com}. 
+. egen n=sum(person!=.),by(person)
+{txt}
+{com}. egen na=sum(agew==.),by(person)
+{txt}
+{com}. drop if n==na
+{txt}(4 observations deleted)
+
+{com}. drop n na
+{txt}
+{com}. 
+. egen lasty=max(year) if age!=.,by(person)
+{txt}(5 missing values generated)
+
+{com}. gen lastage=age if year==lasty
+{txt}(16810 missing values generated)
+
+{com}. gen b=year-lastage
+{txt}(16810 missing values generated)
+
+{com}. replace b=0 if b==.
+{txt}(16810 real changes made)
+
+{com}. egen yb=sum(b),by(person)
+{txt}
+{com}. replace age=year-yb
+{txt}(2088 real changes made)
+
+{com}. drop lasty lastage b
+{txt}
+{com}. 
+. egen lasty=max(year) if agew!=.,by(person)
+{txt}(3 missing values generated)
+
+{com}. gen lastage=agew if year==lasty
+{txt}(16810 missing values generated)
+
+{com}. gen b=year-lastage
+{txt}(16810 missing values generated)
+
+{com}. replace b=0 if b==.
+{txt}(16810 real changes made)
+
+{com}. egen wyb=sum(b),by(person)
+{txt}
+{com}. replace agew=year-wyb
+{txt}(2167 real changes made)
+
+{com}. drop lasty lastage b
+{txt}
+{com}. 
+. * Takes into account the retrospective nature of the data
+. replace age=age-1
+{txt}(22524 real changes made)
+
+{com}. replace agew=agew-1
+{txt}(22524 real changes made)
+
+{com}. 
+. /*
+> 
+> /* Drop additional extreme outlyers - identified from J Laird Summer 09*/
+> 
+> drop if out==1 | out==2                                                 /* drop additional outliers */ 
+> 
+> */
+. 
+. /*  For intermittent "headship" drop the years after the break for long_sample=0 and bring back the family with new id one year after the break for long_sample=1 */
+. /*      Also dropping if less than 2 consecutive periods in the sample */ 
+. /*      This was moved to the end since intermittent "headship" might be due to missing race / educ etc. This way we are not dropping the whole
+>         HH but just the years after the missing data. Alternatively we can not drop these at all, but change the mindist_AER to account for "holes"
+>         in the series */ 
+. 
+. sort person year
+{txt}
+{com}. qby person: gen dyear   = year-year[_n-1]
+{txt}
+{com}. qby person: gen break_d = (dyear>1 & dyear!=. & year<=96 | dyear>2 & dyear!=. & year>96)
+{txt}
+{com}. qby person: gen b_year  = year if break_d == 1
+{txt}
+{com}. egen break_year                 = min(b_year), by(person)
+{txt}(21703 missing values generated)
+
+{com}. 
+. gen long_sample=0                       /* long_sample is equal to one for families which were broken and than put back in to the sample */ 
+{txt}
+{com}. local ind=1
+{txt}
+{com}. while `ind'>0 {c -(}
+{txt}  2{com}.         sum person
+{txt}  3{com}.         local max_id    =       r(max)
+{txt}  4{com}.         count if year==break_year   /* for debugging */
+{txt}  5{com}.         di r(N)                                         /* for debugging */ 
+{txt}  6{com}.         * drop if year==break_year
+.         replace person = person + `max_id' if year>=break_year
+{txt}  7{com}.         replace long_sample = 1 if year>break_year
+{txt}  8{com}.         drop dyear break_d b_year break_year
+{txt}  9{com}.         sort person year
+{txt} 10{com}.         qby person: gen dyear   = year-year[_n-1]
+{txt} 11{com}.         qby person: gen break_d = (dyear>1 & dyear!=. & year<=96 | dyear>2 & dyear!=. & year>96)
+{txt} 12{com}.         qby person: gen b_year  = year if break_d == 1
+{txt} 13{com}.         egen break_year                 = min(b_year), by(person)
+{txt} 14{com}.         count if break_d == 1
+{txt} 15{com}.         local ind=r(N)
+{txt} 16{com}.         di `ind'                                        /* for debugging */
+{txt} 17{com}.         {c )-}
+
+{txt}    Variable {c |}       Obs        Mean    Std. Dev.       Min        Max
+{hline 13}{c +}{hline 56}
+{space 6}person {c |}{res}     22524    9106.912    5884.893          9      23954
+  238
+238
+{txt}person was {res}int{txt} now {res}long
+{txt}(427 real changes made)
+(189 real changes made)
+(22524 missing values generated)
+{res}    0
+0
+{txt}
+{com}. 
+. 
+.         /* merge minimum wage data */ 
+. sort state
+{txt}
+{com}. merge state using psid_states
+{txt}{p}
+(note: you are using old
+{bf:merge} syntax; see
+{bf:{help merge:[D] merge}} for new syntax)
+{p_end}
+{p 0 4 2}
+variable{txt} state
+does not uniquely identify observations in
+the master data
+{p_end}
+
+{com}. drop _merge
+{txt}
+{com}. 
+. sort state_st year
+{txt}
+{com}. merge state_st year using min_wage
+{txt}{p}
+(note: you are using old
+{bf:merge} syntax; see
+{bf:{help merge:[D] merge}} for new syntax)
+{p_end}
+{p 0 4 2}
+variable{txt}s{txt} state_st
+year
+do not uniquely identify observations in
+the master data
+{p_end}
+
+{com}. drop if _merge!=3
+{txt}(318 observations deleted)
+
+{com}. drop _merge
+{txt}
+{com}. 
+. *** merge prices
+. sort year
+{txt}
+{com}. merge m:1 year using price_indices
+{res}{txt}year was {res}int{txt} now {res}float
+
+{txt}{col 5}Result{col 38}# of obs.
+{col 5}{hline 41}
+{col 5}not matched{col 30}{res}               0
+{txt}{col 5}matched{col 30}{res}          22,524{txt}  (_merge==3)
+{col 5}{hline 41}
+
+{com}. keep if _m==3
+{txt}(0 observations deleted)
+
+{com}. drop _m
+{txt}
+{com}. 
+. /* counting the number of observation for baseline sample */
+. drop if age<25 | age>65 
+{txt}(3207 observations deleted)
+
+{com}.  
+. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}D:\GU\git\abbg\stata\notsampled.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res} 7 Jun 2014, 21:26:11
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

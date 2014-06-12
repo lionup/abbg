@@ -5,6 +5,7 @@ clear mata
 cap log close
 set mem 200m
 set more off
+log using select, replace 
 
 *** user parameters
 global consumption  = 5  /*  5=totcons_psid_zero  *** The default                            
@@ -21,11 +22,8 @@ global pec_drop     = 0.25  /* Drop observation in the bottom "pec_drop" percent
                                                                                                                                
 *** see more parameters in Mata part
  
-u data3,clear
+u data3_2,clear
 
-cap log close
-log using select, replace 
- 
 /*** Merge with welfare simulation data
 ren year yearo
 gen year = yearo+1900
@@ -150,6 +148,6 @@ gen mort1_dum = (mortgage1>0 & mortgage1!=.)
 gen mort2_dum = (mortgage2>0 & mortgage2!=.)
  
 log close
-saveold select, replace 
+saveold select_2, replace 
 
 

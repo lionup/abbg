@@ -5,9 +5,9 @@ clear mata
 cap log close
 set more off
 set mem 200m
-u select,clear
 log using first_stage_regs, replace
 
+u select_2,clear
 ************************************
 *** Balanced subsample N=749 T=6 ***
 ************************************
@@ -67,22 +67,26 @@ predict ua if e(sample),res
 
 ************************************
 * account for covariates effects in variances
-* use method one with linear regression
+* use different set of controls
+drop _I*
+xi i.educ*i.yb i.weduc*i.wyb i.race i.wrace 
+local varlist2 _I* bigcity 
+
 * consumption
 gen double uc2 = uc^2
-reg uc2 kidsout bigcity extra _I*
+reg uc2 `varlist2'
 predict double uc2_yhat if e(sample)
 gen muc = uc/sqrt(uc2_yhat)
 
 * total income
 gen double utoty2 = utoty^2
-reg utoty2 kidsout bigcity extra _I*
+reg utoty2 `varlist2'
 predict double utoty2_yhat if e(sample)
 gen mutoty = utoty/sqrt(utoty2_yhat)
 
 * total asset
 gen double ua2 =ua^2
-reg ua2 kidsout bigcity extra _I*
+reg ua2 `varlist2'
 predict double ua2_yhat if e(sample)
 gen mua = ua/sqrt(ua2_yhat)
 
@@ -101,14 +105,14 @@ sum uc muc utoty mutoty ua mua
 drop uc2* utoty2* ua2*
 
 * drop missing after standardization and construct balanced sample
-drop if muc == . | mutoty==. | mua==.
-by person, sort: gen numwav= _N
-keep if numwav == 6
-drop numwav
-codebook person
+*drop if muc == . | mutoty==. | mua==.
+*by person, sort: gen numwav= _N
+*keep if numwav == 6
+*drop numwav
+*codebook person
 
 log close
 
-*saveold first_stage_resid, replace 
+saveold first_stage_resid_2, replace 
 
 

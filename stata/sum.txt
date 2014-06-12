@@ -1,0 +1,30 @@
+909
+
+xi i.educ*i.yb i.weduc*i.wyb
+local varlist2 _I* 
+875
+
+
+xi i.educ*i.yb i.weduc*i.wyb i.race i.wrace 
+local varlist2 _I* bigcity 
+874
+
+xi i.educ*i.yb i.weduc*i.wyb i.race i.wrace 
+local varlist2 _I* kidsout bigcity extra
+866
+
+xi i.educ*i.yb i.weduc*i.wyb i.race i.wrace i.fsize 
+local varlist2 _I* bigcity 
+860
+
+xi i.educ*i.yb i.weduc*i.wyb i.race i.wrace  i.kids
+local varlist2 _I* bigcity 
+867
+
+xi i.educ*i.yb i.weduc*i.wyb i.race i.wrace  
+local varlist2 _I* bigcity   kidsout
+871
+
+xi i.educ*i.yb i.weduc*i.wyb i.race i.wrace  
+local varlist2 _I* bigcity  extra
+869
