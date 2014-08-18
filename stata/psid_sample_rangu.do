@@ -239,7 +239,7 @@ keep if _m==3
 drop _m
 
 /* counting the number of observation for baseline sample */
-drop if age<25 | age>65 
+drop if age<25 | age>=65 
  
 log close
 saveold data3_2, replace 

@@ -1,9 +1,9 @@
 {smcl}
 {com}{sf}{ul off}{txt}{.-}
       name:  {res}<unnamed>
-       {txt}log:  {res}D:\GU\git\abbg\stata\notsampled.smcl
+       {txt}log:  {res}/home/lionup/git/abbg/stata/notsampled.smcl
   {txt}log type:  {res}smcl
- {txt}opened on:  {res} 7 Jun 2014, 21:26:05
+ {txt}opened on:  {res}17 Aug 2014, 17:01:50
 {txt}
 {com}. 
 . u psid_cons_notsampled,clear
@@ -437,15 +437,15 @@ the master data
 {txt}
 {com}. 
 . /* counting the number of observation for baseline sample */
-. drop if age<25 | age>65 
-{txt}(3207 observations deleted)
+. drop if age<25 | age>=65 
+{txt}(3385 observations deleted)
 
 {com}.  
 . log close
       {txt}name:  {res}<unnamed>
-       {txt}log:  {res}D:\GU\git\abbg\stata\notsampled.smcl
+       {txt}log:  {res}/home/lionup/git/abbg/stata/notsampled.smcl
   {txt}log type:  {res}smcl
- {txt}closed on:  {res} 7 Jun 2014, 21:26:11
+ {txt}closed on:  {res}17 Aug 2014, 17:01:55
 {txt}{.-}
 {smcl}
 {txt}{sf}{ul off}

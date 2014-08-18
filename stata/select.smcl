@@ -1,9 +1,9 @@
 {smcl}
 {com}{sf}{ul off}{txt}{.-}
       name:  {res}<unnamed>
-       {txt}log:  {res}D:\GU\git\abbg\stata\select.smcl
+       {txt}log:  {res}/home/lionup/git/abbg/stata/select.smcl
   {txt}log type:  {res}smcl
- {txt}opened on:  {res} 7 Jun 2014, 21:30:59
+ {txt}opened on:  {res}17 Aug 2014, 17:02:43
 {txt}
 {com}. 
 . *** user parameters
@@ -27,15 +27,15 @@
 {com}.  
 . *** Liquid holdings
 . gen liquidhold = cash + bonds + stocks
-{txt}(2368 missing values generated)
+{txt}(2341 missing values generated)
 
 {com}.  
 . * Adjust by price index
 . replace tot_assets3 = tot_assets3/price
-{txt}(15840 real changes made)
+{txt}(15689 real changes made)
 
 {com}. replace fin_assets1 = fin_assets1/price
-{txt}(14063 real changes made)
+{txt}(13935 real changes made)
 
 {com}.  
 . sort person year
@@ -51,9 +51,9 @@
 .   gen oly = ly
 .   gen owly = wly
 .   replace ly=.  if (ly/hours)<0.5*min_wage
-{txt}(317 real changes made, 317 to missing)
+{txt}(305 real changes made, 305 to missing)
 {com}.   replace wly=. if (wly/hourw)<0.5*min_wage
-{txt}(343 real changes made, 343 to missing)
+{txt}(340 real changes made, 340 to missing)
 {com}. {c )-}
 {txt}
 {com}.  
@@ -63,7 +63,7 @@
 . ***************************
 . /* Baseline specification */
 . keep if seo==0
-{txt}(3516 observations deleted)
+{txt}(3488 observations deleted)
 
 {com}.  
 . /* Want to use data from age 26 for lags at age 28, but don't want to condition the sample on characteristics at age 26 */
@@ -75,26 +75,26 @@
 {com}. foreach var of varlist tot_assets* fin_assets* liquidhold {c -(}
 {txt}  2{com}.   gen l2_`var'=l2.`var'
 {txt}  3{com}. {c )-}
-{txt}(4203 missing values generated)
-(4203 missing values generated)
-(4203 missing values generated)
-(4203 missing values generated)
-(4203 missing values generated)
-(4203 missing values generated)
-(5588 missing values generated)
+{txt}(4168 missing values generated)
+(4168 missing values generated)
+(4168 missing values generated)
+(4168 missing values generated)
+(4168 missing values generated)
+(4168 missing values generated)
+(5535 missing values generated)
 
 {com}.  
 . *${c -(}sample2{c )-}
 .  
 . gen log_ly  = log(ly) - log(price)
-{txt}(1248 missing values generated)
+{txt}(1166 missing values generated)
 
 {com}. gen log_wly = log(wly) - log(price)
-{txt}(3497 missing values generated)
+{txt}(3426 missing values generated)
 
 {com}. 
 . replace totcons = totcons/price 
-{txt}(13213 real changes made)
+{txt}(13084 real changes made)
 
 {com}. gen log_totcons = log(totcons)    /* log consumption */ 
 {txt}(8 missing values generated)
@@ -116,20 +116,20 @@
 {txt}  2{com}.     gen d_`var' = `var' - l2.`var'
 {txt}  3{com}.     gen d_`var'_lag = d_`var'*l2.d_`var'
 {txt}  4{com}.   {c )-}
-{txt}(5426 missing values generated)
-(8621 missing values generated)
-(7520 missing values generated)
-(10310 missing values generated)
-(4213 missing values generated)
-(7590 missing values generated)
+{txt}(5319 missing values generated)
+(8504 missing values generated)
+(7424 missing values generated)
+(10202 missing values generated)
+(4178 missing values generated)
+(7531 missing values generated)
 {com}. 
 .   /* Generate percentiles of the interacted difference by year */
 .   foreach var of varlist d_*_lag {c -(}
 {txt}  2{com}.     egen pec_`var'=  xtile(`var'), by(year) n(`npec')
 {txt}  3{com}.   {c )-}
-{txt}(8621 missing values generated)
-(10310 missing values generated)
-(7590 missing values generated)
+{txt}(8504 missing values generated)
+(10202 missing values generated)
+(7531 missing values generated)
 {com}. 
 .   /* Assign missing values for the variable with the potential measurement error  */
 .   foreach var of varlist ly wly totcons {c -(}
@@ -137,19 +137,19 @@
 {txt}  3{com}.   {c )-}
 {txt}(20 real changes made, 20 to missing)
 (16 real changes made, 16 to missing)
-(24 real changes made, 24 to missing)
+(22 real changes made, 22 to missing)
 {com}.   drop d_* pec_* log_*
 . {c )-}
 {txt}
 {com}.  
 . gen totly = (ly+wly)/price    /* total family income */
-{txt}(588 missing values generated)
+{txt}(576 missing values generated)
 
 {com}. gen log_totly  = log(totly) 
-{txt}(946 missing values generated)
+{txt}(894 missing values generated)
 
 {com}. gen log_cons = log(totcons)       /* log consumption */ 
-{txt}(32 missing values generated)
+{txt}(30 missing values generated)
 
 {com}.  
 . gen wife_employed = (hourw>0 & hourw!=.)
@@ -161,9 +161,9 @@
 {com}.  
 . log close
       {txt}name:  {res}<unnamed>
-       {txt}log:  {res}D:\GU\git\abbg\stata\select.smcl
+       {txt}log:  {res}/home/lionup/git/abbg/stata/select.smcl
   {txt}log type:  {res}smcl
- {txt}closed on:  {res} 7 Jun 2014, 21:31:36
+ {txt}closed on:  {res}17 Aug 2014, 17:03:12
 {txt}{.-}
 {smcl}
 {txt}{sf}{ul off}
