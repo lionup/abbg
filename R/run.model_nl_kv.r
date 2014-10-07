@@ -2,10 +2,9 @@ rm(list = ls())
 require(EQL)
 require(data.table)
 require(ggplot2)
-source('~/git/Utils/R/ccquad.r')
 
 #setwd('~/git/abbg/R')
-source('fun.model_solver_nl_cc.r')
+source('fun.model_solver_nl_kv.r')
 set.seed(77)
 
 # SETTIG PARAMETERS
@@ -40,14 +39,9 @@ detach(data)
 
 #grid dimension
 p$nbin  = 100#50    #permanent component
-#p$neps  = 99#49     #transitory component
+p$neps  = 99#49     #transitory component
 p$ngpa  = 50     #asset
-#p$ngpm  = 100#50     # average earnings points
-p$nc    = 40          # degree for chebychev polynomial    
-Q  = cc.quad(p$nc,0,1)
-p$Qn = Q$nodes 
-p$Qw = array(Q$weights)
-
+p$ngpm  = 100#50     #average earnings points
 
 #asset
 p$amax  = 3e5
@@ -74,7 +68,7 @@ start_time = proc.time()[3]
 model  <- comp.solveModel(p)
 cat(paste('\ntotal seconds to compute Cons rule: ' , proc.time()[3] -  start_time ))
 
-#save(model,file='only_model_100gp.dat')
+save(model,file='only_model_100gp.dat')
 
 #load('only_model2.dat')
 start_time = proc.time()[3]  

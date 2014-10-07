@@ -1,7 +1,7 @@
-source('inc.modelsolver_nl_cc.r')
+source('inc.modelsolver_nl_kv.r')
 
 comp.ngpm <- function(im, p, model){
-	source('inc.modelsolver_nl_cc.r')
+	source('inc.modelsolver_nl_kg.r')
 	
 	Mea <- array(0, dim=c(p$nbin, p$ngpa+1))
 	Cea <- Mea  
