@@ -1,7 +1,7 @@
 #cononical random walk model
-#Initial permanent component: sig2eta1 =  0.1507
-#Permanent shock sig2v =   0.0218
-#Transitory shock: sig2eps =   0.0910
+#Initial permanent component: sig2eta1 =  0.15
+#Permanent shock sig2v =   0.01
+#Transitory shock: sig2eps =   0.05
 
 rm(list = ls())
 setwd('~/git/abbg/R2')
@@ -10,16 +10,16 @@ source('fun.model_solver_rw.r')
 # SETTIG PARAMETERS
 p <- list()
 
-p$age_min = 30
-p$age_re  = p$age_min+36 #first period income drop 
-p$age_max = p$age_min+50
-p$nage  = (p$age_re - p$age_min)/2   #periods before retirement
-p$ntr   = (p$age_max - p$age_re)/2 + 1  #periods after retirement
+p$age_min = 25
+p$age_re  = p$age_min+35 #first period income drop at age 60 
+p$age_max = p$age_min+69 #last period 94
+p$nage  = p$age_re - p$age_min   #periods before retirement
+p$ntr   = p$age_max - p$age_re + 1  #periods after retirement
 p$PeriodsToSolve  = p$nage + p$ntr
 
 p$rho     = 2                #(* Coefficient of Relative Risk Aversion *)
-p$R       = 1.06             #(* Gross interest rate *)
-p$beta    = 0.93             #(* Discount factor *)
+p$R       = 1.03             #(* Gross interest rate *)
+p$beta    = 0.96             #(* Discount factor *)
 p$nP      = 6                #(* Permanent shock Number of points in the discrete approximation to lognormal dist *)
 p$nT      = 6                #(* Transitory shock Number of points in the discrete approximation to lognormal dist *)
 p$sig2P   = 0.0218           #(* Permanent shock variance of lognormal distribution *)
