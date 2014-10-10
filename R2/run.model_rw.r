@@ -10,6 +10,7 @@ source('fun.model_solver_rw.r')
 # SETTIG PARAMETERS
 p <- list()
 
+#
 p$age_min = 25
 p$age_re  = p$age_min+35 #first period income drop at age 60 
 p$age_max = p$age_min+69 #last period 94
@@ -20,8 +21,8 @@ p$PeriodsToSolve  = p$nage + p$ntr
 p$rho     = 2                #(* Coefficient of Relative Risk Aversion *)
 p$R       = 1.03             #(* Gross interest rate *)
 p$beta    = 0.96             #(* Discount factor *)
-p$nP      = 6                #(* Permanent shock Number of points in the discrete approximation to lognormal dist *)
-p$nT      = 6                #(* Transitory shock Number of points in the discrete approximation to lognormal dist *)
+p$nP      = 39                #(* Permanent shock Number of points in the discrete approximation to lognormal dist *)
+p$nT      = 19                #(* Transitory shock Number of points in the discrete approximation to lognormal dist *)
 p$sig2P   = 0.0218           #(* Permanent shock variance of lognormal distribution *)
 p$sig2T   = 0.0910           #(* Transitory shock variance of lognormal distribution *)
 #p$pUnemp  = 0 #0.5/100      #Probability of unemployment (when unemployed inc level is zero) 
