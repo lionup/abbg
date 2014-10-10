@@ -43,7 +43,7 @@ FnGridPerm <- function(lx, p, varz, moment=TRUE){
     lvar <- lwidth
 
     # get boundaries and fill in with equally spaced points
-    zgrid    <- array( 0, dim=c(Twork,ngpz)           ) #permanent component
+    zgrid    <- array( 0, dim=c(Twork,ngpz) ) #permanent component
     for(it in 1:Twork){
       zgrid[it,1]    = -lx*sqrt(varz[it])
       zgrid[it,ngpz] = lx*sqrt(varz[it])
