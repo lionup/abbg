@@ -17,8 +17,8 @@ module load r
 
 echo "calling mpirun now"
 
-#R --no-save < run.model_abbg.r > r.output.$JOB_ID
-R --no-save < run.model_rwR.r > r.output.$JOB_ID
+R --no-save < run.model_abbg.r > r.output.$JOB_ID
+#R --no-save < run.model_rwR.r > r.output.$JOB_ID
 
 ## call via: qsub qsub_start_mpi.sh 
 
