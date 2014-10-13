@@ -5,7 +5,7 @@ set.seed(123)
 require(Hmisc)
 require(data.table)
 require(ggplot2)
-require(snow)  
+#require(snow)  
 
 
 # SETTIG PARAMETERS
