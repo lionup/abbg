@@ -1,16 +1,22 @@
 rm(list = ls())
 setwd('~/git/abbg/R2')
-source('fun.model_solver_kvR.r')
+source('fun.model_solver_abbg.r')
+set.seed(123)
+require(Hmisc)
+require(data.table)
+require(ggplot2)
+require(snow)  
+
 
 # SETTIG PARAMETERS
 p <- list()
 
 # GRIDS DIMENSION - STATE VARIABLES
-p$ngpe = 19 #7 			    #transitory component
+p$ngpe = 7 #19 #7 			    #transitory component
 p$ngpz = 39 #11 			    #permanent component
-p$ngpa = 100 #50 		    #asset points
+p$ngpa = 50#100#50 		    #asset points
 p$ngpm = 19  			    #average earnings points
-p$ngpp = p$ngpm * p$ngpz * p$ngpe      #pension points
+#p$ngpp = p$ngpm * p$ngpz * p$ngpe      #pension points
 
 #DEMOGRAPHIC PARAMETERS PARAMETERS
 p$Twork    = 35		#working years
@@ -28,12 +34,15 @@ p$amax  = 300000
 
 #SIMULATION PARAMETERS	
 p$nsim = 50000 #5000
+p$N = 999999
 
 #EARNINGS PROCESS
 p$Veps =  0.05
 p$Vz0  =  0.15
 p$rho  =  1
+p$rho2 =  0.8
 p$Veta_rho1 =  0.01   #Veta if rho==1
+p$tao   = 0.15
 
 #INTEREST RATE
 p$R = 1.03      #annual gross interest rate
@@ -43,7 +52,7 @@ p$gam = 2.0
 p$bet =   1/p$R
 
 #BORROWING LIMIT: SET TO VERY LARGE NEGATIVE NO. FOR NBL
-p$borrowlim = 0.0 #-100000000.0
+p$borrowlim = -100000000.0 #0.0 #-100000000.0
 
 #GOVERNMENT PARAMETERS
 #gouveia strauss 
@@ -60,14 +69,10 @@ p$pencapfrac = 2.2 #cap on (pre-tax) earnings that contribute to pension index,
 p$Rnet = 1.0 + (1.0-p$rtax)*(p$R-1)      #annual after tax interest rate
 
 #OPTIONS
-p$Display              = 1
+p$Display  = 1
 
 start_time = proc.time()[3]  
-model  <- comp.solveModel(p)
-cat(paste('\ntotal seconds to compute Cons rule: ' , proc.time()[3] -  start_time ))
+moments  <- comp.solveModel(p)
+cat(paste('\ntotal seconds to solve the program: ' , proc.time()[3] -  start_time ))
 
-start_time = proc.time()[3]  
-moments <- comp.moments(p, model) 
-cat(paste('\ntotal seconds to compute moments' , proc.time()[3] -  start_time ))
-
-save(model, moments, p, file='kvR.dat') 
+save(p, moments, file='abbg_nbl.dat') 

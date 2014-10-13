@@ -18,14 +18,15 @@ FnGridTrans <- function(lx, p, moment=TRUE){
       ltemp3 = pnorm( legrid[ij]-0.5*lwidth, sd=sqrt(Veps) )
       ledist[ij] = ltemp1 - ltemp3
     }
-    ledist[ngpe] = pnorm( legrid[ngpe]-0.5*lwidth, sd=sqrt(Veps), lower.tail=F )
+    ledist[ngpe] = pnorm( legrid[ngpe]-0.5*lwidth, sd=sqrt(Veps), lower.tail=FALSE )
     ledist = ledist/sum(ledist)
 
     #find variance
     lvar = sum(legrid^2 * ledist) - sum(legrid*ledist)^2
 
     if(moment){
-      rr = (Veps -lvar)^2
+      #rr = (Veps -lvar)^2
+      rr = Veps -lvar
     }else{
       edist <- array( rep(ledist,each=Twork), dim=c(Twork,ngpe) )
       egrid <- array( rep(legrid,each=Twork), dim=c(Twork,ngpe) )
@@ -37,13 +38,15 @@ FnGridTrans <- function(lx, p, moment=TRUE){
 }
 
 #####################################################
-FnGridPerm <- function(lx, p, varz, moment=TRUE){
+FnGridPerm <- function(lx, p, varz, Vetavec, moment=TRUE){
   res <- with(p,{ 
     lwidth <- rep(0,Twork)
     lvar <- lwidth
+    zgrid    <- array( 0, dim=c(Twork,ngpz) ) #permanent component
+    zdist  <- zgrid
+    ztrans <- array( 0, dim=c(Twork-1,ngpz,ngpz) )
 
     # get boundaries and fill in with equally spaced points
-    zgrid    <- array( 0, dim=c(Twork,ngpz) ) #permanent component
     for(it in 1:Twork){
       zgrid[it,1]    = -lx*sqrt(varz[it])
       zgrid[it,ngpz] = lx*sqrt(varz[it])
@@ -54,7 +57,6 @@ FnGridPerm <- function(lx, p, varz, moment=TRUE){
     }
 
     # fill in transition matrix using normal distribution
-    ztrans <- array( 0, dim=c(Twork-1,ngpz,ngpz) )
     for( it in 1:(Twork-1) ){
       for (iz1 in 1:ngpz){
         ztrans[it,iz1,1] <- pnorm( zgrid[it+1,1]+0.5*lwidth[it+1]-rho*zgrid[it,iz1], sd=sqrt(Vetavec[it]) ) 
@@ -63,20 +65,20 @@ FnGridPerm <- function(lx, p, varz, moment=TRUE){
           ltemp3 = pnorm( zgrid[it+1,iz2]-0.5*lwidth[it+1]-rho*zgrid[it,iz1], sd=sqrt(Vetavec[it]) )
           ztrans[it,iz1,iz2] = ltemp1 - ltemp3
         }
-        ztrans[it,iz1,ngpz] = pnorm( zgrid[it+1,ngpz]-0.5*lwidth[it+1]-rho*zgrid[it,iz1], sd=sqrt(Vetavec[it]), lower.tail=F )
+        ztrans[it,iz1,ngpz] = pnorm( zgrid[it+1,ngpz]-0.5*lwidth[it+1]-rho*zgrid[it,iz1], 
+          sd=sqrt(Vetavec[it]), lower.tail=FALSE )
         ztrans[it,iz1,] = ztrans[it,iz1,]/sum(ztrans[it,iz1,])
       }
     }
 
     #find distribution at first period
-    zdist  <- zgrid
     zdist[1,1] = pnorm( zgrid[1,1]+0.5*lwidth[1], sd=sqrt(Vz0) )  
     for (iz1 in 2:(ngpz-1) ){
       ltemp1 = pnorm( zgrid[1,iz1]+0.5*lwidth[1], sd=sqrt(Vz0) )
       ltemp3 = pnorm( zgrid[1,iz1]-0.5*lwidth[1], sd=sqrt(Vz0) )
       zdist[1,iz1] = ltemp1 - ltemp3
     }
-    zdist[1,ngpz] = pnorm( zgrid[1,ngpz]-0.5*lwidth[1], sd=sqrt(Vz0), lower.tail=F )
+    zdist[1,ngpz] = pnorm( zgrid[1,ngpz]-0.5*lwidth[1], sd=sqrt(Vz0), lower.tail=FALSE )
     zdist[1,] = zdist[1,]/sum(zdist[1,])
 
     #find unconditional distributions
@@ -102,11 +104,6 @@ FnGrossInc <- function(lx,lnet,p,stax){
   #lx is gross, lnet is net
   lf = (1-p$pentax - p$btax)*lx + p$btax*( lx^(-p$ptax) + stax )^(-1/p$ptax) - lnet
 }
-
-#####################################################
-#FnTax <- function(ly,p, stax){
-#  lf = p$btax*( ly - (ly^(-p$ptax) + stax)^(-1/p$ptax) ) + p$pentax*ly
-#}
 
 #####################################################
 FnTaxParamNet <- function(lstax, p, kappa, popsize, zgrid, egrid, zdist, edist, moment=TRUE){
@@ -166,14 +163,73 @@ FnTaxParamNet <- function(lstax, p, kappa, popsize, zgrid, egrid, zdist, edist, 
     if(moment){
       rr = ltottax/ltotlabincpre - targetTaxToLabinc
     }else{
-      rr = list(
-      avearnspre   = avearnspre)
+      rr = list(ygrid = ygrid,
+                ypregrid = ypregrid, 
+                avearnspre   = avearnspre)
     }
 
   })     
   return(res)
 }
 
+#####################################################
+FnTax <- function(ly,p, stax){
+  lf = p$btax*( ly - (ly^(-p$ptax) + stax)^(-1/p$ptax) ) + p$pentax*ly
+}
+
+#####################################################
+FnSSParam <- function(lsspar, p, avearnspre, mgrid, pencap, stax, moment=TRUE){
+  res <- with(p,{
+    if (Display==1) cat('SS benefit parameter: ', lsspar, '\n')
+
+    lavearns = sum(avearnspre)/Twork 
+    ssbend1 = 0.18*lavearns
+    ssbend2 = 1.1*lavearns
+     
+    ltotpen = 0.0
+    ppregrid <- array( 0, dim=c(Tret,ngpm) ) #pension grid
+    pgrid    <- ppregrid
+
+    for ( im in 1:ngpm ){  
+      for ( it in 1:Tret ){
+        lmearns = mgrid[Twork,im]
+        
+        if (lmearns<= ssbend1) {
+            ppregrid[it,im] = 0.9*lmearns
+        }else if (lmearns<= ssbend2) {
+            ppregrid[it,im] = 0.9*ssbend1 + 0.32*(lmearns - ssbend1)
+        }else{
+            ppregrid[it,im] = 0.9*ssbend1 + 0.32*(ssbend2-ssbend1) + 0.15*(lmearns - ssbend2)
+        }
+
+        ppregrid[it,im] = ppregrid[it,im]*lsspar
+        pgrid[it,im] = ppregrid[it,im] - FnTax( ppregrid[it,im]*0.85, p, stax )
+      }        
+    }
+
+    #match benefits based on guy with average AIME
+    lmearns =  sum( pmin(avearnspre,pencap) )/Twork
+    if (lmearns<= ssbend1) {
+        lmpen = 0.9*lmearns
+    }else if (lmearns<= ssbend2) {
+        lmpen = 0.9*ssbend1 + 0.32*(lmearns - ssbend1)
+    }else {
+        lmpen = 0.9*ssbend1 + 0.32*(ssbend2-ssbend1) + 0.15*(lmearns - ssbend2)
+    }
+    lmpen = lmpen*lsspar
+
+    if (Display==1) cat('SS Ben for Mean AIME/ Av Pre-tax Earns: ', (lmpen/(sum(avearnspre)/Twork))*100, '%\n')
+
+    if(moment){
+      rr = lmpen/(sum(avearnspre)/Twork) - targetSSAvReplacement
+    }else{
+      rr = list(ppregrid = ppregrid, 
+                pgrid    = pgrid   )
+    }
+
+  })     
+  return(res)
+}
 
 #####################################################
 FindLinProb1 <- function(xi,x){
@@ -196,77 +252,4 @@ FindLinProb1 <- function(xi,x){
   return(fmin)
 }
 
-#####################################################
-econdCDF <- function(p, wprob) {
-  QcondCDF <- wprob
-  for (i in 1:p$ne){
-    for (j in 2:p$ne){
-      QcondCDF[i,j] <- QcondCDF[i,j-1] + QcondCDF[i,j]
-    }
-  }
-  # Force QcondCDF[,p$nw] = 1 numerically
-  #QcondCDF <- QcondCDF / QcondCDF[,p$nw]   
-  return(QcondCDF)
-}
-
-# integrate x  by log normal
-F  <- function(x, level, Sigma) {
-	x * dlnorm(x,level,Sigma)
-}	
-
-DiscreteApproxToMeanOneLogNormal <- function(var,numofshockpoints){
-  std = sqrt(var)
-  LevelAdjustingParameter = -(1/2)*var
-  ListOfEdgePoints = qlnorm( (0:numofshockpoints)/numofshockpoints,LevelAdjustingParameter,std )
-  ListOfEdgePoints[numofshockpoints+1]=100  #change the last point from INF to a big value
-
-  shocklist  = rep(0,numofshockpoints)
-  for (i in 1:numofshockpoints){
-    #intergration over two points and divide by the prob to get the mid point
-    shocklist[i] = integrate(F,ListOfEdgePoints[i],ListOfEdgePoints[i+1],LevelAdjustingParameter,std)$value * numofshockpoints 
-  }
-  return(shocklist)
-}
-
-#CRRA marginal utility function      
-uP <- function(c,Rho){
-  return(c^(-Rho))
-}
-
-# Gothic V prime function
-GothVP <- function(p, a, G, theta, perm, thetaP, permP, C, M){
-  EUP = rep( 0, length(a) ) 
-  for ( i in 1:length(theta) ){
-    for ( j in 1:length(perm) ){
-      mtp = p$R*a/(G*perm[j]) + theta[i]  # money next period
-      EUP = EUP + uP( perm[j]*Cnextp(mtp,C,M),p$rho )*thetaP[i]*permP[j]       
-    }
-  }
-  return(EUP)
-}
-
-# Ct+1 function 
-Cnextp <- function(m,C,M){
-# Cnextp is constructed by interpolation to be the next-period consumption function Ct+1()
-  mtp1 = M[,ncol(M)]  # data for the next-period consumption function
-  ctp1 = C[,ncol(C)]  # data for the next-period consumption function
-
-  c = rep( 0, length(m) ) 
-  end = length(mtp1)
-
-  # extrapolate above maximal m
-  iAbove = m >= mtp1[end]
-  slopeAbove  = ( ctp1[end]-ctp1[end-1] ) / ( mtp1[end]-mtp1[end-1] )
-  c[iAbove]   = ctp1[end] + ( m[iAbove]-mtp1[end] )*slopeAbove
-
-  # extrapolate below minimal m
-  iBelow = m <= mtp1[1]
-  slopeBelow  = 1
-  c[iBelow]   = ctp1[1] + ( m[iBelow]-mtp1[1] )*slopeBelow
-
-  # interpolate
-  iInterp = !(iAbove | iBelow)
-  c[iInterp]  = approx( mtp1,ctp1,m[iInterp] )$y
-  return(c)  
-}
 
