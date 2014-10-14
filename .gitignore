@@ -9,6 +9,7 @@ R/.tensor/
 *.rout
 *.out
 *.RData
+*.mat
 
 #################
 ## Eclipse
