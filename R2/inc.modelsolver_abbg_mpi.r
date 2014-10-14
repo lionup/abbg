@@ -129,9 +129,9 @@ comp.eta.prob <- function(p, varz){
 }
 
 #####################################################
-FnGrossInc <- function(lx,lnet,p,stax){
+FnGrossInc <- function(lx,lnet,p,lstax){
   #lx is gross, lnet is net
-  lf = (1-p$pentax - p$btax)*lx + p$btax*( lx^(-p$ptax) + stax )^(-1/p$ptax) - lnet
+  lf = (1-p$pentax - p$btax)*lx + p$btax*( lx^(-p$ptax) + lstax )^(-1/p$ptax) - lnet
 }
 
 #####################################################
@@ -202,12 +202,12 @@ FnTaxParamNet <- function(lstax, p, kappa, popsize, zgrid, egrid, zdist, edist, 
 }
 
 #####################################################
-FnTax <- function(ly,p, stax){
-  lf = p$btax*( ly - (ly^(-p$ptax) + stax)^(-1/p$ptax) ) + p$pentax*ly
+FnTax <- function(ly,p){
+  lf = p$btax*( ly - (ly^(-p$ptax) + p$stax)^(-1/p$ptax) ) + p$pentax*ly
 }
 
 #####################################################
-FnSSParam <- function(lsspar, p, avearnspre, mgrid, pencap, stax, moment=TRUE){
+FnSSParam <- function(lsspar, p, avearnspre, mgrid, moment=TRUE){
   res <- with(p,{
     if (Display==1) cat('SS benefit parameter: ', lsspar, '\n')
 
@@ -232,7 +232,7 @@ FnSSParam <- function(lsspar, p, avearnspre, mgrid, pencap, stax, moment=TRUE){
         }
 
         ppregrid[it,im] = ppregrid[it,im]*lsspar
-        pgrid[it,im] = ppregrid[it,im] - FnTax( ppregrid[it,im]*0.85, p, stax )
+        pgrid[it,im] = ppregrid[it,im] - FnTax( ppregrid[it,im]*0.85, p )
       }        
     }
 
@@ -282,15 +282,24 @@ FindLinProb1 <- function(xi,x){
 }
 
 #####################################################
-comp.ngpz <- function(iz, p, model){
+comp.ngpz <- function(iz, p, model, muc, it){
   res <- with( c(p,model), {
+    #source('inc.modelsolver_abbg_mpi.r')
+    require(Hmisc)
+
     emuc <- rep(0,ngpa)
+    lcon  <- array( 0, dim=c(ngpa,ngpm,ngpe) )
+    lass  <- lcon
+    lmuc  <- lcon
+    lcon1 <- lcon 
+    lass1 <- lcon 
+    lmuc1 <- lcon 
 
     for( ie in 1:ngpe ){
       for( im in 1:ngpm ){        
         #solve on tt+1 grid
         if (it==Twork) {         
-          muc1[it,,im,iz,ie] = bet*Rnet*mucret[1,,im]      #euler equation
+          lmuc1[,im,ie] = bet*Rnet*mucret[1,,im]      #euler equation
         }else{
           emuc[] = 0.0
           for( iz2 in 1:ngpz ){
@@ -302,43 +311,52 @@ comp.ngpz <- function(iz, p, model){
               emuc = emuc + im2[2]*muc[it+1,,im2[1]  ,iz2,ie2] *ztrans[it,iz,iz2]*edist[it+1,ie2] +
                             im2[3]*muc[it+1,,im2[1]+1,iz2,ie2] *ztrans[it,iz,iz2]*edist[it+1,ie2]                         
             
-              if( any(is.na(emuc)) ) cat('iz2= ',iz2,'ie2= ',ie2,'\n')
+              if( any(!is.finite(emuc)) ) cat('iz2= ',iz2,'ie2= ',ie2,'\n')
             }
           }
-          muc1[it,,im,iz,ie] =  bet*Rnet*emuc                #euler equation
+          lmuc1[,im,ie] =  bet*Rnet*emuc                #euler equation
         }
         
-        con1[it,,im,iz,ie] = muc1[it,,im,iz,ie]^(-1.0/gam) 
+        lcon1[,im,ie] = lmuc1[,im,ie]^(-1.0/gam) 
         
-        if ( any(!is.finite(con1[it,,im,iz,ie])) ) cat( 'nan encountered\n')
+        if ( any(!is.finite(lcon1[,im,ie])) ) cat( 'nan encountered\n')
               
         if (it==Twork) { 
-          ass1[it,,im,iz,ie] = (con1[it,,im,iz,ie] +agridret[1,,im] - ygrid[it,iz,ie] - tran[it,,iz,ie])/Rnet  
+          lass1[,im,ie] = (lcon1[,im,ie] +agridret[1,,im] - ygrid[it,iz,ie] - tran[it,,iz,ie])/Rnet  
         }else{
-          ass1[it,,im,iz,ie] = (con1[it,,im,iz,ie] +agrid[it+1,] - ygrid[it,iz,ie] - tran[it,,iz,ie])/Rnet
+          lass1[,im,ie] = (lcon1[,im,ie] +agrid[it+1,] - ygrid[it,iz,ie] - tran[it,,iz,ie])/Rnet
         }
         
         #deal with borrowing limits
-        if ( min(agrid[it,]) >= ass1[it,1,im,iz,ie] ) {        #BL does not bind anywhere
+        if ( min(agrid[it,]) >= lass1[1,im,ie] ) {        #BL does not bind anywhere
           BLbind = 0  
         }else{
           #find point in tt grid where BL starts to bind
-          BLbind = which.max( agrid[it,][ agrid[it,] < ass1[it,1,im,iz,ie] ] )
+          BLbind = which.max( agrid[it,][ agrid[it,] < lass1[1,im,ie] ] )
           if (it==Twork) { 
-            ass[it,1:BLbind,im,iz,ie] = agridret[1,1,im]
+            lass[1:BLbind,im,ie] = agridret[1,1,im]
           }else{
-            ass[it,1:BLbind,im,iz,ie] = agrid[it+1,1]
+            lass[1:BLbind,im,ie] = agrid[it+1,1]
           }
-          con[it,1:BLbind,im,iz,ie] = xgrid[it,1:BLbind,iz,ie]-ass[it,1:BLbind,im,iz,ie]
-          muc[it,1:BLbind,im,iz,ie] = con[it,1:BLbind,im,iz,ie]^(-gam)
+          lcon[1:BLbind,im,ie] = xgrid[it,1:BLbind,iz,ie]- lass[1:BLbind,im,ie]
+          lmuc[1:BLbind,im,ie] = lcon[1:BLbind,im,ie]^(-gam)
         }
 
         #interpolate muc1 as fun of ass1 to get muc where BL does not bind      
-        con[it,(BLbind+1):ngpa,im,iz,ie] = approxExtrap( ass1[it,,im,iz,ie], con1[it,,im,iz,ie], agrid[it,(BLbind+1):ngpa] )$y
-        muc[it,(BLbind+1):ngpa,im,iz,ie] = con[it,(BLbind+1):ngpa,im,iz,ie]^(-gam)        
-        ass[it,(BLbind+1):ngpa,im,iz,ie] = xgrid[it,(BLbind+1):ngpa,iz,ie] -con[it,(BLbind+1):ngpa,im,iz,ie]  #budget constraint
+        lcon[(BLbind+1):ngpa,im,ie] = approxExtrap( lass1[,im,ie], lcon1[,im,ie], agrid[it,(BLbind+1):ngpa] )$y
+        lmuc[(BLbind+1):ngpa,im,ie] = lcon[(BLbind+1):ngpa,im,ie]^(-gam)        
+        lass[(BLbind+1):ngpa,im,ie] = xgrid[it,(BLbind+1):ngpa,iz,ie] - lcon[(BLbind+1):ngpa,im,ie]  #budget constraint
       }
     }
+
+    list(   
+      lcon      = lcon     , 
+      lass      = lass     , 
+      lmuc      = lmuc     , 
+      lcon1     = lcon1    , 
+      lass1     = lass1    , 
+      lmuc1     = lmuc1     
+    )
   })     
   return(res)
 }

@@ -80,7 +80,106 @@ p_long <- ggplot(plot_long, aes(x=age,y=Value)) +
           theme_bw()
 #print(p_50)
 ggsave('rw.png',width=10.6, height=5.93)  
+
 ##################################################
+#read matlab
+require(R.matlab)
+moments_nl <- readMat('nl.mat')
+moments_rw <- readMat('rw.mat')
+nsim <- 50000
+
+nl_fu <- with(moments_nl, data.table( pid = 1:nsim, eta=zsim[,10], con=csim[,10], ass= asim[,10] ))
+rw_fu <- with(moments_rw, data.table( pid = 1:nsim, eta=zsim[,10], con=csim[,10], ass= asim[,10] ))
+setkey(nl_fu, pid)
+setkey(rw_fu, pid)
+
+#eta and consumption contemporaneous 
+nl_fu[, decile_fu:=as.numeric(cut_number(eta, n = 10))] #give a bin # for each person each age
+rw_fu[, decile_fu:=as.numeric(cut_number(eta, n = 10))] #give a bin # for each person each age
+setkey(nl_fu,  decile_fu)
+setkey(rw_fu,  decile_fu)
+nl_fu[,con_mean:=mean(con), by= decile_fu]
+rw_fu[,con_mean:=mean(con), by= decile_fu]
+nl_fu_uniq <- subset(unique(nl_fu), select=c(decile_fu,con_mean) )
+rw_fu_uniq <- subset(unique(rw_fu), select=c(decile_fu,con_mean) )
+nl_fu_uniq
+rw_fu_uniq
+
+nl_fu_uniq[,model:='nl']
+rw_fu_uniq[,model:='rw']
+fu_uniq <- rbind(nl_fu_uniq, rw_fu_uniq)
+
+setwd('figure')
+p_fu_uniq <- ggplot(fu_uniq, aes(x=decile_fu,y=con_mean)) +
+          geom_line(aes(group =model, color=model)) +
+          ylab('mean consumption')+
+          xlab('eta decile')+
+          ggtitle('consumption and eta decile at age 34') +
+          theme_bw()
+ggsave('con_eta_full.png',width=10.6, height=5.93)  
+
+
+##################################################
+#eta and consumption contemporaneous conditional on asset
+nl_fu[, ass_lev:=as.numeric(cut_number(ass, n = 2))] #give a bin # for each person each age
+rw_fu[, ass_lev:=as.numeric(cut_number(ass, n = 2))] #give a bin # for each person each age
+nl_fu[,con_mean:=NULL]
+nl_fu[,decile_fu:=NULL]
+rw_fu[,con_mean:=NULL]
+rw_fu[,decile_fu:=NULL]
+
+nl_low <- nl_fu[ass_lev == 1]
+nl_hig <- nl_fu[ass_lev == 2]
+rw_low <- rw_fu[ass_lev == 1]
+rw_hig <- rw_fu[ass_lev == 2]
+
+nl_low[, decile:=as.numeric(cut_number(eta, n = 10))] #give a bin # for each person each age
+nl_hig[, decile:=as.numeric(cut_number(eta, n = 10))] #give a bin # for each person each age
+rw_low[, decile:=as.numeric(cut_number(eta, n = 10))] #give a bin # for each person each age
+rw_hig[, decile:=as.numeric(cut_number(eta, n = 10))] #give a bin # for each person each age
+
+setkey(nl_low,  decile)
+setkey(nl_hig,  decile)
+setkey(rw_low,  decile)
+setkey(rw_hig,  decile)
+
+nl_low[,con_mean:=mean(con), by= decile]
+nl_hig[,con_mean:=mean(con), by= decile]
+rw_low[,con_mean:=mean(con), by= decile]
+rw_hig[,con_mean:=mean(con), by= decile]
+
+nl_low_uniq <- subset(unique(nl_low), select=c(decile,con_mean) )
+nl_hig_uniq <- subset(unique(nl_hig), select=c(decile,con_mean) )
+rw_low_uniq <- subset(unique(rw_low), select=c(decile,con_mean) )
+rw_hig_uniq <- subset(unique(rw_hig), select=c(decile,con_mean) )
+
+nl_low_uniq[,model:='nl']
+nl_hig_uniq[,model:='nl']
+rw_low_uniq[,model:='rw']
+rw_hig_uniq[,model:='rw']
+
+nl_low_uniq[,asset:='low']
+nl_hig_uniq[,asset:='high']
+rw_low_uniq[,asset:='low']
+rw_hig_uniq[,asset:='high']
+
+nl_low_uniq
+nl_hig_uniq
+rw_low_uniq
+rw_hig_uniq
+
+uniq <- rbind(nl_low_uniq, nl_hig_uniq, rw_low_uniq, rw_hig_uniq)
+
+p_fu_uniq <- ggplot(uniq, aes(x=decile,y=con_mean)) +
+          geom_line(aes(group =interaction(model,asset), color=interaction(model,asset))) +
+          ylab('mean consumption')+
+          xlab('eta decile')+
+          ggtitle('consumption and eta decile at age 34 conditional on asset level') +
+          theme_bw()
+ggsave('con_eta_asset.png',width=10.6, height=5.93)  
+
+
+
 mm <- data.frame( age=age)
 #median
 mm <- cbind( mm, data.frame(stMedian = apply(asim[,-71], 2, median,na.rm=T)) )

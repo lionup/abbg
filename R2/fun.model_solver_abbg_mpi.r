@@ -60,22 +60,21 @@ comp.solveModel <- function(p) {
 		#varzapprox <- lval$varzapprox 
 
 		#save(zdist,zgrid,ztrans,varzapprox,file='eta.dat' )
-		load('eta.dat')
+		load('eta.rw.dat')
 
 		###################
 		#Earnings
-		stax <- uniroot(FnTaxParamNet, c(0, 1), p, kappa, popsize, zgrid, egrid, zdist, edist,
-      extendInt="yes", tol=1e-6, maxiter=200)$root
-		#stax <-  0.003699068 
-		lval <- FnTaxParamNet(stax, p, kappa, popsize, zgrid, egrid, zdist, edist, FALSE) 
+		#p$stax <- uniroot(FnTaxParamNet, c(0, 1), p, kappa, popsize, zgrid, egrid, zdist, edist,
+    #  extendInt="yes", tol=1e-6, maxiter=200)$root
+		p$stax <-  0.003699068 
+		lval <- FnTaxParamNet(p$stax, p, kappa, popsize, zgrid, egrid, zdist, edist, FALSE) 
 		ygrid      <- lval$ygrid   
 		ypregrid   <- lval$ypregrid
 		avearnspre <- lval$avearnspre #avearnspost avlearnspre avlearnspost  avearnspre2 avearnspost2  
 		  #avlearnspre2  avlearnspost2 varearnspre varearnspost  varlearnspre  varlearnspost 
 	
 		#Mean pre-tax earnings grid for pension
-		pencap = pencapfrac* sum(avearnspre)/(Twork)
-		p$pencap <- pencap
+		p$pencap  = pencapfrac* sum(avearnspre)/(Twork)
 
 		###################
 		#simulate to get distribution of average pre-tax incomes
@@ -88,13 +87,13 @@ comp.solveModel <- function(p) {
 	  ypresim <- array( 0,dim=c(nsim, Ttot) )
 		for (i in 1:nsim){
 			ypresim[i,1] = ypregrid[ 1,zsimI[i,1],esimI[i,1] ]
-			yavsim[i,1]= min(ypresim[i,1], pencap)
+			yavsim[i,1]= min(ypresim[i,1], p$pencap)
 
 		  for (it in 2:Twork){
 		     zsimI[i,it]   = sample( ngpz,1,prob=ztrans[it-1,zsimI[i,it-1],] )
 		     esimI[i,it]   = sample( ngpe,1,prob=edist[it,] )
 		     ypresim[i,it] = ypregrid[ it,zsimI[i,it],esimI[i,it] ]
-		     yavsim[i,it]  = ( (it-1)*yavsim[i,it-1] + min(ypresim[i,it],pencap) )/it
+		     yavsim[i,it]  = ( (it-1)*yavsim[i,it-1] + min(ypresim[i,it],p$pencap) )/it
 			}	 
 		}
 
@@ -107,10 +106,9 @@ comp.solveModel <- function(p) {
 
 		###################
 		#Pensions
-		sspar <- uniroot(FnSSParam, c(0.1,1.5), p, avearnspre, mgrid, 
-			pencap, stax, extendInt="yes", tol=1e-3, maxiter=30)$root
-		#sspar <- 1.06032 
-		lval <- FnSSParam(sspar, p, avearnspre, mgrid, pencap, stax,FALSE)
+		#sspar <- uniroot(FnSSParam, c(0.1,1.5), p, avearnspre, mgrid, extendInt="yes", tol=1e-3, maxiter=30)$root
+		sspar <- 1.06032 
+		lval <- FnSSParam(sspar, p, avearnspre, mgrid,FALSE)
 		ppregrid <- lval$ppregrid
 		pgrid    <- lval$pgrid  
 
@@ -246,42 +244,59 @@ comp.solveModel <- function(p) {
 		#############################################
 		con  <- array( 0, dim=c(Twork,ngpa,ngpm,ngpz,ngpe) )
 		ass  <- con
-		ass1 <- con 
-		con1 <- con 
 		muc  <- con
+		con1 <- con 
+		ass1 <- con 
 		muc1 <- con 
 
 		model = list(	
-			mucret
-			mgrid
-			ypregrid
-			agridret
-			agrid
-			ygrid
-			tran
-			xgrid
-
-			muc1
-			con1
-			ass1
+			mucret   =mucret  ,  
+			mgrid    =mgrid   , 
+			ypregrid =ypregrid, 
+			ygrid    =ygrid   ,    
+			ztrans   =ztrans  ,  
+			edist    =edist   , 
+			agridret =agridret,    
+			agrid    =agrid   , 
+			tran     =tran    , 
+			xgrid    =xgrid  
 		)
 
-		cl <- makeCluster(type='MPI')
-		chainN = length(cl) 
-		cat('Number of Chains: ',chainN,'\n')
-		zi = 1:ngpz
+		if(mode == 'mpi'){ 
+			cat('[mode=mpi] USING MPI !!!!! \n')
+			require(snow)  
+			cl <- makeCluster(type='MPI')
+			chainN = length(cl) 
+			cat('Number of Chains: ',chainN,'\n')
+		} else if (mode == 'multicore'){
+			cat('[mode=multicore] YEAH !!!!! \n')
+			require(parallel)
+			chainN = detectCores()
+			cat('Number of Chains: ',chainN,'\n')
+		}	
 
-		for( it in Twork:1){
+		for( it in Twork:1 ){
 		  if (Display==1) cat( 'Solving for decision rules at age ', it, '\n')             
 
-		  p$it <- it
-			vals <- parLapply(cl, zi, comp.ngpz, p, model)
-		
-			for(iz in zi){
-				model$M[l,im,,] <- vals[[iz]][ai,]
-				model$C[l,im,,] <- vals[[iz]][ai+p$ngpm,]
-			}	
+			if(mode == 'mpi'){ 
+				vals <- parLapply(cl, 1:ngpz, comp.ngpz, p, model, muc, it)
+		  }else if (mode == 'multicore'){
+        vals <- mclapply(1:ngpz, comp.ngpz, p, model, muc, it, mc.cores = chainN )
+      }else{
+        vals <- lapply(1:ngpz, comp.ngpz, p, model, muc, it)
+      } 
+
+			for(iz in 1:ngpz){
+				 con[it, , ,iz, ] <- vals[[iz]]$lcon  
+				 ass[it, , ,iz, ] <- vals[[iz]]$lass  
+				 muc[it, , ,iz, ] <- vals[[iz]]$lmuc  
+				con1[it, , ,iz, ] <- vals[[iz]]$lcon1
+				ass1[it, , ,iz, ] <- vals[[iz]]$lass1
+				muc1[it, , ,iz, ] <- vals[[iz]]$lmuc1
+			}
 		}  #t
+
+		if (mode == 'mpi') stopCluster(cl)
 
 		#####################################################
 		#Simulations
