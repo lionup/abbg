@@ -1,30 +1,87 @@
 setwd('figure')
 require(ggplot2)   
+require(data.table)
 
 age = 25:94
-mm <- data.frame( age=age)
-require(data.table)
-require(ggplot2)
 attach(c(p,moments))
 
+#conditional on permanent income decile, average asset
 avsave_iniz <- data.table( pid = 1:nsim, iniz=zsim[,1], avsave=apply(asim[,1:70], 1, mean) )
 setkey(avsave_iniz, pid)
-
 avsave_iniz[, decile:=as.numeric(cut_number(iniz, n = 10))] #give a bin # for each person each age
 setkey(avsave_iniz,decile)
 avsave_iniz[,avsave_decile:=mean(avsave), by=decile]
 wealth_decile <- subset(unique(avsave_iniz), select=c(decile,avsave_decile) )
 
-########################
+#conditional on asset decile, average asset
 avsave_ta <- data.table( pid = 1:nsim, ta=asim[,10], avsave=apply(asim[,10:35], 1, mean) )
 setkey(avsave_ta, pid)
-
 avsave_ta[, decile:=as.numeric(cut_number(ta, n = 10))] #give a bin # for each person each age
 setkey(avsave_ta,decile)
 avsave_ta[,avsave_decile:=mean(avsave), by=decile]
 wealth_decile <- subset(unique(avsave_ta), select=c(decile,avsave_decile) )
 
+######write to matlab
+require(R.matlab)
+writeMat('rw.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim)
 
+###for a given asset decile at age 34, consumption at age 35 for the 2 models? 
+con_ta <- data.table( pid = 1:nsim, ta=asim[,10], con=csim[,11] )
+setkey(con_ta, pid)
+con_ta[, decile:=as.numeric(cut_number(ta, n = 10))] #give a bin # for each person each age
+setkey(con_ta, decile)
+con_ta[,con_decile:=mean(con), by=decile]
+con_ta_unique <- subset(unique(con_ta), select=c(decile,con_decile) )
+
+###for a given after tax income decile at age 34, consumption at age 35 for the 2 models? 
+con_ta <- data.table( pid = 1:nsim, ta=ysim[,10], con=csim[,11] )
+setkey(con_ta, pid)
+con_ta[, decile:=as.numeric(cut_number(ta, n = 10))] #give a bin # for each person each age
+setkey(con_ta, decile)
+con_ta[,con_decile:=mean(con), by=decile]
+con_ta_unique <- subset(unique(con_ta), select=c(decile,con_decile) )
+
+###consumption between age 34 and 65, for all decile of age 34 asset
+con_p <- data.table( csim[,10:41] )
+con_p[,pid:=1:nsim]
+con_p[,ta:=asim[,10]] 
+setkey(con_p, pid)
+
+con_p[, decile:=as.numeric(cut_number(ta, n = 10))] #give a bin # for each person each age
+setkey(con_p, decile)
+con_p[,pid:=NULL]
+con_p[,ta:=NULL]
+
+plot_wide <- con_p[, lapply(.SD,mean), by=decile]
+
+plot_long <- reshape(plot_wide, direction="long", varying=list(names(plot_wide)[2:33]), v.names="Value", 
+        idvar=c("decile"), timevar="age", times=34:65)
+p_long <- ggplot(plot_long, aes(x=age,y=Value)) +
+          geom_line(aes(group =decile, color=decile))
+
+###consumption between age 35 and 65, for all decile of age 34 earnings
+con_p <- data.table( csim[,11:41] )
+con_p[,pid:=1:nsim]
+con_p[,ta:=ysim[,10]] 
+setkey(con_p, pid)
+
+con_p[, decile:=as.numeric(cut_number(ta, n = 10))] #give a bin # for each person each age
+setkey(con_p, decile)
+con_p[,pid:=NULL]
+con_p[,ta:=NULL]
+
+plot_wide <- con_p[, lapply(.SD,mean), by=decile]
+
+plot_long <- reshape(plot_wide, direction="long", varying=list(names(plot_wide)[2:32]), v.names="Value", 
+        idvar=c("decile"), timevar="age", times=35:65)
+p_long <- ggplot(plot_long, aes(x=age,y=Value)) +
+          geom_line(aes(group =decile, color=decile)) +
+          ggtitle('consumption conditional on earnings decile (random walk)') +
+          theme_bw()
+#print(p_50)
+ggsave('rw.png',width=10.6, height=5.93)  
+##################################################
+mm <- data.frame( age=age)
 #median
 mm <- cbind( mm, data.frame(stMedian = apply(asim[,-71], 2, median,na.rm=T)) )
 mm <- cbind( mm, data.frame(ctMedian = apply(csim, 2, median,na.rm=T)) )
