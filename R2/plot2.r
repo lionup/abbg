@@ -23,7 +23,7 @@ wealth_decile <- subset(unique(avsave_ta), select=c(decile,avsave_decile) )
 
 ######write to matlab
 require(R.matlab)
-writeMat('rw.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim)
+with(moments_nl,writeMat('nl.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim))
 
 ###for a given asset decile at age 34, consumption at age 35 for the 2 models? 
 con_ta <- data.table( pid = 1:nsim, ta=asim[,10], con=csim[,11] )
@@ -180,6 +180,34 @@ p_fu_uniq <- ggplot(uniq, aes(x=decile,y=con_mean)) +
           theme_bw()
 ggsave('con_eta_asset.png',width=10.6, height=5.93)  
 
+##################################################
+moments_nl <- moments
+require(R.matlab)
+moments_rw <- readMat('rw.mat')
+
+var_nl <- apply(moments_nl$ysim[,1:35],2,var)
+var_rw <- apply(moments_rw$ysim[,1:35],2,var)
+var_y <- data.table(age = 25:59, nl=var_nl, rw=var_rw)
+var_y_long <- reshape(var_y, direction="long", varying=list(names(var_y)[2:3]), v.names="Value", 
+        idvar=c("age"), timevar="model", times=c('nl','rw'))
+p_y <- ggplot(var_y_long, aes(x=age,y=Value)) +
+          geom_line(aes(group =model, color=model)) +
+          ggtitle('variance of after tax earnings') +
+          theme_bw()
+#p_y
+ggsave('var_earnings.png',width=10.6, height=5.93)  
+
+mean_nl <- apply(moments_nl$ysim[,1:35],2,mean)
+mean_rw <- apply(moments_rw$ysim[,1:35],2,mean)
+mean_y <- data.table(age = 25:59, nl=mean_nl, rw=mean_rw)
+mean_y_long <- reshape(mean_y, direction="long", varying=list(names(mean_y)[2:3]), v.names="Value", 
+        idvar=c("age"), timevar="model", times=c('nl','rw'))
+p_y <- ggplot(mean_y_long, aes(x=age,y=Value)) +
+          geom_line(aes(group =model, color=model)) +
+          ggtitle('mean of after tax earnings') +
+          theme_bw()
+#p_y
+ggsave('mean_earnings.png',width=10.6, height=5.93)  
 
 
 mm <- data.frame( age=age)
