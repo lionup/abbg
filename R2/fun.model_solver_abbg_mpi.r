@@ -265,7 +265,7 @@ comp.solveModel <- function(p) {
 		if(mode == 'mpi'){ 
 			cat('[mode=mpi] USING MPI !!!!! \n')
 			require(snow)  
-			cl <- makeCluster(type='MPI')
+			cl <- makeCluster(type='MPI', spec=39)
 			chainN = length(cl) 
 			cat('Number of Chains: ',chainN,'\n')
 		} else if (mode == 'multicore'){
