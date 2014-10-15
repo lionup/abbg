@@ -48,13 +48,13 @@ trans.matrix <- function(x1, x2, prob=T){
 comp.eta.sim <- function(p, varz){
   res <- with(p,{ 
 
-    Vgrid<- (1:N) / (1+N) #quantile
-    V_draw <- array(0, dim = c(Twork,N)) #quantile draw for each period
-    for (i in 1:Twork) V_draw[i,] = sample(Vgrid)
+    #Vgrid<- (1:N) / (1+N) #quantile
+    #V_draw <- array(0, dim = c(Twork,N)) #quantile draw for each period
+    #for (i in 1:Twork) V_draw[i,] = sample(Vgrid)
 
     #first period
     Mateta = array(0, dim = c(Twork,N))
-    Mateta[1,] <- qnorm( V_draw[1,], sd=sqrt(Vz0) )
+    Mateta[1,] <- rnorm( N, sd=sqrt(Vz0) )
 
     lc <- rep(0, Twork-1)
     sig_v <- lc
@@ -76,7 +76,7 @@ comp.eta.sim <- function(p, varz){
 
       sig_v[it-1]= sqrt( varz[it] - var(index) - mean(index2) )
   
-      shockperm <-  qnorm( V_draw[it,], sd=sig_v[it-1] )
+      shockperm <-  rnorm( N, sd=sig_v[it-1] )
       b[it-1] <- sig_v[it-1] * qnorm(1-tau)
       c <- sqrt(varz[it]) * qnorm(1-tau)
 

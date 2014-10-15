@@ -12,7 +12,7 @@ p <- list()
 
 # GRIDS DIMENSION - STATE VARIABLES
 p$ngpe = 7 #19 #7 			    #transitory component
-p$ngpz = 39 #11 			    #permanent component
+p$ngpz = 40 #11 			    #permanent component
 p$ngpa = 50#100#50 		    #asset points
 p$ngpm = 19  			    #average earnings points
 #p$ngpp = p$ngpm * p$ngpz * p$ngpe      #pension points
@@ -39,9 +39,9 @@ p$N = 999999
 p$Veps =  0.05
 p$Vz0  =  0.15
 p$rho  =  1
-p$rho2 =  0.8
+p$delta =  0.2
 p$Veta_rho1 =  0.01   #Veta if rho==1
-p$tao   = 0.15
+p$tau   = 0.15
 
 #INTEREST RATE
 p$R = 1.03      #annual gross interest rate
@@ -69,10 +69,10 @@ p$Rnet = 1.0 + (1.0-p$rtax)*(p$R-1)      #annual after tax interest rate
 
 #OPTIONS
 p$Display  = 1
-p$mode <- 'mpi' #'serial' #'multicore' #'mpi' #'mpiLB'
+p$mode <- 'multicore' #'serial' #'multicore' #'mpi' 
 
 start_time = proc.time()[3]  
 moments  <- comp.solveModel(p)
 cat(paste('\ntotal seconds to solve the program: ' , proc.time()[3] -  start_time ))
 
-save(p, moments, file='abbg_mpi.dat') 
+save(p, moments, file='nl_matchrw.dat') 

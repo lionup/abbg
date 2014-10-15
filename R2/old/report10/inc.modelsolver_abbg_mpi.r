@@ -53,42 +53,36 @@ comp.eta.sim <- function(p, varz){
     for (i in 1:Twork) V_draw[i,] = sample(Vgrid)
 
     #first period
-    Mateta = array(0, dim = c(Twork,N))
-    Mateta[1,] <- qnorm( V_draw[1,], sd=sqrt(Vz0) )
+    Mateta_true = array(0, dim = c(Twork,N))
+    Mateta_true[1,] <- qnorm( V_draw[1,], sd=sqrt(varz[1]) )
 
-    lc <- rep(0, Twork-1)
-    sig_v <- lc
-    b <- lc
+    #working age
+    shockperm <-  qnorm( V_draw[2:Twork,], sd=sqrt(Veta_rho1) )
+    lc <- sqrt(varz)*qnorm(1-tao) #c
+    b <- sqrt(Veta_rho1) * qnorm(1-tao)
 
-    for (it in 2:Twork){  #working age
-      lc[it-1] <- quantile(Mateta[it-1,], 1-tau)
-      iab = Mateta[it-1,] >  lc[it-1]
-      ibe = Mateta[it-1,] < -lc[it-1]
-      iyes = iab | ibe    
+    for (it in 2:Twork){  #periods before retirement
+      iab = Mateta_true[it-1,] >  lc[it-1]
+      ibe = Mateta_true[it-1,] < -lc[it-1]
 
-      # mean(eta_t|eta_t-1)
-      index = (1- delta * tau * iyes) * Mateta[it-1,]
-      #var(index)
+      #for below -c, check whether shock greater than b
+      ibe[ibe] <-  shockperm[it-1,which(ibe)] > b
 
-      #var(eta_t|eta_t-1) - Veta_rho1 
-      index2 = tau * (1-tau) * delta^2 * Mateta[it-1,]^2 * iyes
-      #mean(index2)
+      #for above c, check whether shock smaller than -b
+      iab[iab] <-  shockperm[it-1,which(iab)] < -b
 
-      sig_v[it-1]= sqrt( varz[it] - var(index) - mean(index2) )
-  
-      shockperm <-  qnorm( V_draw[it,], sd=sig_v[it-1] )
-      b[it-1] <- sig_v[it-1] * qnorm(1-tau)
-      c <- sqrt(varz[it]) * qnorm(1-tau)
+      #normal guys
+      ino = !(iab | ibe)   
+      Mateta_true[it,which(ino)] = Mateta_true[it-1,which(ino)] + 
+        shockperm[it-1,which(ino)]
 
-      iab = (Mateta[it-1,] >  c) & (shockperm < -b[it-1])
-      ibe = (Mateta[it-1,] < -c) & (shockperm >  b[it-1])
-      iyes = iab | ibe    
- 
-      Mateta[it,] = (1-delta*iyes) * Mateta[it-1,] + shockperm
+      #nl guys
+      Mateta_true[it,which(!ino)] = rho2 * Mateta_true[it-1,which(!ino)] + 
+        shockperm[it-1,which(!ino)]
     }
 
-    save(Mateta, file='Mateta.dat')
-    Mateta 
+    save(Mateta_true, file='Mateta.dat')
+    Mateta_true 
   })     
   return(res)
 }
@@ -97,7 +91,7 @@ comp.eta.sim <- function(p, varz){
 comp.eta.prob <- function(p, varz){
   res <- with(p,{ 
     # get the simulations of workers
-    #Mateta <- comp.eta.sim(p,varz)
+    #Mateta_true <- comp.eta.sim(p,varz)
     load('Mateta.dat')
 
     # Quantiles of eta and epsilon, by age
@@ -109,10 +103,10 @@ comp.eta.prob <- function(p, varz){
     lvar <- rep(0,Twork)
 
     for (i in 1:Twork){ #periods before retirement
-      zgrid[i,] <- quantile( Mateta[i,], veta, names=F, na.rm = T )
+      zgrid[i,] <- quantile( Mateta_true[i,], veta, names=F, na.rm = T )
     }  
 
-    long <- data.table( pid = 1:N, age=rep(age, each=N), income = c(t(Mateta)) )
+    long <- data.table( pid = 1:N, age=rep(age, each=N), income = c(t(Mateta_true)) )
     setkey(long, pid, age)
     long[, q:=as.numeric(cut_number(income, n = ngpz)), age] #give a bin # for each person each age
     long$income <- NULL

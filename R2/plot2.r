@@ -88,6 +88,8 @@ moments_nl <- readMat('nl.mat')
 moments_rw <- readMat('rw.mat')
 nsim <- 50000
 
+##################################################
+moments_nl <- moments
 nl_fu <- with(moments_nl, data.table( pid = 1:nsim, eta=zsim[,10], con=csim[,10], ass= asim[,10] ))
 rw_fu <- with(moments_rw, data.table( pid = 1:nsim, eta=zsim[,10], con=csim[,10], ass= asim[,10] ))
 setkey(nl_fu, pid)
