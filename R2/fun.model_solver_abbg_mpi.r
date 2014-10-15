@@ -60,7 +60,7 @@ comp.solveModel <- function(p) {
 		#varzapprox <- lval$varzapprox 
 
 		#save(zdist,zgrid,ztrans,varzapprox,file='eta.dat' )
-		load('eta.rw.dat')
+		load('eta.dat')
 
 		###################
 		#Earnings
