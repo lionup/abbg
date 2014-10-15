@@ -19,7 +19,7 @@ module add r
 
 echo "calling mpirun now"
 
-mpirun -np 40 /data/uctprgu/R/x86_64-unknown-linux-gnu-library/3.0/snow/RMPISNOW -q < run.model_abbg.mpi.r > r.output.$JOB_ID
+mpirun -np 40 /data/uctprgu/R/x86_64-unknown-linux-gnu-library/3.1/snow/RMPISNOW -q < run.model_abbg.mpi.r > r.output.$JOB_ID
 #R --no-save < run.model_rwR.r > r.output.$JOB_ID
 
 ## call via: qsub qsub_start_mpi.sh 
