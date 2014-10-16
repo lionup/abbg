@@ -69,10 +69,10 @@ p$Rnet = 1.0 + (1.0-p$rtax)*(p$R-1)      #annual after tax interest rate
 
 #OPTIONS
 p$Display  = 1
-p$mode <- 'mpi' #'serial' #'multicore' #'mpi' 
+p$mode <- 'multicore' #'serial' #'multicore' #'mpi' 
 
 start_time = proc.time()[3]  
 moments  <- comp.solveModel(p)
 cat(paste('\ntotal seconds to solve the program: ' , proc.time()[3] -  start_time ))
 
-save(p, moments, file='~/git/abbg/R2/nl_risk_aver.dat') 
+save(p, moments, file='nl_risk_aver.dat') 
