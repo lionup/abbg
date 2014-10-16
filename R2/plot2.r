@@ -85,20 +85,67 @@ p_long <- ggplot(plot_long, aes(x=age,y=Value)) +
 ggsave('rw.png',width=10.6, height=5.93)  
 
 ##################################################
+#contemporaneous consumption and eta decile
+
 #read matlab
-require(R.matlab)
-moments_nl <- readMat('nl.mat')
-moments_rw <- readMat('rw.mat')
+#require(R.matlab)
+#moments_nl <- readMat('nl.mat')
+#moments_rw <- readMat('rw.mat')
+
+load('nl_nbl.dat')
+moments_nl <- moments
+load('rw_nbl.dat')
+moments_rw <- moments
 nsim <- 50000
 
-##################################################
-moments_nl <- moments
 nl_fu <- with(moments_nl, data.table( pid = 1:nsim, eta=zsim[,10], con=csim[,10], ass= asim[,10] ))
 rw_fu <- with(moments_rw, data.table( pid = 1:nsim, eta=zsim[,10], con=csim[,10], ass= asim[,10] ))
 setkey(nl_fu, pid)
 setkey(rw_fu, pid)
 
-#eta and consumption contemporaneous 
+nl_fu[, decile_fu:=as.numeric(cut_number(eta, n = 10))] #give a bin # for each person each age
+rw_fu[, decile_fu:=as.numeric(cut_number(eta, n = 10))] #give a bin # for each person each age
+setkey(nl_fu,  decile_fu)
+setkey(rw_fu,  decile_fu)
+nl_fu[,con_mean:=mean(con), by= decile_fu]
+rw_fu[,con_mean:=mean(con), by= decile_fu]
+nl_fu_uniq <- subset(unique(nl_fu), select=c(decile_fu,con_mean) )
+rw_fu_uniq <- subset(unique(rw_fu), select=c(decile_fu,con_mean) )
+nl_fu_uniq
+rw_fu_uniq
+
+nl_fu_uniq[,model:='nl']
+rw_fu_uniq[,model:='rw']
+fu_uniq <- rbind(nl_fu_uniq, rw_fu_uniq)
+
+setwd('figure')
+p_fu_uniq <- ggplot(fu_uniq, aes(x=decile_fu,y=con_mean)) +
+          geom_line(aes(group =model, color=model)) +
+          ylab('mean consumption')+
+          xlab('eta decile')+
+          ggtitle('consumption and eta decile at age 34') +
+          theme_bw()
+ggsave('con_eta_full.png',width=10.6, height=5.93)  
+
+##################################################
+#contemporaneous log consumption and eta decile
+
+#read matlab
+#require(R.matlab)
+#moments_nl <- readMat('nl.mat')
+#moments_rw <- readMat('rw.mat')
+
+load('nl_nbl.dat')
+moments_nl <- moments
+load('rw_nbl.dat')
+moments_rw <- moments
+nsim <- 50000
+
+nl_fu <- with(moments_nl, data.table( pid = 1:nsim, eta=zsim[,10], con=csim[,10], ass= asim[,10] ))
+rw_fu <- with(moments_rw, data.table( pid = 1:nsim, eta=zsim[,10], con=csim[,10], ass= asim[,10] ))
+setkey(nl_fu, pid)
+setkey(rw_fu, pid)
+
 nl_fu[, decile_fu:=as.numeric(cut_number(eta, n = 10))] #give a bin # for each person each age
 rw_fu[, decile_fu:=as.numeric(cut_number(eta, n = 10))] #give a bin # for each person each age
 setkey(nl_fu,  decile_fu)
@@ -184,6 +231,7 @@ p_fu_uniq <- ggplot(uniq, aes(x=decile,y=con_mean)) +
 ggsave('con_eta_asset.png',width=10.6, height=5.93)  
 
 ##################################################
+#mean and variance of income
 moments_nl <- moments
 require(R.matlab)
 moments_rw <- readMat('rw.mat')
@@ -212,6 +260,9 @@ p_y <- ggplot(mean_y_long, aes(x=age,y=Value)) +
 #p_y
 ggsave('mean_earnings.png',width=10.6, height=5.93)  
 
+
+
+##################################################
 
 mm <- data.frame( age=age)
 #median
