@@ -1,4 +1,4 @@
-source('inc.modelsolver_abbg_mpi.r')
+source('~/git/abbg/R2/inc.modelsolver_abbg_mpi.r')
 
 comp.solveModel <- function(p) {
 	res <- with(p,{ 
@@ -6,11 +6,11 @@ comp.solveModel <- function(p) {
 		#DATA
 		#####################################################
 		#log experience profile
-		kappa = read.table("../R/old/KV/Input/kappasmooth.txt")$V1 #25~59
+		kappa = read.table("~/git/abbg/R/old/KV/Input/kappasmooth.txt")$V1 #25~59
 		kappa = kappa + log(0.75)
 
 		#survival probabilities
-		surprob = read.table("../R/old/KV/Input/surprobsmooth.txt")$V1 #60~89
+		surprob = read.table("~/git/abbg/R/old/KV/Input/surprobsmooth.txt")$V1 #60~89
 		annprem <- surprob
 
 		#unconditional survival prob
@@ -59,7 +59,7 @@ comp.solveModel <- function(p) {
 		ztrans     <- lval$ztrans      
 		varzapprox <- lval$varzapprox 
 
-		save(zdist,zgrid,ztrans,varzapprox,file='eta.dat' )
+		#save(zdist,zgrid,ztrans,varzapprox,file='~/git/abbg/R2/eta.dat' )
 		#load('eta.dat')
 
 		###################
@@ -264,10 +264,15 @@ comp.solveModel <- function(p) {
 
 		if(mode == 'mpi'){ 
 			cat('[mode=mpi] USING MPI !!!!! \n')
-			require(snow)  
+			require(snow) 
+			require(Rmpi) 
 			cl <- makeCluster(type='MPI', spec=39)
 			chainN = length(cl) 
 			cat('Number of Chains: ',chainN,'\n')
+
+			clusterEvalQ( cl,require(Hmisc) )
+			clusterEvalQ( cl,source('~/git/abbg/R2/inc.modelsolver_abbg_mpi.r') )
+
 		} else if (mode == 'multicore'){
 			cat('[mode=multicore] YEAH !!!!! \n')
 			require(parallel)

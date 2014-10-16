@@ -87,7 +87,7 @@ comp.eta.sim <- function(p, varz){
       Mateta[it,] = (1-delta*iyes) * Mateta[it-1,] + shockperm
     }
 
-    save(Mateta, file='Mateta.dat')
+    #save(Mateta, file='Mateta.dat')
     Mateta 
   })     
   return(res)
@@ -97,8 +97,8 @@ comp.eta.sim <- function(p, varz){
 comp.eta.prob <- function(p, varz){
   res <- with(p,{ 
     # get the simulations of workers
-    #Mateta <- comp.eta.sim(p,varz)
-    load('Mateta.dat')
+    Mateta <- comp.eta.sim(p,varz)
+    #load('~/git/abbg/R2/Mateta.dat')
 
     # Quantiles of eta and epsilon, by age
     zgrid <- array( 0, dim=c(Twork, ngpz) )  #bins
@@ -291,7 +291,7 @@ FindLinProb1 <- function(xi,x){
 comp.ngpz <- function(iz, p, model, muc, it){
   res <- with( c(p,model), {
     #source('inc.modelsolver_abbg_mpi.r')
-    require(Hmisc)
+    #require(Hmisc)
 
     emuc <- rep(0,ngpa)
     lcon  <- array( 0, dim=c(ngpa,ngpm,ngpe) )
