@@ -47,7 +47,7 @@ p$Veta_rho1 =  0.01   #Veta if rho==1
 p$R = 1.03      #annual gross interest rate
 
 #PREFERENCE PARMETERS
-p$gam =   2#15
+p$gam =   15 #2 #15
 p$bet =   1/p$R
 
 #BORROWING LIMIT: SET TO VERY LARGE NEGATIVE NO. FOR NBL
@@ -75,4 +75,4 @@ start_time = proc.time()[3]
 moments  <- comp.solveModel(p)
 cat(paste('\ntotal seconds to solve the program: ' , proc.time()[3] -  start_time ))
 
-save(p, moments, file='rw_nbl.dat') 
+save(p, moments, file='rw_nbl_risk.dat') 
