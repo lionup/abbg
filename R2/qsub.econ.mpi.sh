@@ -14,9 +14,10 @@ source ~/.bash_profile
 #$ -j y
 #$ -cwd
 
-#module add openmpi/gcc
-module load openmpi
-module load open64
+module add openmpi/gcc
+#module load openmpi
+#module load open64
+module load gcc
 module add r
 
 echo "calling mpirun now"
