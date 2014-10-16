@@ -23,10 +23,10 @@ wealth_decile <- subset(unique(avsave_ta), select=c(decile,avsave_decile) )
 
 ######write to matlab
 require(R.matlab)
-load('rw_nbl.dat')
+load('rw_zbl_risk.dat')
 moments$lcsim <- log(moments$csim)
 summary(c(moments$lcsim))
-with(moments,writeMat('rw_nbl.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,lcsim=lcsim,ysim=ysim,ypresim=ypresim))
+with(moments,writeMat('rw_zbl_risk.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,lcsim=lcsim,ysim=ysim,ypresim=ypresim))
 
 ###for a given asset decile at age 34, consumption at age 35 for the 2 models? 
 con_ta <- data.table( pid = 1:nsim, ta=asim[,10], con=csim[,11] )
@@ -88,61 +88,27 @@ ggsave('rw.png',width=10.6, height=5.93)
 #contemporaneous consumption and eta decile
 
 #read matlab
-#require(R.matlab)
-#moments_nl <- readMat('nl.mat')
+require(R.matlab)
+moments <- readMat('nl_zbl.mat')
 #moments_rw <- readMat('rw.mat')
 
+#setwd('~/git/abbg/R2/figure/nbl')
 load('nl_nbl.dat')
+moments$lcsim <- log(moments$csim)
 moments_nl <- moments
-load('rw_nbl.dat')
+
+load('rw_zbl.dat')
+moments$lcsim <- log(moments$csim)
 moments_rw <- moments
+
 nsim <- 50000
 
-nl_fu <- with(moments_nl, data.table( pid = 1:nsim, eta=zsim[,10], con=csim[,10], ass= asim[,10] ))
-rw_fu <- with(moments_rw, data.table( pid = 1:nsim, eta=zsim[,10], con=csim[,10], ass= asim[,10] ))
-setkey(nl_fu, pid)
-setkey(rw_fu, pid)
-
-nl_fu[, decile_fu:=as.numeric(cut_number(eta, n = 10))] #give a bin # for each person each age
-rw_fu[, decile_fu:=as.numeric(cut_number(eta, n = 10))] #give a bin # for each person each age
-setkey(nl_fu,  decile_fu)
-setkey(rw_fu,  decile_fu)
-nl_fu[,con_mean:=mean(con), by= decile_fu]
-rw_fu[,con_mean:=mean(con), by= decile_fu]
-nl_fu_uniq <- subset(unique(nl_fu), select=c(decile_fu,con_mean) )
-rw_fu_uniq <- subset(unique(rw_fu), select=c(decile_fu,con_mean) )
-nl_fu_uniq
-rw_fu_uniq
-
-nl_fu_uniq[,model:='nl']
-rw_fu_uniq[,model:='rw']
-fu_uniq <- rbind(nl_fu_uniq, rw_fu_uniq)
-
-setwd('figure')
-p_fu_uniq <- ggplot(fu_uniq, aes(x=decile_fu,y=con_mean)) +
-          geom_line(aes(group =model, color=model)) +
-          ylab('mean consumption')+
-          xlab('eta decile')+
-          ggtitle('consumption and eta decile at age 34') +
-          theme_bw()
-ggsave('con_eta_full.png',width=10.6, height=5.93)  
-
-##################################################
+#nl_fu <- with(moments_nl, data.table( pid = 1:nsim, eta=zsim[,10], con=csim[,10], ass= asim[,10] ))
+#rw_fu <- with(moments_rw, data.table( pid = 1:nsim, eta=zsim[,10], con=csim[,10], ass= asim[,10] ))
 #contemporaneous log consumption and eta decile
+nl_fu <- with(moments_nl, data.table( pid = 1:nsim, eta=zsim[,10], con=lcsim[,10], ass= asim[,10] ))
+rw_fu <- with(moments_rw, data.table( pid = 1:nsim, eta=zsim[,10], con=lcsim[,10], ass= asim[,10] ))
 
-#read matlab
-#require(R.matlab)
-#moments_nl <- readMat('nl.mat')
-#moments_rw <- readMat('rw.mat')
-
-load('nl_nbl.dat')
-moments_nl <- moments
-load('rw_nbl.dat')
-moments_rw <- moments
-nsim <- 50000
-
-nl_fu <- with(moments_nl, data.table( pid = 1:nsim, eta=zsim[,10], con=csim[,10], ass= asim[,10] ))
-rw_fu <- with(moments_rw, data.table( pid = 1:nsim, eta=zsim[,10], con=csim[,10], ass= asim[,10] ))
 setkey(nl_fu, pid)
 setkey(rw_fu, pid)
 
@@ -161,15 +127,20 @@ nl_fu_uniq[,model:='nl']
 rw_fu_uniq[,model:='rw']
 fu_uniq <- rbind(nl_fu_uniq, rw_fu_uniq)
 
-setwd('figure')
-p_fu_uniq <- ggplot(fu_uniq, aes(x=decile_fu,y=con_mean)) +
+zbl_full <- ggplot(fu_uniq, aes(x=decile_fu,y=con_mean)) +
           geom_line(aes(group =model, color=model)) +
-          ylab('mean consumption')+
+          ylab('log consumption')+
           xlab('eta decile')+
-          ggtitle('consumption and eta decile at age 34') +
+          ggtitle('zero borrowing / risk aversion=2') +
           theme_bw()
-ggsave('con_eta_full.png',width=10.6, height=5.93)  
+p_fu_uniq
+ggsave('con_eta_full_zbl_risk.png',width=10.6, height=5.93)  
 
+png(filename="con_eta_full.png",width=15, height=15, units='in', res=300)
+multiplot( zbl_full, nbl_full, zbl_risk_full, nbl_risk_full, cols=2)
+dev.off()
+
+save(zbl, nbl, zbl_risk, nbl_risk, zbl_full, nbl_full, zbl_risk_full, nbl_risk_full, file='plot.dat')
 
 ##################################################
 #eta and consumption contemporaneous conditional on asset
@@ -222,13 +193,18 @@ rw_hig_uniq
 
 uniq <- rbind(nl_low_uniq, nl_hig_uniq, rw_low_uniq, rw_hig_uniq)
 
-p_fu_uniq <- ggplot(uniq, aes(x=decile,y=con_mean)) +
+zbl <- ggplot(uniq, aes(x=decile,y=con_mean)) +
           geom_line(aes(group =interaction(model,asset), color=interaction(model,asset))) +
-          ylab('mean consumption')+
+          ylab('log consumption')+
           xlab('eta decile')+
-          ggtitle('consumption and eta decile at age 34 conditional on asset level') +
+          ggtitle('zero borrowing / risk aversion=2') +
           theme_bw()
-ggsave('con_eta_asset.png',width=10.6, height=5.93)  
+p_fu_uniq
+ggsave('con_eta_asset_zbl_risk.png',width=10.6, height=5.93)  
+
+png(filename="con_eta_asset.png",width=15, height=15, units='in', res=300)
+multiplot(zbl, nbl, zbl_risk, nbl_risk, cols=2)
+dev.off()
 
 ##################################################
 #mean and variance of income
