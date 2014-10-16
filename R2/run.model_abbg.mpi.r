@@ -69,7 +69,7 @@ p$Rnet = 1.0 + (1.0-p$rtax)*(p$R-1)      #annual after tax interest rate
 
 #OPTIONS
 p$Display  = 1
-p$mode <- 'mpi' #'serial' #'multicore' #'mpi' 
+p$mode <- 'multicore' #'serial' #'multicore' #'mpi' 
 
 start_time = proc.time()[3]  
 moments  <- comp.solveModel(p)
