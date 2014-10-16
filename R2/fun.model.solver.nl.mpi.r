@@ -1,4 +1,4 @@
-source('~/git/abbg/R2/inc.modelsolver_abbg_mpi.r')
+source('~/git/abbg/R2/inc.modelsolver.nl.mpi.r')
 
 comp.solveModel <- function(p) {
 	res <- with(p,{ 
@@ -271,7 +271,7 @@ comp.solveModel <- function(p) {
 			cat('Number of Chains: ',chainN,'\n')
 
 			clusterEvalQ( cl,require(Hmisc) )
-			clusterEvalQ( cl,source('~/git/abbg/R2/inc.modelsolver_abbg_mpi.r') )
+			clusterEvalQ( cl,source('~/git/abbg/R2/inc.modelsolver.nl.mpi.r') )
 
 		} else if (mode == 'multicore'){
 			cat('[mode=multicore] YEAH !!!!! \n')

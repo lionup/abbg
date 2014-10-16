@@ -1,6 +1,6 @@
 rm(list = ls())
 #setwd('~/git/abbg/R2')
-source('~/git/abbg/R2/fun.model_solver_abbg_mpi.r')
+source('~/git/abbg/R2/fun.model.solver.nl.mpi.r')
 set.seed(123)
 require(Hmisc)
 require(data.table)
@@ -47,11 +47,11 @@ p$tau   = 0.15
 p$R = 1.03      #annual gross interest rate
 
 #PREFERENCE PARMETERS
-p$gam =   15
+p$gam =   2#15
 p$bet =   1/p$R
 
 #BORROWING LIMIT: SET TO VERY LARGE NEGATIVE NO. FOR NBL
-p$borrowlim = 0 #0.0 #-100000000.0
+p$borrowlim = -100000000 #0.0 #-100000000.0
 
 #GOVERNMENT PARAMETERS
 #gouveia strauss 
@@ -75,4 +75,4 @@ start_time = proc.time()[3]
 moments  <- comp.solveModel(p)
 cat(paste('\ntotal seconds to solve the program: ' , proc.time()[3] -  start_time ))
 
-save(p, moments, file='nl_risk_aver.dat') 
+save(p, moments, file='nl_nbl.dat') 
