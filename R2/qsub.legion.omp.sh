@@ -11,7 +11,7 @@
 
 # 9. load modules
 module unload compilers
-module load recommended/r
+module load recommended/r-new
 #module load gsl/1.15/gnu.4.6.3
 
 R --no-save --slave < $HOME/git/abbg/R2/run.model_abbg.mpi.r > r.output.$JOB_ID
