@@ -1,79 +1,43 @@
-#####################################################
-comp.ngpz <- function(iz, p, model, muc, it){
-  res <- with( c(p,model), {
-    #source('inc.modelsolver_abbg_mpi.r')
-    require(Hmisc)
+grida<-function(allow, p, maxincome){
 
-    emuc <- rep(0,ngpa)
-    lcon  <- array( 0, dim=c(ngpa,ngpm,ngpe) )
-    lass  <- lcon
-    lmuc  <- lcon
-    lcon1 <- lcon 
-    lass1 <- lcon 
-    lmuc1 <- lcon 
+  xa <- array( 0, dim=c(p$nT+1, p$na, p$nt+p$ntr) ) 
 
-    for( ie in 1:ngpe ){
-      for( im in 1:ngpm ){        
-        #solve on tt+1 grid
-        if (it==Twork) {         
-          lmuc1[,im,ie] = bet*Rnet*mucret[1,,im]      #euler equation
-        }else{
-          emuc[] = 0.0
-          for( iz2 in 1:ngpz ){
-            for( ie2 in 1:ngpe ){
-              #find two probabilities and average over:
-              lnextm = ( it*mgrid[it,im] + min(ypregrid[it+1,iz2,ie2],pencap) )/(it+1)
-              im2 = FindLinProb1(lnextm, mgrid[it+1,])
-              
-              emuc = emuc + im2[2]*muc[it+1,,im2[1]  ,iz2,ie2] *ztrans[it,iz,iz2]*edist[it+1,ie2] +
-                            im2[3]*muc[it+1,,im2[1]+1,iz2,ie2] *ztrans[it,iz,iz2]*edist[it+1,ie2]                         
-            
-              if( any(!is.finite(emuc)) ) cat('iz2= ',iz2,'ie2= ',ie2,'\n')
-            }
-          }
-          lmuc1[,im,ie] =  bet*Rnet*emuc                #euler equation
-        }
-        
-        lcon1[,im,ie] = lmuc1[,im,ie]^(-1.0/gam) 
-        
-        if ( any(!is.finite(lcon1[,im,ie])) ) cat( 'nan encountered\n')
-              
-        if (it==Twork) { 
-          lass1[,im,ie] = (lcon1[,im,ie] +agridret[1,,im] - ygrid[it,iz,ie] - tran[it,,iz,ie])/Rnet  
-        }else{
-          lass1[,im,ie] = (lcon1[,im,ie] +agrid[it+1,] - ygrid[it,iz,ie] - tran[it,,iz,ie])/Rnet
-        }
-        
-        #deal with borrowing limits
-        if ( min(agrid[it,]) >= lass1[1,im,ie] ) {        #BL does not bind anywhere
-          BLbind = 0  
-        }else{
-          #find point in tt grid where BL starts to bind
-          BLbind = which.max( agrid[it,][ agrid[it,] < lass1[1,im,ie] ] )
-          if (it==Twork) { 
-            lass[1:BLbind,im,ie] = agridret[1,1,im]
-          }else{
-            lass[1:BLbind,im,ie] = agrid[it+1,1]
-          }
-          lcon[1:BLbind,im,ie] = xgrid[it,1:BLbind,iz,ie]- lass[1:BLbind,im,ie]
-          lmuc[1:BLbind,im,ie] = lcon[1:BLbind,im,ie]^(-gam)
-        }
+  amid  <- p$am * maxincome #second highest bound on asset grid
+  ahigh <- p$ah * maxincome  #upper bound of asset grid, for extreme values
+ 
+  xa[,1,] <- array( allow,dim=c(p$nT+1, p$nt+p$ntr) ) + p$minass
+  xa[,2,] <- xa[,1,] + 1e-8
+  xa[,3,] <- xa[,2,] + 1e-6 
+  xa[,4,] <- xa[,3,] + 1e-4
+  xa[,5,] <- xa[,4,] + 1e-3 
+ 
+  for (j in 1:(p$nt+p$ntr)){ 
 
-        #interpolate muc1 as fun of ass1 to get muc where BL does not bind      
-        lcon[(BLbind+1):ngpa,im,ie] = approxExtrap( lass1[,im,ie], lcon1[,im,ie], agrid[it,(BLbind+1):ngpa] )$y
-        lmuc[(BLbind+1):ngpa,im,ie] = lcon[(BLbind+1):ngpa,im,ie]^(-gam)        
-        lass[(BLbind+1):ngpa,im,ie] = xgrid[it,(BLbind+1):ngpa,iz,ie] - lcon[(BLbind+1):ngpa,im,ie]  #budget constraint
-      }
+    adif <- (amid[j] - allow) / 3
+    # points 4 to p$na1
+    const <- ( adif - (xa[,5,j] - allow) ) / (p$na1-5)
+    for (i in 6:p$na1) {
+       xa[,i,j] = xa[,5,j] + const * (i - 5)
     }
 
-    list(   
-      lcon      = lcon     , 
-      lass      = lass     , 
-      lmuc      = lmuc     , 
-      lcon1     = lcon1    , 
-      lass1     = lass1    , 
-      lmuc1     = lmuc1     
-    )
-  })     
-  return(res)
-}
+    # points p$na1+1 to p$na1+p$na2
+    const = adif / p$na2
+    for (i in 1:p$na2) {
+      xa[,p$na1+i,j] = xa[,p$na1,j] + const * i 
+    }
+        
+    # points p$na1+p$na2+1 to p$na1+p$na2+p$na3
+    const = adif / p$na3
+    for (i in 1:p$na3) {
+      xa[,p$na1+p$na2+i,j] = xa[,p$na1+p$na2,j] + const * i 
+    }
+    
+    # points p$na1+p$na2+p$na3+1 to 100
+    const = (ahigh[j] - amid[j]) / p$na4
+    for (i in 1:p$na4) {
+      xa[,p$na1+p$na2+p$na3+i,j] = xa[,p$na1+p$na2+p$na3,j] + const * i 
+    }
+  }  
+  
+  return(xa)
+} 
