@@ -206,6 +206,9 @@ png(filename="con_eta_asset.png",width=15, height=15, units='in', res=300)
 multiplot(zbl, nbl, zbl_risk, nbl_risk, cols=2)
 dev.off()
 
+png(filename="nbl.png",width=15, height=15, units='in', res=300)
+plot(25:59,nbl,ylab='natural borrowing limit',xlab='age',type='l')
+dev.off()
 ##################################################
 #mean and variance of income
 moments_nl <- moments
