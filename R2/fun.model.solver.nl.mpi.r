@@ -418,7 +418,8 @@ comp.solveModel <- function(p) {
 			ypresim = ypresim,
 			asim    = asim   , 
 			xsim    = xsim   , 
-			csim    = csim   
+			csim    = csim   ,
+			popsize = popsize   
 		)   
 	}) 
 
