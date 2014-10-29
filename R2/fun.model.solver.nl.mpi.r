@@ -59,8 +59,8 @@ comp.solveModel <- function(p) {
 		ztrans     <- lval$ztrans      
 		varzapprox <- lval$varzapprox 
 
-		#save(zdist,zgrid,ztrans,varzapprox,file='~/git/abbg/R2/eta.dat' )
-		#load('eta.dat')
+		save(zdist,zgrid,ztrans,varzapprox,file='eta.dat')
+		#load('~/git/abbg/R2/eta.dat')
 
 		###################
 		#Earnings
@@ -421,5 +421,27 @@ comp.solveModel <- function(p) {
 		)   
 	}) 
 
+  return(res)
+}
+
+#####################################################
+FnBetaKY <- function(lbet, p){
+  res <- with(p,{
+
+    p$bet <- lbet
+    cat(' Beta guess: ',p$bet, '\n')
+
+    moments  <- comp.solveModel(p)
+
+    lcapital = sum( colSums(moments$asim[,1:Ttot]) * moments$popsize )
+    lincome = (R-1)*lcapital + sum( colSums(moments$ypresim) * moments$popsize ) 
+
+    simKY =lcapital/lincome
+    FnBetaKY = simKY-targetKY
+
+    cat(' Simulated - Target KY: ',FnBetaKY, '\n')
+
+    FnBetaKY
+  })     
   return(res)
 }

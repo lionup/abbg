@@ -1,10 +1,8 @@
-rm(list = ls())
-#setwd('~/git/abbg/R2')
-source('~/git/abbg/R2/fun.model.solver.nl.mpi.r')
+source('~/git/abbg/R2/fun.model.solver.rw.mpi.r')
 set.seed(123)
 require(Hmisc)
-require(data.table)
-require(ggplot2)
+#require(data.table)
+#require(ggplot2)
 
 
 # SETTIG PARAMETERS
@@ -12,7 +10,7 @@ p <- list()
 
 # GRIDS DIMENSION - STATE VARIABLES
 p$ngpe = 7 #19 #7 			    #transitory component
-p$ngpz = 40 #11 			    #permanent component
+p$ngpz = 39 #11 			    #permanent component
 p$ngpa = 50#100#50 		    #asset points
 p$ngpm = 19  			    #average earnings points
 #p$ngpp = p$ngpm * p$ngpz * p$ngpe      #pension points
@@ -33,21 +31,21 @@ p$amax  = 300000
 
 #SIMULATION PARAMETERS	
 p$nsim = 50000 #5000
-p$N = 999999
+#p$N = 999999
 
 #EARNINGS PROCESS
 p$Veps =  0.05
 p$Vz0  =  0.15
 p$rho  =  1
-p$delta =  0.2
+#p$delta =  0.2
 p$Veta_rho1 =  0.01   #Veta if rho==1
-p$tau   = 0.15
+#p$tau   = 0.15
 
 #INTEREST RATE
 p$R = 1.03      #annual gross interest rate
 
 #PREFERENCE PARMETERS
-p$gam =   2
+p$gam =   2 #2 #15
 p$bet =   1/p$R
 
 #BORROWING LIMIT: SET TO VERY LARGE NEGATIVE NO. FOR NBL
@@ -71,8 +69,12 @@ p$Rnet = 1.0 + (1.0-p$rtax)*(p$R-1)      #annual after tax interest rate
 p$Display  = 1
 p$mode <- 'multicore' #'serial' #'multicore' #'mpi' 
 
-start_time = proc.time()[3]  
-moments  <- comp.solveModel(p)
-cat(paste('\ntotal seconds to solve the program: ' , proc.time()[3] -  start_time ))
+#find beta by matching KY ratio
+cat(' Beta before: ',p$bet, '\n')
+p$bet <- uniroot(p$bet, c(p$bet, p$bet*1.01), p, extendInt="yes", tol=1e-2, maxiter=30)$root
+cat(' Beta after: ',p$bet, '\n')
 
-save(p, moments, file='nl_zbl.dat') 
+#use new bet to compute moments
+moments  <- comp.solveModel(p)
+save(p, moments, file='rw_zbl.dat') 
+

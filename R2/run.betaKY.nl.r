@@ -71,8 +71,11 @@ p$Rnet = 1.0 + (1.0-p$rtax)*(p$R-1)      #annual after tax interest rate
 p$Display  = 1
 p$mode <- 'multicore' #'serial' #'multicore' #'mpi' 
 
-start_time = proc.time()[3]  
-moments  <- comp.solveModel(p)
-cat(paste('\ntotal seconds to solve the program: ' , proc.time()[3] -  start_time ))
+#find beta by matching KY ratio
+cat(' Beta before: ',p$bet, '\n')
+p$bet <- uniroot(p$bet, c(p$bet, p$bet*1.01), p, extendInt="yes", tol=1e-2, maxiter=30)$root
+cat(' Beta after: ',p$bet, '\n')
 
+#use new bet to compute moments
+moments  <- comp.solveModel(p)
 save(p, moments, file='nl_zbl.dat') 

@@ -53,10 +53,10 @@ comp.solveModel <- function(p) {
 		  varz[it] = (rho^2)*varz[it-1] + Vetavec[it-1]
 		}
 		
-		znsd = optimize(FnGridPerm, c(1,4), p, varz, Vetavec, tol=1e-2)$minimum
-		lval = FnGridPerm(znsd, p, varz, Vetavec, FALSE) 
-		#znsd <- 2.775511 #39
+		#znsd = optimize(FnGridPerm, c(1,4), p, varz, Vetavec, tol=1e-2)$minimum
+		znsd <- 2.775511 #39
 		#znsd <- 2.046858 #11
+		lval = FnGridPerm(znsd, p, varz, Vetavec, FALSE) 
 		zdist      <- lval$zdist      
 		zgrid      <- lval$zgrid      
 		ztrans     <- lval$ztrans      
@@ -420,9 +420,32 @@ comp.solveModel <- function(p) {
 			ypresim = ypresim,
 			asim    = asim   , 
 			xsim    = xsim   , 
-			csim    = csim   
+			csim    = csim   ,
+			popsize = popsize
 		)   
 	}) 
 
+  return(res)
+}
+
+#####################################################
+FnBetaKY <- function(lbet, p){
+  res <- with(p,{
+
+    p$bet <- lbet
+    cat(' Beta guess: ',p$bet, '\n')
+
+    moments  <- comp.solveModel(p)
+
+    lcapital = sum( colSums(moments$asim[,1:Ttot]) * moments$popsize )
+    lincome = (R-1)*lcapital + sum( colSums(moments$ypresim) * moments$popsize ) 
+
+    simKY =lcapital/lincome
+    FnBetaKY = simKY-targetKY
+
+    cat(' Simulated - Target KY: ',FnBetaKY, '\n')
+
+    FnBetaKY
+  })     
   return(res)
 }
