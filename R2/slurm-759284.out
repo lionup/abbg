@@ -1,14 +1,14 @@
 Changed directory to /home/hpcgu1/git/abbg/R2.
 
-JobID: 759280
+JobID: 759284
 ======
-Time: Wed Oct 29 14:38:57 GMT 2014
-Running on master node: sand-2-22
+Time: Wed Oct 29 15:14:26 GMT 2014
+Running on master node: sand-1-79
 Current directory: /home/hpcgu1/git/abbg/R2
 
 Nodes allocated:
 ================
-sand-2-22
+sand-1-79
 
 numtasks=16, numnodes=1, mpi_tasks_per_node=16 (OMP_NUM_THREADS=16)
 
@@ -36,65 +36,63 @@ Loading required package: ggplot2
 [mode=multicore] YEAH !!!!! 
 Loading required package: parallel
 Number of Chains:  16 
- Simulated - Target KY:  2.168284 
+ Simulated - Target KY:  2.197331 
  Beta guess:  0.9805825 
 [mode=multicore] YEAH !!!!! 
 Number of Chains:  16 
- Simulated - Target KY:  2.236782 
+ Simulated - Target KY:  2.262436 
  Beta guess:  0.961165 
 [mode=multicore] YEAH !!!!! 
 Number of Chains:  16 
- Simulated - Target KY:  2.099452 
+ Simulated - Target KY:  2.131259 
  Beta guess:  0.9903883 
 [mode=multicore] YEAH !!!!! 
 Number of Chains:  16 
- Simulated - Target KY:  2.321124 
+ Simulated - Target KY:  2.344076 
  Beta guess:  0.9417476 
 [mode=multicore] YEAH !!!!! 
 Number of Chains:  16 
- Simulated - Target KY:  1.945702 
+ Simulated - Target KY:  1.985188 
  Beta guess:  1.01 
 [mode=multicore] YEAH !!!!! 
 Number of Chains:  16 
- Simulated - Target KY:  2.462877 
+ Simulated - Target KY:  2.481381 
  Beta guess:  0.9029126 
 [mode=multicore] YEAH !!!!! 
 Number of Chains:  16 
- Simulated - Target KY:  1.664983 
+ Simulated - Target KY:  1.72171 
  Beta guess:  1.049223 
 [mode=multicore] YEAH !!!!! 
 Number of Chains:  16 
- Simulated - Target KY:  2.744459 
+ Simulated - Target KY:  2.755297 
  Beta guess:  0.8252427 
 [mode=multicore] YEAH !!!!! 
 Number of Chains:  16 
- Simulated - Target KY:  1.050417 
+ Simulated - Target KY:  1.161968 
  Beta guess:  1.12767 
 [mode=multicore] YEAH !!!!! 
 Number of Chains:  16 
- Simulated - Target KY:  3.289154 
+ Simulated - Target KY:  3.292517 
  Beta guess:  0.6699029 
 [mode=multicore] YEAH !!!!! 
 Number of Chains:  16 
- Simulated - Target KY:  -0.2179352 
+ Simulated - Target KY:  0.1102704 
  Beta guess:  1.284563 
 [mode=multicore] YEAH !!!!! 
 Number of Chains:  16 
- Simulated - Target KY:  4.311313 
- Beta guess:  0.6994787 
+ Simulated - Target KY:  4.311597 
+ Beta guess:  0.3592233 
 [mode=multicore] YEAH !!!!! 
 Number of Chains:  16 
- Simulated - Target KY:  0.04317478 
- Beta guess:  0.6944787 
+ Simulated - Target KY:  -1.415705 
+ Beta guess:  1.59835 
 [mode=multicore] YEAH !!!!! 
 Number of Chains:  16 
- Simulated - Target KY:  -0.01335933 
- Beta guess:  0.6944787 
+ Simulated - Target KY:  6.073507 
+ Beta guess:  0.5934585 
 [mode=multicore] YEAH !!!!! 
 Number of Chains:  16 
- Simulated - Target KY:  -0.006386156 
- Beta after:  0.6944787 
+ Simulated - Target KY:  -0.3446157 
+ Beta guess:  0.6647755 
 [mode=multicore] YEAH !!!!! 
 Number of Chains:  16 
-
-total seconds to solve the program:  13824.777
