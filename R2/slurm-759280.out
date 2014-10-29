@@ -1,0 +1,38 @@
+Changed directory to /home/hpcgu1/git/abbg/R2.
+
+JobID: 759280
+======
+Time: Wed Oct 29 14:38:57 GMT 2014
+Running on master node: sand-2-22
+Current directory: /home/hpcgu1/git/abbg/R2
+
+Nodes allocated:
+================
+sand-2-22
+
+numtasks=16, numnodes=1, mpi_tasks_per_node=16 (OMP_NUM_THREADS=16)
+
+Executing command:
+==================
+R --no-save --slave < run.betaKY.nl.r
+
+Loading required package: Hmisc
+Loading required package: grid
+Loading required package: lattice
+Loading required package: survival
+Loading required package: splines
+Loading required package: Formula
+
+Attaching package: ‘Hmisc’
+
+The following objects are masked from ‘package:base’:
+
+    format.pval, round.POSIXt, trunc.POSIXt, units
+
+Loading required package: data.table
+Loading required package: ggplot2
+ Beta before:  0.9708738 
+ Beta guess:  0.9708738 
+[mode=multicore] YEAH !!!!! 
+Loading required package: parallel
+Number of Chains:  16 
