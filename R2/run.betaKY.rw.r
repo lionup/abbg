@@ -49,7 +49,7 @@ p$gam =   15 #2 #15
 p$bet =   1/p$R
 
 #BORROWING LIMIT: SET TO VERY LARGE NEGATIVE NO. FOR NBL
-p$borrowlim = 0 #0.0 #-100000000.0
+p$borrowlim = -100000000.0 #0.0 #-100000000.0
 
 #GOVERNMENT PARAMETERS
 #gouveia strauss 
@@ -66,7 +66,7 @@ p$pencapfrac = 2.2 #cap on (pre-tax) earnings that contribute to pension index,
 p$Rnet = 1.0 + (1.0-p$rtax)*(p$R-1)      #annual after tax interest rate
 
 #OPTIONS
-p$Display  = 1
+p$Display  = 0 #1
 p$mode <- 'multicore' #'serial' #'multicore' #'mpi' 
 
 #find beta by matching KY ratio
@@ -78,6 +78,6 @@ cat(' Beta after: ',p$bet, '\n')
 
 #use new bet to compute moments
 moments  <- comp.solveModel(p)
-save(p, moments, file='rw_zbl_risk.dat') 
+save(p, moments, file='rw_nbl_risk.dat') 
 
 cat(paste('\ntotal seconds to solve the program: ' , proc.time()[3] -  start_time ))

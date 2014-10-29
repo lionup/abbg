@@ -3,7 +3,7 @@
 #$ -l h_rt=3:0:0
 #$ -l mem=8G
 #$ -N abbg
-#$ -l thr=12
+#$ -l thr=16
 #$ -wd /home/uctprgu/Scratch/abbg
 #$ -j y
 #$ -M uctprgu@ucl.ac.uk	# send notifications to
