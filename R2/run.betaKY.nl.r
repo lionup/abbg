@@ -72,6 +72,8 @@ p$Display  = 1
 p$mode <- 'multicore' #'serial' #'multicore' #'mpi' 
 
 #find beta by matching KY ratio
+start_time = proc.time()[3]  
+
 cat(' Beta before: ',p$bet, '\n')
 p$bet <- uniroot(FnBetaKY, c(p$bet, p$bet*1.01), p, extendInt="yes", tol=1e-2, maxiter=30)$root
 cat(' Beta after: ',p$bet, '\n')
@@ -79,3 +81,6 @@ cat(' Beta after: ',p$bet, '\n')
 #use new bet to compute moments
 moments  <- comp.solveModel(p)
 save(p, moments, file='nl_zbl.dat') 
+
+cat(paste('\ntotal seconds to solve the program: ' , proc.time()[3] -  start_time ))
+
