@@ -51,7 +51,7 @@ p$gam =   15
 p$bet =   1/p$R
 
 #BORROWING LIMIT: SET TO VERY LARGE NEGATIVE NO. FOR NBL
-p$borrowlim = -100000000.0 #0.0 #-100000000.0
+p$borrowlim = 0 #0.0 #-100000000.0
 
 #GOVERNMENT PARAMETERS
 #gouveia strauss 
@@ -80,7 +80,7 @@ cat(' Beta after: ',p$bet, '\n')
 
 #use new bet to compute moments
 moments  <- comp.solveModel(p)
-save(p, moments, file='nl_nbl_risk.dat') 
+save(p, moments, file='nl_zbl_risk.dat') 
 
 cat(paste('\ntotal seconds to solve the program: ' , proc.time()[3] -  start_time ))
 
