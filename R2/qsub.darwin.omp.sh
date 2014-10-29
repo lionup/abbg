@@ -59,8 +59,8 @@ module add scheduler R/3.1.1
 application="mpirun -np 1 Rscript"
 
 #! Run options for the application:
+options="run.betaKY.rw.r"
 #options="run.betaKY.nl.r"
-options="run.betaKY.nl.r"
 #options="run.model.nl.mpi.r"
 
 #! Work directory (i.e. where the job will run):
