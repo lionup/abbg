@@ -6,7 +6,6 @@
 R/.tensor/
 *.sh~
 *.txt~
-*.rout
 *.out
 *.RData
 *.mat
