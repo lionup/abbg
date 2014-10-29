@@ -1,0 +1,62 @@
+Changed directory to /home/hpcgu1/git/abbg/R2.
+
+JobID: 759956
+======
+Time: Wed Oct 29 19:30:42 GMT 2014
+Running on master node: sand-2-43
+Current directory: /home/hpcgu1/git/abbg/R2
+
+Nodes allocated:
+================
+sand-2-43
+
+numtasks=16, numnodes=1, mpi_tasks_per_node=16 (OMP_NUM_THREADS=16)
+
+Executing command:
+==================
+R --no-save --slave < run.betaKY.rw.r
+
+Loading required package: Hmisc
+Loading required package: grid
+Loading required package: lattice
+Loading required package: survival
+Loading required package: splines
+Loading required package: Formula
+
+Attaching package: ‘Hmisc’
+
+The following objects are masked from ‘package:base’:
+
+    format.pval, round.POSIXt, trunc.POSIXt, units
+
+ Beta before:  0.7 
+ Beta guess:  0.5 
+[mode=multicore] YEAH !!!!! 
+Loading required package: parallel
+Number of Chains:  16 
+ Simulated - Target KY:  -1.463875 
+ Beta guess:  1 
+[mode=multicore] YEAH !!!!! 
+Number of Chains:  16 
+ Simulated - Target KY:  1.85669 
+ Beta guess:  0.7204256 
+[mode=multicore] YEAH !!!!! 
+Number of Chains:  16 
+ Simulated - Target KY:  -0.2360132 
+ Beta guess:  0.7580163 
+[mode=multicore] YEAH !!!!! 
+Number of Chains:  16 
+ Simulated - Target KY:  0.03063698 
+ Beta guess:  0.7530163 
+[mode=multicore] YEAH !!!!! 
+Number of Chains:  16 
+ Simulated - Target KY:  -0.007840409 
+ Beta guess:  0.7530163 
+[mode=multicore] YEAH !!!!! 
+Number of Chains:  16 
+ Simulated - Target KY:  -0.008917081 
+ Beta after:  0.7530163 
+[mode=multicore] YEAH !!!!! 
+Number of Chains:  16 
+
+total seconds to solve the program:  5764.109

@@ -96,3 +96,21 @@ Number of Chains:  16
  Beta guess:  0.6647755 
 [mode=multicore] YEAH !!!!! 
 Number of Chains:  16 
+ Simulated - Target KY:  0.08143047 
+ Beta guess:  0.6511446 
+[mode=multicore] YEAH !!!!! 
+Number of Chains:  16 
+ Simulated - Target KY:  -0.004311786 
+ Beta guess:  0.6561446 
+[mode=multicore] YEAH !!!!! 
+Number of Chains:  16 
+ Simulated - Target KY:  0.03082882 
+ Beta guess:  0.6511446 
+[mode=multicore] YEAH !!!!! 
+Number of Chains:  16 
+ Simulated - Target KY:  -0.006132728 
+ Beta after:  0.6511446 
+[mode=multicore] YEAH !!!!! 
+Number of Chains:  16 
+
+total seconds to solve the program:  17191.697
