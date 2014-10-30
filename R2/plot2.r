@@ -23,10 +23,14 @@ wealth_decile <- subset(unique(avsave_ta), select=c(decile,avsave_decile) )
 
 ######write to matlab
 require(R.matlab)
-load('rw_zbl_risk.dat')
+load('nl_zbl.dat')
+p$ngpz
+p$gam
+p$borrowlim
+p$bet
 moments$lcsim <- log(moments$csim)
 summary(c(moments$lcsim))
-with(moments,writeMat('rw_zbl_risk.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,lcsim=lcsim,ysim=ysim,ypresim=ypresim))
+with(moments,writeMat('nl_zbl.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,lcsim=lcsim,ysim=ysim,ypresim=ypresim))
 
 ###for a given asset decile at age 34, consumption at age 35 for the 2 models? 
 con_ta <- data.table( pid = 1:nsim, ta=asim[,10], con=csim[,11] )
