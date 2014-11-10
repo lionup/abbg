@@ -305,7 +305,6 @@ comp.solveModel <- function(p) {
 		msimI <- zsimI
 		esim  <- zsimI
 		zsim  <- zsimI
-		#tsim  <- zsimI
 		msim  <- zsimI
 
 		ysim   <- ypresim
@@ -398,14 +397,23 @@ comp.solveModel <- function(p) {
 			popsize = popsize,
 			annprem = annprem, 
 
+			ztrans  = ztrans ,
+			zgrid   = zgrid  ,
 			egrid   = egrid  ,
+
+			ypregrid= ypregrid,
+			ygrid   = ygrid   ,
+
 			mgrid   = mgrid  ,
+			
 			agrid   = agrid  , 
 			agridret= agridret, 
-			con     = con    ,
-			conret  = conret ,
+			
 			pgrid   = pgrid  ,
-			ppregrid= ppregrid
+			ppregrid= ppregrid,
+
+			con     = con    ,
+			conret  = conret 
 		)   
 	}) 
   return(res)
@@ -444,7 +452,6 @@ comp.moments <- function(p, models, tau0, tau1) {
 		trsim[,1:irb]    <- trsim[hhnum,1:irb]
 
 		#find shock tau1=0.5 at age 36
-		load('~/git/abbg/R2/eta.dat')
 		iz2 <- FindLinProb1( tau1, cumsum(ztrans[irb,zsimI[1,irb],]) )
 
 		#working life after shock
@@ -520,19 +527,25 @@ comp.moments <- function(p, models, tau0, tau1) {
 		}
 
 		moments= list(
-		  zsimI   = zsimI  , 
+		  zsimI   = zsimI  ,
+		  zsim    = zsim   , 
+
 		  esimI   = esimI  , 
-			zsim    = zsim   , 
 			esim    = esim   , 
+		  
 		  msimI   = msimI  , 
 		  msim    = msim   , 
+		  
 		  yavsim  = yavsim , 
 			ysim    = ysim   , 
 			ypresim = ypresim,
+			
 			asim    = asim   , 
 			xsim    = xsim   , 
 			csim    = csim   ,
-			popsize = popsize   
+			trsim   = trsim  ,
+
+			popsize = popsize  
 		)   
 	}) 
 

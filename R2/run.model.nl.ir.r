@@ -84,4 +84,4 @@ start_time = proc.time()[3]
 moments  <- comp.moments(p, models, 0.1, 0.5)
 cat(paste('\ntime for simulations: ' , proc.time()[3] -  start_time ))
 
-save(p, moments, file='sim_ir_01_05.dat') 
+save(p, models, moments, file='sim_ir_01_05.dat') 
