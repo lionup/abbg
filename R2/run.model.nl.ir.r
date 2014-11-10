@@ -81,7 +81,7 @@ p$mode <- 'multicore' #'serial' #'multicore' #'mpi'
 #save(models, file='sim_ir_sample.dat') 
 #cat(paste('\ntime for decision rules: ' , proc.time()[3] -  start_time ))
 
-load('sim_ir_sample.dat')
+load('~/git/abbg/R2/sim_ir_sample.dat')
 
 triquant <- c(0.1,0.5,0.9)
 for( tau0 in triquant ){
