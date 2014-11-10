@@ -413,14 +413,15 @@ comp.solveModel <- function(p) {
 			ppregrid= ppregrid,
 
 			con     = con    ,
-			conret  = conret 
+			conret  = conret ,
+			p       = p
 		)   
 	}) 
   return(res)
 }
 
-comp.moments <- function(p, models, tau0, tau1) {
-	res <- with( c(p, models), { 
+comp.moments <- function(models, tau0, tau1) {
+	res <- with( c(models, models$p), { 
 		# Keep only tau0-percentile of initial eta
 		#load('nl_zbl.dat')
 		#attach(moments)
@@ -465,7 +466,7 @@ comp.moments <- function(p, models, tau0, tau1) {
 			}  	 
 			  
 			ypresim[,it] = ypregrid[ cbind(it,zsimI[,it],esimI[,it]) ]
-			yavsim[,it]  = ( (it-1)*yavsim[,it-1] + pmin(ypresim[,it],p$pencap) )/it
+			yavsim[,it]  = ( (it-1)*yavsim[,it-1] + pmin(ypresim[,it], pencap) )/it
 
 			zsim[,it]    = zgrid[it,zsimI[,it]]
 		  esim[,it]    = egrid[it,esimI[,it]]
@@ -527,25 +528,14 @@ comp.moments <- function(p, models, tau0, tau1) {
 		}
 
 		moments= list(
-		  zsimI   = zsimI  ,
 		  zsim    = zsim   , 
-
-		  esimI   = esimI  , 
 			esim    = esim   , 
-		  
-		  msimI   = msimI  , 
-		  msim    = msim   , 
-		  
-		  yavsim  = yavsim , 
+
 			ysim    = ysim   , 
 			ypresim = ypresim,
 			
 			asim    = asim   , 
-			xsim    = xsim   , 
-			csim    = csim   ,
-			trsim   = trsim  ,
-
-			popsize = popsize  
+			csim    = csim
 		)   
 	}) 
 

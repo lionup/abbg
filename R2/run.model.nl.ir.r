@@ -76,12 +76,22 @@ p$Rnet = 1.0 + (1.0-p$rtax)*(p$R-1)      #annual after tax interest rate
 p$Display  = 1
 p$mode <- 'multicore' #'serial' #'multicore' #'mpi' 
 
-start_time = proc.time()[3]  
-models  <- comp.solveModel(p)
-cat(paste('\ntime for decision rules: ' , proc.time()[3] -  start_time ))
+#start_time = proc.time()[3]  
+#models  <- comp.solveModel(p)
+#save(models, file='sim_ir_sample.dat') 
+#cat(paste('\ntime for decision rules: ' , proc.time()[3] -  start_time ))
 
-start_time = proc.time()[3]  
-moments  <- comp.moments(p, models, 0.1, 0.5)
-cat(paste('\ntime for simulations: ' , proc.time()[3] -  start_time ))
+load('sim_ir_sample.dat')
 
-save(p, models, moments, file='sim_ir_01_05.dat') 
+triquant <- c(0.1,0.5,0.9)
+for( tau0 in triquant ){
+	for( tau1 in triquant ){
+
+		start_time = proc.time()[3]  
+		moments  <- comp.moments(models, tau0, tau1)
+		save( moments, file=paste('sim.ir',tau0, tau1,'dat',sep='.') ) 
+		cat(paste('\ntime for tau0/tau1:', tau0, '/', tau1, 'is', proc.time()[3] -  start_time ))
+	}
+}
+
+
