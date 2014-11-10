@@ -18,7 +18,7 @@
 #! How many (MPI) tasks will there be in total? (<= nodes*16)
 #SBATCH --ntasks=16
 #! How much wallclock time will be required?
-#SBATCH --time=05:00:00
+#SBATCH --time=01:00:00
 #! What types of email messages do you wish to receive?
 #SBATCH --mail-type=ALL
 #! Uncomment this to prevent the job from being requeued (e.g. if
@@ -59,9 +59,10 @@ module add scheduler R/3.1.1
 application="mpirun -np 1 Rscript"
 
 #! Run options for the application:
-options="run.betaKY.rw.r"
+#options="run.betaKY.rw.r"
 #options="run.betaKY.nl.r"
 #options="run.model.nl.mpi.r"
+options="run.model.nl.lr.r"
 
 #! Work directory (i.e. where the job will run):
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
