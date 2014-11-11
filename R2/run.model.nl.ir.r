@@ -14,7 +14,7 @@ p <- list()
 
 # GRIDS DIMENSION - STATE VARIABLES
 p$ngpe = 7 #19 #7 			    #transitory component
-p$ngpz = 40 #11 			    #permanent component
+p$ngpz = 100 #11 			    #permanent component
 p$ngpa = 50#100#50 		    #asset points
 p$ngpm = 19  			    #average earnings points
 #p$ngpp = p$ngpm * p$ngpz * p$ngpe      #pension points
@@ -78,20 +78,20 @@ p$mode <- 'multicore' #'serial' #'multicore' #'mpi'
 
 start_time = proc.time()[3]  
 models  <- comp.solveModel(p)
-save(models, file='sim_ir_sample.dat') 
+save(models, file='sim_ir_sample_100.dat') 
 cat(paste('\ntime for decision rules: ' , proc.time()[3] -  start_time ))
 
 #load('~/git/abbg/R2/sim_ir_sample.dat')
 
-triquant <- c(0.1,0.5,0.9)
-for( tau0 in triquant ){
-	for( tau1 in triquant ){
-
-		start_time = proc.time()[3]  
-		moments  <- comp.moments(models, tau0, tau1)
-		save( moments, file=paste('sim.ir',tau0, tau1,'dat',sep='.') ) 
-		cat(paste('\ntime for tau0/tau1:', tau0, '/', tau1, 'is', proc.time()[3] -  start_time ))
-	}
-}
+#triquant <- c(0.1,0.5,0.9)
+#for( tau0 in triquant ){
+#	for( tau1 in triquant ){
+#
+#		start_time = proc.time()[3]  
+#		moments  <- comp.moments(models, tau0, tau1)
+#		save( moments, file=paste('sim.ir',tau0, tau1,'dat',sep='.') ) 
+#		cat(paste('\ntime for tau0/tau1:', tau0, '/', tau1, 'is', proc.time()[3] -  start_time ))
+#	}
+#}
 
 

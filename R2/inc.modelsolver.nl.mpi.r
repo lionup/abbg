@@ -87,7 +87,7 @@ comp.eta.sim <- function(p, varz){
       Mateta[it,] = (1-delta*iyes) * Mateta[it-1,] + shockperm
     }
 
-    save(Mateta, file='Mateta.dat')
+    #save(Mateta, file='Mateta.dat')
     Mateta 
   })     
   return(res)

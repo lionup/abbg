@@ -1,29 +1,47 @@
-setwd('figure')
 require(ggplot2)   
 require(data.table)
 age = 25:94
 
-load('sim.ir.0.1.0.1.dat')
-mll <- moments
+load('sim.ir.0.1.0.1.dat'); ll <- moments
+load('sim.ir.0.1.0.5.dat'); lm <- moments
+load('sim.ir.0.1.0.9.dat'); lh <- moments
+load('sim.ir.0.5.0.1.dat'); ml <- moments
+load('sim.ir.0.5.0.5.dat'); mm <- moments
+load('sim.ir.0.5.0.9.dat'); mh <- moments
+load('sim.ir.0.9.0.1.dat'); hl <- moments
+load('sim.ir.0.9.0.5.dat'); hm <- moments
+load('sim.ir.0.9.0.9.dat'); hh <- moments
 
-load('sim.ir.0.1.0.5.dat')
-mlm <- moments
+setwd('figure')
 
-load('sim.ir.0.1.0.9.dat')
-mlh <- moments
+ypre <- data.table(age=age,  
+  ll = colMeans(ll$ypresim),
+  lm = colMeans(lm$ypresim),
+  lh = colMeans(lh$ypresim), 
+  ml = colMeans(ml$ypresim),
+  mm = colMeans(mm$ypresim),
+  mh = colMeans(mh$ypresim),
+  hl = colMeans(hl$ypresim),
+  hm = colMeans(hm$ypresim),
+  hh = colMeans(hh$ypresim) ) 
 
-yprel <- data.table(age=age, low = colMeans(mll$ypresim),
-                             med = colMeans(mlm$ypresim),
-                             hig = colMeans(mlh$ypresim) ) 
-yprel <- subset(yprel,age< 60)
+ypre <- subset(ypre,age< 60)
 
-yprel$l_m_percen <- with( yprel, (low-med)/med ) 
-yprel$h_m_percen <- with( yprel, (hig-med)/med ) 
+ypre$dev_ll_lm <- with( ypre, (ll-lm)/lm ) 
+ypre$dev_lh_lm <- with( ypre, (lh-lm)/lm ) 
+ypre$dev_ml_mm <- with( ypre, (ml-mm)/mm ) 
+ypre$dev_mh_mm <- with( ypre, (mh-mm)/mm ) 
+ypre$dev_hl_hm <- with( ypre, (hl-hm)/hm ) 
+ypre$dev_hh_hm <- with( ypre, (hh-hm)/hm ) 
 
-p_yprel <- ggplot(yprel, aes(x=age,y=l_m_percen)) + 
-           geom_line() +
-           geom_line(aes(y=h_m_percen))
-p_yprel
+p_ypre <- ggplot(ypre, aes(x=age,y=dev_ll_lm)) + 
+           geom_line(aes(color='ll')) +
+           geom_line(aes(y=dev_lh_lm, color='lh')) +
+           geom_line(aes(y=dev_ml_mm, color='ml')) +
+           geom_line(aes(y=dev_mh_mm, color='mh')) +
+           geom_line(aes(y=dev_hl_hm, color='hl')) +
+           geom_line(aes(y=dev_hh_hm, color='hh'))
+p_ypre
 
 
 

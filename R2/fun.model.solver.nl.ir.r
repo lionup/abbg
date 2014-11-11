@@ -52,14 +52,14 @@ comp.solveModel <- function(p) {
 		  varz[it] = (rho^2)*varz[it-1] + Vetavec[it-1]
 		}
 		
-		#lval = comp.eta.prob(p,varz)
-		#zdist      <- lval$zdist      
-		#zgrid      <- lval$zgrid      
-		#ztrans     <- lval$ztrans      
-		#varzapprox <- lval$varzapprox 
+		lval = comp.eta.prob(p,varz)
+		zdist      <- lval$zdist      
+		zgrid      <- lval$zgrid      
+		ztrans     <- lval$ztrans      
+		varzapprox <- lval$varzapprox 
 
-		#save(zdist,zgrid,ztrans,varzapprox,file='eta.dat')
-		load('~/git/abbg/R2/eta.dat')
+		save(zdist,zgrid,ztrans,varzapprox,file='eta_100.dat')
+		#load('~/git/abbg/R2/eta.dat')
 
 		###################
 		#Earnings
