@@ -15,7 +15,7 @@ p <- list()
 # GRIDS DIMENSION - STATE VARIABLES
 p$ngpe = 7 #19 #7 			    #transitory component
 p$ngpz = 100 #100 #40 #11 			    #permanent component
-p$ngpa = 50#100#50 		    #asset points
+p$ngpa = 50 #100#50 		    #asset points
 p$ngpm = 19  			    #average earnings points
 #p$ngpp = p$ngpm * p$ngpz * p$ngpe      #pension points
 
@@ -89,12 +89,12 @@ for( tau0 in triquant ){
 	samples  <- comp.samples(models, tau0)
 	save( samples, file=paste('sim.ir.sample',p$ngpz,tau0,'dat',sep='.') ) 
 
-	#for( tau1 in triquant ){
-	#	start_time = proc.time()[3]  
-	#	moments  <- comp.moments(models, samples, tau1)
-	#	save( moments, file=paste('sim.ir.res',p$ngpz,tau0,tau1,'dat',sep='.') ) 
-	#	cat(paste('\ntime for tau0/tau1:', tau0, '/', tau1, 'is', proc.time()[3] -  start_time ))
-	#}
+	for( tau1 in triquant ){
+		start_time = proc.time()[3]  
+		moments  <- comp.moments(models, samples, tau1)
+		save( moments, file=paste('sim.ir.res',p$ngpz,tau0,tau1,'dat',sep='.') ) 
+		cat(paste('\ntime for tau0/tau1:', tau0, '/', tau1, 'is', proc.time()[3] -  start_time ))
+	}
 }
 
 

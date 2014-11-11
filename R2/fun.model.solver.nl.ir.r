@@ -57,7 +57,7 @@ comp.solveModel <- function(p) {
 		#zgrid      <- lval$zgrid      
 		#ztrans     <- lval$ztrans      
 		#varzapprox <- lval$varzapprox 
-#
+
 		#save(zdist,zgrid,ztrans,varzapprox,file='eta_100.dat')
 		load('~/git/abbg/R2/eta.dat')
 
@@ -428,10 +428,10 @@ comp.samples <- function(models, tau0){
 		# Keep only tau0-percentile of initial eta
 		eta_1 = quantile(zsim[,irb], tau0)
 		hhnum <- which(zsim[,irb] == eta_1)
-		if( length(hhnum) < 1000 ) cat('need more in percentile ',tau0,'\n')
+		if( length(hhnum) < 400 ) cat('need more in percentile ',tau0,'\n')
 		
-		indnum <- sample(hhnum, 1000) #random select 1000 individuals
-		hhnum <- rep(indnum, each = 50) #enlarge to original sample
+		indnum <- sample(hhnum, 400) #random select 1000 individuals
+		hhnum <- rep(indnum, each = 125) #enlarge to original sample
 
 		#replace values before 35
 		zsimI[,1:irb] <- zsimI[hhnum,1:irb]
