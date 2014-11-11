@@ -85,9 +85,11 @@ load('~/git/abbg/R2/sim.ir.rule.100.dat')
 
 triquant <- c(0.1,0.5,0.9)
 
-for( tau0 in triquant ){
-	samples  <- comp.samples(models, tau0)
-	save( samples, file=paste('sim.ir.sample',p$ngpz,tau0,'dat',sep='.') ) 
+for( tau0 in 0.9 ){
+	#samples  <- comp.samples(models, tau0)
+	#save( samples, file=paste('sim.ir.sample',p$ngpz,tau0,'dat',sep='.') ) 
+
+	load('~/git/abbg/R2/sim.ir.sample.100.0.9.dat')
 
 	for( tau1 in triquant ){
 		start_time = proc.time()[3]  
