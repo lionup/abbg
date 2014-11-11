@@ -52,14 +52,14 @@ comp.solveModel <- function(p) {
 		  varz[it] = (rho^2)*varz[it-1] + Vetavec[it-1]
 		}
 		
-		lval = comp.eta.prob(p,varz)
-		zdist      <- lval$zdist      
-		zgrid      <- lval$zgrid      
-		ztrans     <- lval$ztrans      
-		varzapprox <- lval$varzapprox 
-
-		save(zdist,zgrid,ztrans,varzapprox,file='eta_100.dat')
-		#load('~/git/abbg/R2/eta.dat')
+		#lval = comp.eta.prob(p,varz)
+		#zdist      <- lval$zdist      
+		#zgrid      <- lval$zgrid      
+		#ztrans     <- lval$ztrans      
+		#varzapprox <- lval$varzapprox 
+#
+		#save(zdist,zgrid,ztrans,varzapprox,file='eta_100.dat')
+		load('~/git/abbg/R2/eta.dat')
 
 		###################
 		#Earnings
@@ -298,31 +298,75 @@ comp.solveModel <- function(p) {
 
 		if (mode == 'mpi') stopCluster(cl)
 
-		#####################################################
-		#Simulations
-		#####################################################
-		#simulate until age 35
-		msimI <- zsimI
-		esim  <- zsimI
-		zsim  <- zsimI
-		msim  <- zsimI
+		models= list(
+			popsize = popsize,
+			annprem = annprem, 
 
-		ysim   <- ypresim
-		csim   <- ypresim
-		xsim   <- ypresim
-		trsim  <- ypresim
+			ztrans  = ztrans ,
+			zgrid   = zgrid  ,
+			zdist   = zdist  ,
 
-		asim   <- array( 0,dim=c(nsim, Ttot+1) )
+			egrid   = egrid  ,
+			edist   = edist  ,  
+
+			ypregrid= ypregrid,
+			ygrid   = ygrid   ,
+
+			mgrid   = mgrid  ,
+			
+			agrid   = agrid  , 
+			agridret= agridret, 
+			
+			pgrid   = pgrid  ,
+			ppregrid= ppregrid,
+
+			con     = con    ,
+			conret  = conret ,
+			p       = p
+		)   
+	}) 
+  return(res)
+}
+
+#####################################################
+#Simulations until age 35, and create sample
+#####################################################
+comp.samples <- function(models, tau0){
+	res <- with( c(models, models$p), { 
+		
+		zsimI  <- array( 0,dim=c(nsim, Twork) )
+	  esimI  <- zsimI
+	  yavsim <- zsimI
+		msimI  <- zsimI
+		esim   <- zsimI
+		zsim   <- zsimI
+		msim   <- zsimI
+
+	  ypresim <- array( 0,dim=c(nsim, Ttot) )
+		ysim    <- ypresim
+		csim    <- ypresim
+		xsim    <- ypresim
+		trsim   <- ypresim
+
+		asim    <- array( 0,dim=c(nsim, Ttot+1) )
 
 		#initial earnings
-		zsim[,1] = zgrid[1,zsimI[,1]]
-		esim[,1] = egrid[1,esimI[,1]]
+	  zsimI[,1] = sample( ngpz,nsim,replace=T,prob=zdist[1,] )
+	  zsim[,1]  = zgrid[1,zsimI[,1]]
+
+	  esimI[,1] = sample( ngpe,nsim,replace=T,prob=edist[1,] )
+		esim[,1]  = egrid[1,esimI[,1]]
+
+		ysim[,1]    = ygrid[ cbind(1,zsimI[,1],esimI[,1]) ]
+		ypresim[,1] = ypregrid[ cbind(1,zsimI[,1],esimI[,1]) ]
+		yavsim[,1]  = ypresim[,1]
+		yavsim[,1][ypresim[,1] > pencap] = pencap
+
 		for( i in 1:nsim ){
 		  im2 = FindLinProb1(yavsim[i,1],mgrid[1,])
 		  msimI[i,1] = sample( c(im2[1],im2[1]+1), 1, prob=im2[2:3] )
 		}
 		msim[,1] = mgrid[1,msimI[,1]]
-		ysim[,1] = ygrid[ cbind(1,zsimI[,1],esimI[,1]) ]
 
 		#do t=1 separately
 		it = 1
@@ -341,9 +385,15 @@ comp.solveModel <- function(p) {
 
 		#working life
 		for( it in 2:irb ){
+			for (i in 1:nsim) zsimI[i,it] = sample( ngpz,1,prob=ztrans[it-1,zsimI[i,it-1],] )
 		  zsim[,it] = zgrid[it,zsimI[,it]]
+
+		  esimI[,it]   = sample( ngpe,nsim,replace=TRUE,prob=edist[it,] )
 		  esim[,it] = egrid[it,esimI[,it]]
+
 		  ysim[,it] = ygrid[ cbind(it,zsimI[,it],esimI[,it]) ]
+		  ypresim[,it] = ypregrid[ cbind(it,zsimI[,it],esimI[,it]) ]
+		  yavsim[,it]  = ( (it-1)*yavsim[,it-1] + pmin(ypresim[,it], pencap) )/it
 
 		  for( i in 1:nsim ){
 		    im2 = FindLinProb1(yavsim[i,it], mgrid[it,])
@@ -375,61 +425,11 @@ comp.solveModel <- function(p) {
 		  }
 		}
 
-		models= list(
-		  zsimI   = zsimI  ,
-		  zsim    = zsim   , 
-
-		  esimI   = esimI  , 
-			esim    = esim   , 
-		  
-		  msimI   = msimI  , 
-		  msim    = msim   , 
-		  
-		  yavsim  = yavsim , 
-			ysim    = ysim   , 
-			ypresim = ypresim,
-			
-			asim    = asim   , 
-			xsim    = xsim   , 
-			csim    = csim   ,
-			trsim   = trsim  ,
-
-			popsize = popsize,
-			annprem = annprem, 
-
-			ztrans  = ztrans ,
-			zgrid   = zgrid  ,
-			egrid   = egrid  ,
-
-			ypregrid= ypregrid,
-			ygrid   = ygrid   ,
-
-			mgrid   = mgrid  ,
-			
-			agrid   = agrid  , 
-			agridret= agridret, 
-			
-			pgrid   = pgrid  ,
-			ppregrid= ppregrid,
-
-			con     = con    ,
-			conret  = conret ,
-			p       = p
-		)   
-	}) 
-  return(res)
-}
-
-comp.moments <- function(models, tau0, tau1) {
-	res <- with( c(models, models$p), { 
 		# Keep only tau0-percentile of initial eta
-		#load('nl_zbl.dat')
-		#attach(moments)
 		eta_1 = quantile(zsim[,irb], tau0)
-
 		hhnum <- which(zsim[,irb] == eta_1)
 		if( length(hhnum) < 1000 ) cat('need more in percentile ',tau0,'\n')
-
+		
 		indnum <- sample(hhnum, 1000) #random select 1000 individuals
 		hhnum <- rep(indnum, each = 50) #enlarge to original sample
 
@@ -452,6 +452,35 @@ comp.moments <- function(models, tau0, tau1) {
 		asim[,1:(irb+1)] <- asim[hhnum,1:(irb+1)]
 		trsim[,1:irb]    <- trsim[hhnum,1:irb]
 
+		samples = list(
+		  zsimI   = zsimI  ,
+		  zsim    = zsim   , 
+
+		  esimI   = esimI  , 
+			esim    = esim   , 
+		  
+		  msimI   = msimI  , 
+		  msim    = msim   , 
+		  
+		  yavsim  = yavsim , 
+			ysim    = ysim   , 
+			ypresim = ypresim,
+			
+			asim    = asim   , 
+			xsim    = xsim   , 
+			csim    = csim   ,
+			trsim   = trsim
+		)   
+	}) 
+  return(res)
+}
+
+#####################################################
+#compute moments
+#####################################################
+comp.moments <- function(models, samples, tau1) {
+	res <- with( c(models, models$p, samples), { 
+
 		#find shock tau1=0.5 at age 36
 		iz2 <- FindLinProb1( tau1, cumsum(ztrans[irb,zsimI[1,irb],]) )
 
@@ -464,13 +493,14 @@ comp.moments <- function(models, tau0, tau1) {
 			     zsimI[i,it]   = sample( ngpz,1,prob=ztrans[it-1,zsimI[i,it-1],] )
 			  }
 			}  	 
-			  
+			zsim[,it]    = zgrid[it,zsimI[,it]]
+
+		  esimI[,it]   = sample( ngpe,nsim,replace=TRUE,prob=edist[it,] )
+		  esim[,it]    = egrid[it,esimI[,it]]
+
+		  ysim[,it]    = ygrid[ cbind(it,zsimI[,it],esimI[,it]) ]
 			ypresim[,it] = ypregrid[ cbind(it,zsimI[,it],esimI[,it]) ]
 			yavsim[,it]  = ( (it-1)*yavsim[,it-1] + pmin(ypresim[,it], pencap) )/it
-
-			zsim[,it]    = zgrid[it,zsimI[,it]]
-		  esim[,it]    = egrid[it,esimI[,it]]
-		  ysim[,it]    = ygrid[ cbind(it,zsimI[,it],esimI[,it]) ]
 
 		  for( i in 1:nsim ){
 		    im2 = FindLinProb1(yavsim[i,it], mgrid[it,])
