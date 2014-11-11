@@ -99,5 +99,5 @@ load('~/git/abbg/R2/sim.ir.rule.100.dat')
 #}
 
 load( paste('~/git/abbg/R2/sim.ir.sample',p$ngpz,0.1,'dat',sep='.') )
-moments  <- comp.moments(models, samples, 0.1, 0.1)
-save( moments, file=paste('sim.ir.res',p$ngpz,0.1, 0.1,'dat',sep='.') ) 
+moments  <- comp.moments(models, samples, 0.1, 0.5)
+save( moments, file=paste('sim.ir.res',p$ngpz,0.1, 0.5,'dat',sep='.') ) 
