@@ -83,19 +83,21 @@ p$mode <- 'multicore' #'serial' #'multicore' #'mpi'
 
 load('~/git/abbg/R2/sim.ir.rule.100.dat')
 
-triquant <- c(0.1,0.5,0.9)
+#triquant <- c(0.1,0.5,0.9)
+#
+#for( tau0 in triquant ){
+#	#samples  <- comp.samples(models, tau0)
+#	#save( samples, file=paste('sim.ir.sample',p$ngpz,tau0,'dat',sep='.') ) 
+#	load( paste('~/git/abbg/R2/sim.ir.sample',p$ngpz,tau0,'dat',sep='.') )
+#
+#	for( tau1 in triquant ){
+#		start_time = proc.time()[3]  
+#		moments  <- comp.moments(models, samples, tau0, tau1)
+#		save( moments, file=paste('sim.ir.res',p$ngpz,tau0,tau1,'dat',sep='.') ) 
+#		cat(paste('\ntime for tau0/tau1:', tau0, '/', tau1, 'is', proc.time()[3] -  start_time ))
+#	}
+#}
 
-for( tau0 in triquant ){
-	#samples  <- comp.samples(models, tau0)
-	#save( samples, file=paste('sim.ir.sample',p$ngpz,tau0,'dat',sep='.') ) 
-	load( paste('~/git/abbg/R2/sim.ir.sample',p$ngpz,tau0,'dat',sep='.') )
-
-	for( tau1 in triquant ){
-		start_time = proc.time()[3]  
-		moments  <- comp.moments(models, samples, tau0, tau1)
-		save( moments, file=paste('sim.ir.res',p$ngpz,tau0,tau1,'dat',sep='.') ) 
-		cat(paste('\ntime for tau0/tau1:', tau0, '/', tau1, 'is', proc.time()[3] -  start_time ))
-	}
-}
-
-
+load( paste('~/git/abbg/R2/sim.ir.sample',p$ngpz,0.1,'dat',sep='.') )
+moments  <- comp.moments(models, samples, 0.1, 0.1)
+save( moments, file=paste('sim.ir.res',p$ngpz,0.1, 0.1,'dat',sep='.') ) 
