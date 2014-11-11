@@ -1,6 +1,6 @@
 #!/bin/bash -l
 #$ -S /bin/bash
-#$ -l h_rt=3:0:0
+#$ -l h_rt=1:0:0
 #$ -l mem=8G
 #$ -N abbg
 #$ -l thr=16
