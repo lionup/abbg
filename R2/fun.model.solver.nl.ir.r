@@ -428,10 +428,10 @@ comp.moments <- function(models, tau0, tau1) {
 		eta_1 = quantile(zsim[,irb], tau0)
 
 		hhnum <- which(zsim[,irb] == eta_1)
-		if( length(hhnum) < 1250 ) cat('need more in percentile ',tau0,'\n')
+		if( length(hhnum) < 1000 ) cat('need more in percentile ',tau0,'\n')
 
-		indnum <- sample(hhnum, 1250) #random select 1250 individuals
-		hhnum <- rep(indnum, each = 40) #enlarge to original sample
+		indnum <- sample(hhnum, 1000) #random select 1000 individuals
+		hhnum <- rep(indnum, each = 50) #enlarge to original sample
 
 		#replace values before 35
 		zsimI[,1:irb] <- zsimI[hhnum,1:irb]
