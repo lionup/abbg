@@ -58,8 +58,9 @@ comp.solveModel <- function(p) {
 		#ztrans     <- lval$ztrans      
 		#varzapprox <- lval$varzapprox 
 
-		#save(zdist,zgrid,ztrans,varzapprox,file='eta_100.dat')
-		load('~/git/abbg/R2/eta.dat')
+		#save( zdist,zgrid,ztrans,varzapprox,file=paste('eta',ngpz,'dat',sep='.') )
+		#load('~/git/abbg/R2/eta.dat')
+    load( paste('~/git/abbg/R2/eta',ngpz,'dat',sep='.') )
 
 		###################
 		#Earnings
@@ -478,11 +479,18 @@ comp.samples <- function(models, tau0){
 #####################################################
 #compute moments
 #####################################################
-comp.moments <- function(models, samples, tau1) {
+comp.moments <- function(models, samples, tau0, tau1) {
 	res <- with( c(models, models$p, samples), { 
 
 		#find shock tau1=0.5 at age 36
-		iz2 <- FindLinProb1( tau1, cumsum(ztrans[irb,zsimI[1,irb],]) )
+		load('~/git/abbg/R2/sig_v.dat')
+    shockperm <-  qnorm( tau1, sd=sig_v[irb] )
+    iab  = (tau0 == 0.9) & (tau1 == 0.1)
+    ibe  = (tau0 == 0.1) & (tau1 == 0.9)
+    iyes = iab | ibe    
+
+    zshock <- (1-delta*iyes) * unique(zsim[,irb]) + shockperm
+		iz2 <- FindLinProb1( zshock, zgrid[irb+1,] )
 
 		#working life after shock
 		for ( it in (irb+1):Twork ){
