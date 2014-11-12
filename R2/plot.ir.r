@@ -2,6 +2,36 @@ require(ggplot2)
 require(data.table)
 age = 25:94
 
+######write to matlab
+#require(R.matlab)
+#load('sim.ir.res.100.0.1.0.1.dat')
+#with( moments,writeMat('ir.0.1.0.1.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
+#
+#load('sim.ir.res.100.0.1.0.5.dat')
+#with( moments,writeMat('ir.0.1.0.5.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
+#
+#load('sim.ir.res.100.0.1.0.9.dat')
+#with( moments,writeMat('ir.0.1.0.9.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
+#
+#load('sim.ir.res.100.0.5.0.1.dat')
+#with( moments,writeMat('ir.0.5.0.1.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
+#
+#load('sim.ir.res.100.0.5.0.5.dat')
+#with( moments,writeMat('ir.0.5.0.5.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
+#
+#load('sim.ir.res.100.0.5.0.9.dat')
+#with( moments,writeMat('ir.0.5.0.9.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
+#
+#load('sim.ir.res.100.0.9.0.1.dat')
+#with( moments,writeMat('ir.0.9.0.1.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
+#
+#load('sim.ir.res.100.0.9.0.5.dat')
+#with( moments,writeMat('ir.0.9.0.5.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
+#
+#load('sim.ir.res.100.0.9.0.9.dat')
+#with( moments,writeMat('ir.0.9.0.9.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
+#
+
 load('sim.ir.res.100.0.1.0.1.dat'); ll <- moments
 load('sim.ir.res.100.0.1.0.5.dat'); lm <- moments
 load('sim.ir.res.100.0.1.0.9.dat'); lh <- moments
