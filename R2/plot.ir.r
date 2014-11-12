@@ -2,15 +2,15 @@ require(ggplot2)
 require(data.table)
 age = 25:94
 
-load('sim.ir.res.0.1.0.1.dat'); ll <- moments
-load('sim.ir.res.0.1.0.5.dat'); lm <- moments
-load('sim.ir.res.0.1.0.9.dat'); lh <- moments
-load('sim.ir.res.0.5.0.1.dat'); ml <- moments
-load('sim.ir.res.0.5.0.5.dat'); mm <- moments
-load('sim.ir.res.0.5.0.9.dat'); mh <- moments
-load('sim.ir.res.0.9.0.1.dat'); hl <- moments
-load('sim.ir.res.0.9.0.5.dat'); hm <- moments
-load('sim.ir.res.0.9.0.9.dat'); hh <- moments
+load('sim.ir.res.100.0.1.0.1.dat'); ll <- moments
+load('sim.ir.res.100.0.1.0.5.dat'); lm <- moments
+load('sim.ir.res.100.0.1.0.9.dat'); lh <- moments
+load('sim.ir.res.100.0.5.0.1.dat'); ml <- moments
+load('sim.ir.res.100.0.5.0.5.dat'); mm <- moments
+load('sim.ir.res.100.0.5.0.9.dat'); mh <- moments
+load('sim.ir.res.100.0.9.0.1.dat'); hl <- moments
+load('sim.ir.res.100.0.9.0.5.dat'); hm <- moments
+load('sim.ir.res.100.0.9.0.9.dat'); hh <- moments
 
 setwd('figure')
 
@@ -36,13 +36,19 @@ ypre$dev_hl_hm <- with( ypre, (hl-hm)/hm )
 ypre$dev_hh_hm <- with( ypre, (hh-hm)/hm ) 
 
 p_ypre <- ggplot(ypre, aes(x=age,y=dev_ll_lm)) + 
-           geom_line(aes(color='ll')) +
-           geom_line(aes(y=dev_lh_lm, color='lh')) +
-           geom_line(aes(y=dev_ml_mm, color='ml')) +
-           geom_line(aes(y=dev_mh_mm, color='mh')) +
-           geom_line(aes(y=dev_hl_hm, color='hl')) +
-           geom_line(aes(y=dev_hh_hm, color='hh'))
-p_ypre
+           geom_line(aes(color='ini=.1 shock=.1')) +
+           geom_line(aes(y=dev_lh_lm, color='ini=.1 shock=.9')) +
+           geom_line(aes(y=dev_ml_mm, color='ini=.5 shock=.1')) +
+           geom_line(aes(y=dev_mh_mm, color='ini=.5 shock=.9')) +
+           geom_line(aes(y=dev_hl_hm, color='ini=.9 shock=.1')) +
+           geom_line(aes(y=dev_hh_hm, color='ini=.9 shock=.9')) +
+           ylab('percentage change from shock=.5')+
+           labs(color = NULL) +
+           ggtitle('Impulse responses, earnings') +
+           theme_bw()
+
+#p_ypre
+ggsave('ir_ypre.png',width=10.6, height=5.93)  
 
 #after tax income
 y <- data.table(age=age,  
@@ -66,13 +72,18 @@ y$dev_hl_hm <- with( y, (hl-hm)/hm )
 y$dev_hh_hm <- with( y, (hh-hm)/hm ) 
 
 p_y <- ggplot(y, aes(x=age,y=dev_ll_lm)) + 
-           geom_line(aes(color='ll')) +
-           geom_line(aes(y=dev_lh_lm, color='lh')) +
-           geom_line(aes(y=dev_ml_mm, color='ml')) +
-           geom_line(aes(y=dev_mh_mm, color='mh')) +
-           geom_line(aes(y=dev_hl_hm, color='hl')) +
-           geom_line(aes(y=dev_hh_hm, color='hh'))
-p_y
+           geom_line(aes(color='ini=.1 shock=.1')) +
+           geom_line(aes(y=dev_lh_lm, color='ini=.1 shock=.9')) +
+           geom_line(aes(y=dev_ml_mm, color='ini=.5 shock=.1')) +
+           geom_line(aes(y=dev_mh_mm, color='ini=.5 shock=.9')) +
+           geom_line(aes(y=dev_hl_hm, color='ini=.9 shock=.1')) +
+           geom_line(aes(y=dev_hh_hm, color='ini=.9 shock=.9')) +
+           ylab('percentage change from shock=.5')+
+           labs(color = NULL) +
+           ggtitle('Impulse responses, earnings') +
+           theme_bw()
+#p_y
+ggsave('ir_ynet.png',width=10.6, height=5.93)  
 
 #consumption
 c <- data.table(age=age,  
@@ -96,13 +107,18 @@ c$dev_hl_hm <- with( c, (hl-hm)/hm )
 c$dev_hh_hm <- with( c, (hh-hm)/hm ) 
 
 p_c <- ggplot(c, aes(x=age,y=dev_ll_lm)) + 
-           geom_line(aes(color='ll')) +
-           geom_line(aes(y=dev_lh_lm, color='lh')) +
-           geom_line(aes(y=dev_ml_mm, color='ml')) +
-           geom_line(aes(y=dev_mh_mm, color='mh')) +
-           geom_line(aes(y=dev_hl_hm, color='hl')) +
-           geom_line(aes(y=dev_hh_hm, color='hh'))
-p_c
+           geom_line(aes(color='ini=.1 shock=.1')) +
+           geom_line(aes(y=dev_lh_lm, color='ini=.1 shock=.9')) +
+           geom_line(aes(y=dev_ml_mm, color='ini=.5 shock=.1')) +
+           geom_line(aes(y=dev_mh_mm, color='ini=.5 shock=.9')) +
+           geom_line(aes(y=dev_hl_hm, color='ini=.9 shock=.1')) +
+           geom_line(aes(y=dev_hh_hm, color='ini=.9 shock=.9')) +
+           ylab('percentage change from shock=.5')+
+           labs(color = NULL) +
+           ggtitle('Impulse responses, consumption') +
+           theme_bw()
+#p_c
+ggsave('ir_con.png',width=10.6, height=5.93)  
 
 #asset
 a <- data.table(age=c(age,95),  
@@ -126,11 +142,16 @@ a$dev_hl_hm <- with( a, (hl-hm)/hm )
 a$dev_hh_hm <- with( a, (hh-hm)/hm ) 
 
 p_a <- ggplot(a, aes(x=age,y=dev_ll_lm)) + 
-           geom_line(aes(color='ll')) +
-           geom_line(aes(y=dev_lh_lm, color='lh')) +
-           geom_line(aes(y=dev_ml_mm, color='ml')) +
-           geom_line(aes(y=dev_mh_mm, color='mh')) +
-           geom_line(aes(y=dev_hl_hm, color='hl')) +
-           geom_line(aes(y=dev_hh_hm, color='hh'))
-p_a
+           geom_line(aes(color='ini=.1 shock=.1')) +
+           geom_line(aes(y=dev_lh_lm, color='ini=.1 shock=.9')) +
+           geom_line(aes(y=dev_ml_mm, color='ini=.5 shock=.1')) +
+           geom_line(aes(y=dev_mh_mm, color='ini=.5 shock=.9')) +
+           geom_line(aes(y=dev_hl_hm, color='ini=.9 shock=.1')) +
+           geom_line(aes(y=dev_hh_hm, color='ini=.9 shock=.9')) +
+           ylab('percentage change from shock=.5')+
+           labs(color = NULL) +
+           ggtitle('Impulse responses, asset') +
+           theme_bw()
+#p_a
+ggsave('ir_ass.png',width=10.6, height=5.93)  
 
