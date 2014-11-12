@@ -3,46 +3,46 @@ require(data.table)
 age = 25:94
 
 ######write to matlab
-#require(R.matlab)
-#load('sim.ir.res.100.0.1.0.1.dat')
-#with( moments,writeMat('ir.0.1.0.1.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
-#
-#load('sim.ir.res.100.0.1.0.5.dat')
-#with( moments,writeMat('ir.0.1.0.5.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
-#
-#load('sim.ir.res.100.0.1.0.9.dat')
-#with( moments,writeMat('ir.0.1.0.9.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
-#
-#load('sim.ir.res.100.0.5.0.1.dat')
-#with( moments,writeMat('ir.0.5.0.1.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
-#
-#load('sim.ir.res.100.0.5.0.5.dat')
-#with( moments,writeMat('ir.0.5.0.5.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
-#
-#load('sim.ir.res.100.0.5.0.9.dat')
-#with( moments,writeMat('ir.0.5.0.9.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
-#
-#load('sim.ir.res.100.0.9.0.1.dat')
-#with( moments,writeMat('ir.0.9.0.1.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
-#
-#load('sim.ir.res.100.0.9.0.5.dat')
-#with( moments,writeMat('ir.0.9.0.5.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
-#
-#load('sim.ir.res.100.0.9.0.9.dat')
-#with( moments,writeMat('ir.0.9.0.9.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
-#
+require(R.matlab)
+load('sim.ir.res.nbl.100.0.1.0.1.dat')
+with( moments,writeMat('ir.0.1.0.1.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
 
-load('sim.ir.res.100.0.1.0.1.dat'); ll <- moments
-load('sim.ir.res.100.0.1.0.5.dat'); lm <- moments
-load('sim.ir.res.100.0.1.0.9.dat'); lh <- moments
-load('sim.ir.res.100.0.5.0.1.dat'); ml <- moments
-load('sim.ir.res.100.0.5.0.5.dat'); mm <- moments
-load('sim.ir.res.100.0.5.0.9.dat'); mh <- moments
-load('sim.ir.res.100.0.9.0.1.dat'); hl <- moments
-load('sim.ir.res.100.0.9.0.5.dat'); hm <- moments
-load('sim.ir.res.100.0.9.0.9.dat'); hh <- moments
+load('sim.ir.res.nbl.100.0.1.0.5.dat')
+with( moments,writeMat('ir.0.1.0.5.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
 
-setwd('figure')
+load('sim.ir.res.nbl.100.0.1.0.9.dat')
+with( moments,writeMat('ir.0.1.0.9.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
+
+load('sim.ir.res.nbl.100.0.5.0.1.dat')
+with( moments,writeMat('ir.0.5.0.1.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
+
+load('sim.ir.res.nbl.100.0.5.0.5.dat')
+with( moments,writeMat('ir.0.5.0.5.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
+
+load('sim.ir.res.nbl.100.0.5.0.9.dat')
+with( moments,writeMat('ir.0.5.0.9.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
+
+load('sim.ir.res.nbl.100.0.9.0.1.dat')
+with( moments,writeMat('ir.0.9.0.1.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
+
+load('sim.ir.res.nbl.100.0.9.0.5.dat')
+with( moments,writeMat('ir.0.9.0.5.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
+
+load('sim.ir.res.nbl.100.0.9.0.9.dat')
+with( moments,writeMat('ir.0.9.0.9.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim) )
+
+
+load('sim.ir.res.nbl.100.0.1.0.1.dat'); ll <- moments
+load('sim.ir.res.nbl.100.0.1.0.5.dat'); lm <- moments
+load('sim.ir.res.nbl.100.0.1.0.9.dat'); lh <- moments
+load('sim.ir.res.nbl.100.0.5.0.1.dat'); ml <- moments
+load('sim.ir.res.nbl.100.0.5.0.5.dat'); mm <- moments
+load('sim.ir.res.nbl.100.0.5.0.9.dat'); mh <- moments
+load('sim.ir.res.nbl.100.0.9.0.1.dat'); hl <- moments
+load('sim.ir.res.nbl.100.0.9.0.5.dat'); hm <- moments
+load('sim.ir.res.nbl.100.0.9.0.9.dat'); hh <- moments
+
+setwd('figure/report12/nbl')
 
 #pretax income
 ypre <- data.table(age=age,  
@@ -164,12 +164,12 @@ a <- data.table(age=c(age,95),
 
 a <- subset(a,age>25 & age< 60)
 
-a$dev_ll_lm <- with( a, (ll-lm)/lm ) 
-a$dev_lh_lm <- with( a, (lh-lm)/lm ) 
-a$dev_ml_mm <- with( a, (ml-mm)/mm ) 
-a$dev_mh_mm <- with( a, (mh-mm)/mm ) 
-a$dev_hl_hm <- with( a, (hl-hm)/hm ) 
-a$dev_hh_hm <- with( a, (hh-hm)/hm ) 
+a$dev_ll_lm <- with( a, (ll-lm)/abs(lm) ) 
+a$dev_lh_lm <- with( a, (lh-lm)/abs(lm) ) 
+a$dev_ml_mm <- with( a, (ml-mm)/abs(mm) ) 
+a$dev_mh_mm <- with( a, (mh-mm)/abs(mm) ) 
+a$dev_hl_hm <- with( a, (hl-hm)/abs(hm) ) 
+a$dev_hh_hm <- with( a, (hh-hm)/abs(hm) ) 
 
 p_a <- ggplot(a, aes(x=age,y=dev_ll_lm)) + 
            geom_line(aes(color='ini=.1 shock=.1')) +
