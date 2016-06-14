@@ -10,7 +10,7 @@ require(MASS)
 require(plot3D)
 
 
-names <- 'nl_nbl'
+names <- 'nl_zbl'
 ename <- '_30'
 #ename <-'' 
 load( paste('~/git/abbg/R2/',names,'.dat',sep='') )
@@ -28,6 +28,7 @@ nl_fu <- with(moments, data.table( pid = 1:nsim,  age=rep(age,each=nsim),
 	ass=c(asim[1:nobs]) ))
 nl_fu <- nl_fu[age>=30]
 nl_fu <- nl_fu[ass>0] 
+#nl_fu[ass<1] 
 nl_fu[,ass:=log(ass)]
 setkey(nl_fu, pid, age)
 
