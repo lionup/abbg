@@ -6,7 +6,9 @@ scp uctprgu@hpc.econ.ucl.ac.uk:/data/uctprgu/git/abbg/R/cohort30.dat .
 scp US.dat uctprgu@hpc.econ.ucl.ac.uk:/data/uctprgu/git/lg2/Stata/result3/cmes2014/
 
 source('fun.sim.data.r')
-load('sim_100_99.dat')
+#load('sim_100_99.dat')
+load('sim_200_199.dat')
+
 #simdata <-data.matrix(sim)
 #save(simdata,file='simdata.dat')
 #require(R.matlab)
