@@ -10,7 +10,7 @@ require(MASS)
 require(plot3D)
 
 
-names <- 'nl_nbl'
+names <- 'nl_zbl'
 ename <- '_parallel'
 #ename <-'' 
 load( paste('~/git/abbg/R2/',names,'.dat',sep='') )
