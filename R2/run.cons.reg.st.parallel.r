@@ -5,6 +5,10 @@ setwd('~/git/abbg/R2/figure/report14')
 require(ggplot2)   
 require(data.table)
 require(EQL)
+require(parallel)
+require(MASS)
+require(plot3D)
+
 
 names <- 'nl_nbl'
 ename <- '_parallel'
@@ -50,7 +54,6 @@ nl_fu[,ystd:=(yres-mean(yres))/sd(yres)]
 nl_fu[,agestd:=(age-mean(age))/sd(age)]
 
 #evaluate c=g(y,a,age)
-require(parallel)
 Kgrid = data.matrix( expand.grid(z3=0:K3, z2=0:K2, z1=0:K1) )
 
 decomHerm <- function(i, Kgrid, nl_fu){
@@ -63,7 +66,6 @@ save( Mat, file=paste('Mat_',names,ename,'.dat',sep='') )
 
 #regress cons on inc ass age 
 #ResP <- lm(cres~Mat-1,data=nl_fu)$coefficients
-require(MASS)
 ResP <- ginv(Mat) %*% nl_fu$cres
 
 # Covariates (to compute the derivative of the quantile function with respect to y_{t-1})
@@ -97,7 +99,8 @@ persis2 <- mclapply(1:nrow(Vgrid), derivHerm, K1, K2, K3, nl_fu$ystd, sdinc, nob
 persis <- array(persis2, dim=c(ntau, ntau))
 save( persis, file=paste('persis_',names,ename,'.dat',sep='') )
 
-require(plot3D)
+
+#graph
 png(paste('dc_',names,ename,'.png',sep=''),width=10.6, height=5.93, units='in', res=300)
 
 persp3D(x=VecTau,y=VecTau,z=persis, 
