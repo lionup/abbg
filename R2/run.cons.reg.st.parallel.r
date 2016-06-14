@@ -96,7 +96,7 @@ derivHerm <- function(i, K1, K2, K3, ystd, sdinc, nobs, Vgrid, ResP){
 }
 
 persis2 <- mclapply(1:nrow(Vgrid), derivHerm, K1, K2, K3, nl_fu$ystd, sdinc, nobs, Vgrid, ResP)
-persis <- array(persis2, dim=c(ntau, ntau))
+persis <- array(unlist(persis2), dim=c(ntau, ntau))
 save( persis, file=paste('persis_',names,ename,'.dat',sep='') )
 
 
