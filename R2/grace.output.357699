@@ -1,0 +1,66 @@
+Sender: LSF System <lsfadmin@c08n10>
+Subject: Job 357699: <abbg> in cluster <grace> Exited
+
+Job <abbg> was submitted from host <grace1> by user <rg684> in cluster <grace>.
+Job was executed on host(s) <20*c08n10>, in queue <cowles>, as user <rg684> in cluster <grace>.
+</home/fas/meghir/rg684> was used as the home directory.
+</home/fas/meghir/rg684/git/abbg/R2> was used as the working directory.
+Started at Tue Jun 14 19:25:30 2016
+Results reported on Tue Jun 14 20:25:47 2016
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/bash -l
+
+#BSUB -q cowles
+#BSUB -W 02:00
+#BSUB -J abbg
+
+#BSUB -n 20
+#BSUB -R "span[hosts=1]" 
+##BSUB -n 40
+##BSUB -R "span[ptile=20]" 
+
+#BSUB -o grace.output.%J   # output file name in which %J is replaced by the job ID
+##BSUB -N                   # sent email
+
+# 9. load modules
+echo "Slot count: $LSB_DJOB_NUMPROC"
+echo "Slot distribution: $LSB_MCPU_HOSTS"
+
+module load Apps/R/3.2.2-generic
+module load Libs/GSL/1.16
+
+R --no-save --slave < ~/git/abbg/R2/run.cons.reg.st.parallel.r > grace.R.$LSB_JOBID
+
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   7146.44 sec.
+    Max Memory :                                 3229 MB
+    Average Memory :                             2744.84 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Processes :                              6
+    Max Threads :                                7
+
+The output (if any) follows:
+
+Slot count: 20
+Slot distribution: c08n10 20 
+Loading required package: ggplot2
+Loading required package: data.table
+Loading required package: EQL
+Loading required package: ttutils
+Loading required package: parallel
+Loading required package: MASS
+Loading required package: plot3D
+Error in x[-1, -1] + x[-1, -ncol(x)] : 
+  non-numeric argument to binary operator
+Calls: persp3D -> check.colvar.persp -> meangrid
+Execution halted
