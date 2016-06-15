@@ -7,7 +7,8 @@ require(data.table)
 require(EQL)
 
 names <- 'nl_nbl'
-ename <- '_etaeps_'
+#ename <- '_etaeps'
+ename <- ''
 load( paste('~/git/abbg/R2/',names,'.dat',sep='') )
 moments$lcsim <- log(moments$csim)
 #moments$asim[moments$asim<1e-12] <- 1e-12
@@ -28,8 +29,8 @@ setkey(nl_fu, pid, age)
 #take out full age dummies for consumption and asset
 nl_fu[ ,cres:=lm(con~factor(age))$residuals ]
 nl_fu[ ,ares:=lm(ass~factor(age))$residuals ]
-#nl_fu[ ,yres:=lm(inc~factor(age))$residuals ]
-nl_fu[,yres:=eta+eps]
+nl_fu[ ,yres:=lm(inc~factor(age))$residuals ]
+#nl_fu[,yres:=eta+eps]
 
 
 #cut data into asset and age deciles

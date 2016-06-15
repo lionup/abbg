@@ -11,8 +11,8 @@ require(plot3D)
 
 
 names <- 'nl_zbl'
-ename <- '_1e9'
-#ename <-'' 
+#ename <- '_1e9'
+ename <-'_parallel' 
 load( paste('~/git/abbg/R2/',names,'.dat',sep='') )
 moments$lcsim <- log(moments$csim)
 #moments$asim[moments$asim<1e-12] <- 1e-12
@@ -100,7 +100,7 @@ derivHerm <- function(i, K1, K2, K3, ystd, sdinc, nobs, Vgrid, ResP){
 persis2 <- mclapply(1:nrow(Vgrid), derivHerm, K1, K2, K3, nl_fu$ystd, sdinc, nobs, Vgrid, ResP)
 persis <- array(unlist(persis2), dim=c(ntau, ntau))
 save( persis, file=paste('persis_',names,ename,'.dat',sep='') )
-
+#load( paste('persis_',names,ename,'.dat',sep='') )
 
 #graph
 png(paste('dc_',names,ename,'.png',sep=''),width=10.6, height=5.93, units='in', res=300)
