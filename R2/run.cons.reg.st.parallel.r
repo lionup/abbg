@@ -11,7 +11,7 @@ require(plot3D)
 
 
 names <- 'nl_zbl'
-ename <- '_30_1e9'
+ename <- '_1e9'
 #ename <-'' 
 load( paste('~/git/abbg/R2/',names,'.dat',sep='') )
 moments$lcsim <- log(moments$csim)
@@ -26,7 +26,7 @@ nobs = nsim*Twork
 nl_fu <- with(moments, data.table( pid = 1:nsim,  age=rep(age,each=nsim), 
 	eta=c(zsim), eps=c(esim), inc=c(lysim[1:nobs]), con=c(lcsim[1:nobs]), 
 	ass=c(asim[1:nobs]) ))
-nl_fu <- nl_fu[age>=30]
+#nl_fu <- nl_fu[age>=30]
 #nl_fu <- nl_fu[ass>0] 
 nl_fu[ass<1e-9]$ass <- 1e-9
 nl_fu[,ass:=log(ass)]
