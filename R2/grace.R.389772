@@ -1,0 +1,10 @@
+
+Call:
+lm(formula = cres ~ yres, data = nl_fu)
+
+Coefficients:
+(Intercept)         yres  
+  3.271e-16    7.351e-01  
+
+null device 
+          1 
