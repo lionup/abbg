@@ -61,6 +61,7 @@ for (kk1 in 0:K1) {
   }  
 }
 save( Mat, file=paste('Mat_',names,ename,'.dat',sep='') )
+#load( paste('Mat_',names,ename,'.dat',sep='') )
 
 #require(parallel)
 #decomHerm <- function(i, K1, K2, K3, nl_fu){
@@ -85,6 +86,7 @@ ResP <- lm(cres~Mat-1,data=nl_fu)$coefficients
 Vage = quantile(c(nl_fu$agestd),VecTau, names=F, na.rm = T ) 
 Vass = quantile(c(nl_fu$astd),VecTau, names=F, na.rm = T )
 meaninc = mean(nl_fu$ystd) #this equal to 0
+sdinc = sd(nl_fu$yres)
 Vgrid = data.matrix( expand.grid(z1=Vage, z2=Vass) )
 
 # hermite decompostion and derivative
@@ -95,20 +97,20 @@ Mat3 = array( 0, dim=c(ntau^2, (K1+1)*(K2+1)*(K3+1)) )
 for (kk1 in 1:K1) {
   for (kk2 in 0:K2) {    
     for (kk3 in 0:K3) {
-		  Mat3[,1+kk3+(K3+1)*(kk2+(K2+1)*kk1)] = kk1 * hermite( meaninc,kk1-1 )  * 
+		  Mat3[,1+kk3+(K3+1)*(kk2+(K2+1)*kk1)] = kk1 * hermite( meaninc,kk1-1 ) / sdinc* 
 		    hermite(Vgrid[,1], kk2) * hermite(Vgrid[,2], kk3)
     }
   }  
 }
 
 # Matrix of persistence
-persis <- Mat3 %*% ResP
-persis2 <- array(persis, dim=c(ntau, ntau))
+persis2 <- Mat3 %*% ResP
+persis <- array(persis, dim=c(ntau, ntau))
 
 require(plot3D)
 png(paste('dc_',names,ename,'.png',sep=''),width=10.6, height=5.93, units='in', res=300)
 
-persp3D(x=VecTau,y=VecTau,z=persis2, 
+persp3D(x=VecTau,y=VecTau,z=persis, 
   xlab='age percentile', ylab='asset percentile', zlab='consumption response', zlim=c(0,0.8),
   ticktype = "detailed",theta=-60, phi=25)
 

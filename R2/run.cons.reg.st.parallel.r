@@ -9,17 +9,24 @@ require(parallel)
 require(MASS)
 require(plot3D)
 
-
+#parameters
 names <- 'nl_zbl'
-#ename <- '_1e9'
+#ename <- '_30'
 ename <-'_parallel' 
+K1 <- 2 #second order hermite for income
+K2 <- 1 #second order hermite for age
+K3 <- 2 #second order hermite for ass
+ntau <- 11  #number of tau used as interpolation node
+VecTau <- (1:ntau)/(1+ntau) #get the quantile of interpolation node
+
 load( paste('~/git/abbg/R2/',names,'.dat',sep='') )
 moments$lcsim <- log(moments$csim)
 #moments$asim[moments$asim<1e-12] <- 1e-12
 #moments$lasim <- log(moments$asim)
 moments$lysim <- log(moments$ysim)
 
-#Q1: is working age correct? 
+#load the data
+#is working age correct? 
 attach(c(p,moments))
 age = 25:(25+Twork-1)
 nobs = nsim*Twork
@@ -27,8 +34,8 @@ nl_fu <- with(moments, data.table( pid = 1:nsim,  age=rep(age,each=nsim),
 	eta=c(zsim), eps=c(esim), inc=c(lysim[1:nobs]), con=c(lcsim[1:nobs]), 
 	ass=c(asim[1:nobs]) ))
 #nl_fu <- nl_fu[age>=30]
-#nl_fu <- nl_fu[ass>0] 
-nl_fu[ass<1e-9]$ass <- 1e-9
+nl_fu <- nl_fu[ass>0] 
+#nl_fu[ass<1e-9]$ass <- 1e-9
 nl_fu[,ass:=log(ass)]
 setkey(nl_fu, pid, age)
 
@@ -38,16 +45,8 @@ nl_fu[ ,ares:=lm(ass~factor(age))$residuals ]
 nl_fu[ ,yres:=lm(inc~factor(age))$residuals ]
 #nl_fu[,yres:=eta+eps]
 
-
-#cut data into asset and age deciles
-#nl_fu[, agedec:=as.numeric(cut_number(age, n = 10))] #give a bin # for each person each age
-#nl_fu[, assdec:=as.numeric(cut_number(ares, n = 10))] #give a bin # for each person each age
-
-K1 <- 2 #second order hermite for income
-K2 <- 1 #second order hermite for age
-K3 <- 2 #second order hermite for ass
-ntau <- 11  #number of tau used as interpolation node
-VecTau <- (1:ntau)/(1+ntau) #get the quantile of interpolation node
+#ols regression of consumption on income
+lm(cres~yres,data=nl_fu)
 
 #standarlize consumption, income, age, and 
 #nl_fu[,cstd:=(cres-mean(cres))/sd(cres)]
@@ -65,6 +64,7 @@ decomHerm <- function(i, Kgrid, nl_fu){
 Mat <- mclapply(1:nrow(Kgrid), decomHerm, Kgrid, nl_fu)
 Mat <- array( unlist(Mat), dim = c(length(Mat[[1]]), length(Mat)) )
 save( Mat, file=paste('Mat_',names,ename,'.dat',sep='') )
+#load( paste('Mat_',names,ename,'.dat',sep='') )
 
 #regress cons on inc ass age 
 #ResP <- lm(cres~Mat-1,data=nl_fu)$coefficients
@@ -107,8 +107,10 @@ png(paste('dc_',names,ename,'.png',sep=''),width=10.6, height=5.93, units='in', 
 
 persp3D(x=VecTau,y=VecTau,z=persis, 
   xlab='age percentile', ylab='asset percentile', zlab='consumption response', zlim=c(0,0.8),
-  ticktype = "detailed",theta=-60, phi=25)
+  ticktype = "detailed",theta=-60, phi=45)
 
 dev.off() 
 
-
+#require(R.matlab)
+#writeMat(paste('persis_',names,ename,'.mat',sep=''), persis=persis)
+#readMat(paste('persis_',names,ename,'.mat',sep=''))
