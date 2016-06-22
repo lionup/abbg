@@ -10,7 +10,7 @@ require(MASS)
 require(plot3D)
 
 #parameters
-names <- 'nl_nbl'
+names <- 'nl_zbl'
 #ename <- '_30'
 ename <-'_parallel' 
 K1 <- 2 #second order hermite for income
@@ -46,7 +46,16 @@ nl_fu[ ,yres:=lm(inc~factor(age))$residuals ]
 #nl_fu[,yres:=eta+eps]
 
 #ols regression of consumption on income
-lm(cres~yres,data=nl_fu)
+#lm(cres~yres,data=nl_fu)
+m <- lm(cres~yres + age + ares + yres*age + yres* ares + age*ares + yres*age*ares,data=nl_fu)
+beta.hat <- coef(m)
+library(arm)
+display(m, detail= TRUE)
+
+meanage <- mean(nl_fu$age)
+meana <- mean(nl_fu$ares)
+dy.dx <- beta.hat["yres"] +  beta.hat["yres:age"]*meanage +
+  beta.hat["yres:ares"]*meana + beta.hat["yres:age:ares"]*meanage*meana
 
 #standarlize consumption, income, age, and 
 #nl_fu[,cstd:=(cres-mean(cres))/sd(cres)]
@@ -112,5 +121,5 @@ persp3D(x=VecTau,y=VecTau,z=persis,
 dev.off() 
 
 #require(R.matlab)
-#writeMat(paste('persis_',names,ename,'.mat',sep=''), persis=persis)
+#writeMat(paste('persis_',names,ename,'.mat',sep=''), persis=t(persis))
 #readMat(paste('persis_',names,ename,'.mat',sep=''))

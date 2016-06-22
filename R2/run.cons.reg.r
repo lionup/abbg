@@ -6,7 +6,7 @@ require(ggplot2)
 require(data.table)
 require(EQL)
 
-names <- 'nl_nbl'
+names <- 'nl_zbl'
 #ename <- '_etaeps'
 ename <- ''
 load( paste('~/git/abbg/R2/',names,'.dat',sep='') )
@@ -32,6 +32,17 @@ nl_fu[ ,ares:=lm(ass~factor(age))$residuals ]
 nl_fu[ ,yres:=lm(inc~factor(age))$residuals ]
 #nl_fu[,yres:=eta+eps]
 
+#ols regression of consumption on income
+#lm(cres~yres,data=nl_fu)
+m <- lm(cres~yres + age + ares + yres*age + yres* ares + age*ares + yres*age*ares,data=nl_fu)
+beta.hat <- coef(m)
+library(arm)
+display(m, detail= TRUE)
+
+meanage <- mean(nl_fu$age)
+meana <- mean(nl_fu$ares)
+dy.dx <- beta.hat["yres"] +  beta.hat["yres:age"]*meanage +
+  beta.hat["yres:ares"]*meana + beta.hat["yres:age:ares"]*meanage*meana
 
 #cut data into asset and age deciles
 #nl_fu[, agedec:=as.numeric(cut_number(age, n = 10))] #give a bin # for each person each age
@@ -81,12 +92,26 @@ save( Mat, file=paste('Mat_',names,ename,'.dat',sep='') )
 ResP <- lm(cres~Mat-1,data=nl_fu)$coefficients
 #ResP <- lm(cstd~Mat-1,data=nl_fu)$coefficients
 
+#find the mean regression
+meaninc = mean(nl_fu$ystd) #this equal to 0
+sdinc = sd(nl_fu$yres)
+meana = mean(nl_fu$astd)
+meanage = mean(nl_fu$agestd)
+Mat2 = rep( 0, (K1+1)*(K2+1)*(K3+1) )
+for (kk1 in 1:K1) {
+  for (kk2 in 0:K2) {    
+    for (kk3 in 0:K3) {
+      Mat2[1+kk3+(K3+1)*(kk2+(K2+1)*kk1)] = kk1 * hermite( meaninc,kk1-1 ) / sdinc /sdinc* 
+        hermite(meanage, kk2) * hermite(meana, kk3)
+    }
+  }  
+}
+Mat2 %*% ResP
+
 # Covariates (to compute the derivative of the quantile function with respect to y_{t-1})
 # get quantiles of last period
 Vage = quantile(c(nl_fu$agestd),VecTau, names=F, na.rm = T ) 
 Vass = quantile(c(nl_fu$astd),VecTau, names=F, na.rm = T )
-meaninc = mean(nl_fu$ystd) #this equal to 0
-sdinc = sd(nl_fu$yres)
 Vgrid = data.matrix( expand.grid(z1=Vage, z2=Vass) )
 
 # hermite decompostion and derivative
@@ -105,7 +130,7 @@ for (kk1 in 1:K1) {
 
 # Matrix of persistence
 persis2 <- Mat3 %*% ResP
-persis <- array(persis, dim=c(ntau, ntau))
+persis <- array(persis2, dim=c(ntau, ntau))
 
 require(plot3D)
 png(paste('dc_',names,ename,'.png',sep=''),width=10.6, height=5.93, units='in', res=300)
