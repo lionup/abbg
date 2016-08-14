@@ -1,7 +1,7 @@
 ##################################################
 #derivative of consumption on earnings, by asset and by age
 rm(list = ls())
-setwd('~/git/abbg/R2/figure/report14')
+setwd('~/git/abbg/R/figure/report14')
 require(ggplot2)   
 require(data.table)
 require(EQL)
@@ -10,7 +10,7 @@ require(MASS)
 require(plot3D)
 
 #parameters
-names <- 'nl_zbl'
+names <- 'cohort30'
 #ename <- '_30'
 ename <-'_parallel' 
 K1 <- 2 #second order hermite for income
@@ -19,7 +19,7 @@ K3 <- 2 #second order hermite for ass
 ntau <- 11  #number of tau used as interpolation node
 VecTau <- (1:ntau)/(1+ntau) #get the quantile of interpolation node
 
-load( paste('~/git/abbg/R2/',names,'.dat',sep='') )
+load( paste('~/git/abbg/R/',names,'.dat',sep='') )
 moments$lcsim <- log(moments$csim)
 #moments$asim[moments$asim<1e-12] <- 1e-12
 #moments$lasim <- log(moments$asim)
@@ -28,10 +28,11 @@ moments$lysim <- log(moments$ysim)
 #load the data
 #is working age correct? 
 attach(c(p,moments))
-age = 25:(25+Twork-1)
-nobs = nsim*Twork
+age = seq(p$age_min, p$age_re-2, 2)
+nobs = nsim*nage
+
 nl_fu <- with(moments, data.table( pid = 1:nsim,  age=rep(age,each=nsim), 
-	eta=c(zsim), eps=c(esim), inc=c(lysim[1:nobs]), con=c(lcsim[1:nobs]), 
+	eta=c(etasim), eps=c(epssim), inc=c(lysim[1:nobs]), con=c(lcsim[1:nobs]), 
 	ass=c(asim[1:nobs]) ))
 #nl_fu <- nl_fu[age>=30]
 nl_fu <- nl_fu[ass>0] 

@@ -234,7 +234,7 @@ comp.moments<- function(p, model) {
     }  
   }
 
-##RETIRE####
+	##RETIRE####
   for (it in 1:p$Tret) {  
   	ysim[,p$nage+it]  = pgrid[ msimI[,p$nage] ]
   	asim[,p$nage+it]  = p$R * ( xsim[,p$nage+it-1] - csim[,p$nage+it-1] )
