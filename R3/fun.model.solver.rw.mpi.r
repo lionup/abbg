@@ -1,4 +1,4 @@
-source('~/git/abbg/R3/inc.modelsolver.nl.mpi.r')
+source('~/git/abbg/R3/inc.modelsolver.rw.mpi.r')
 
 comp.solveModel <- function(p) {
 	res <- with(p,{
@@ -6,15 +6,46 @@ comp.solveModel <- function(p) {
 		#DATA
 		#####################################################
 		#log experience profile
-		kappa = read.table("~/git/abbg/R/old/KV/Input/kappasmooth.txt")$V1 #25~59
-		kappa = kappa + log(0.75)
+		kappa <- 11.237 +
+						 c(-0.2773, -0.2047, -0.1465, -0.1008, -0.0659,
+			         -0.0401, -0.0218, -0.0098, -0.0025, 0.001,
+			          0.0018,  0.001, -0.0007, -0.0027, -0.0044,
+			         -0.0052, -0.0049, -0.0034, -0.0004, 0.0038,
+			         0.0093,  0.0157,  0.0225,  0.0294,  0.0355,
+			         0.0402,  0.0425,  0.0414,  0.0359,  0.0246,
+			         0.0062,  -0.0208, -0.0581, -0.1073, -0.1704, -0.2494)
 
-		#survival probabilities
-		surprob = read.table("~/git/abbg/R/old/KV/Input/surprobsmooth.txt")$V1 #60~89
+		incpro <- data.table(age=25:60,kappa=kappa)
+		setkey(incpro, age)
+		age_full <- seq( age_min, age_re-2, by=2 )
+		incpro <- incpro[J(age_full)]
+		kappa <- incpro$kappa
+
+		#load survival probabilities
+		#suvive prob from 59 to 60 is 1
+		#these are suvive prob from 60 to 61 and afterwards
+		#suvive prob from 94 to 95 is 0
+		surprob <- read.table("~/git/abbg/R/old/KV/Input/surprobsmooth.txt")$V1
+
+		#biennial: suvive prob from 59 to 61 is 1
+		#I need recalculate from 61 to 63 and afterwards
+		#suvive prob from 93 to 95 is 0, I don't have to recalculate the last one
+		for (it in 1:(Tret-1)){
+			surprob[it*2+1] <- surprob[it*2+1] * surprob[it*2]
+		}
+
+		#take 63:95, sep by 2
+		incpro <- data.table(age=61:95,surprob=surprob)
+		setkey(incpro, age)
+		age_full <- seq( age_re+2, age_max+2, by=2 )
+		incpro <- incpro[J(age_full)]
+		surprob <- incpro$surprob
+
+		#perfect annuity market
 		annprem <- surprob
 
-		#unconditional survival prob
-		unconsurprob = rep(1,Tret)
+		#unconditional survival prob 61~93
+		unconsurprob <- rep(1,Tret)
 		for(it in 2:Tret){
 		  unconsurprob[it] = unconsurprob[it-1]* surprob[it-1]
 		}
@@ -53,21 +84,23 @@ comp.solveModel <- function(p) {
 		  varz[it] = (rho^2)*varz[it-1] + Vetavec[it-1]
 		}
 
-		#lval = comp.eta.prob(p,varz)
-		#zdist      <- lval$zdist
-		#zgrid      <- lval$zgrid
-		#ztrans     <- lval$ztrans
-		#varzapprox <- lval$varzapprox
+		znsd = optimize(FnGridPerm, c(1,4), p, varz, Vetavec, tol=1e-2)$minimum
+		#znsd <- 2.775511 #39
+		#znsd <- 2.046858 #11
+		lval = FnGridPerm(znsd, p, varz, Vetavec, FALSE)
+		zdist      <- lval$zdist
+		zgrid      <- lval$zgrid
+		ztrans     <- lval$ztrans
+		varzapprox <- lval$varzapprox
 
-		#save(zdist,zgrid,ztrans,varzapprox,file='eta.dat')
-		load('~/git/abbg/R3/eta.dat')
+		#save(zdist,zgrid,ztrans,varzapprox,file='~/git/abbg/R3/eta.dat' )
+		#load('eta.dat')
 
 		###################
 		#Earnings
 		#p$stax <- uniroot(FnTaxParamNet, c(0, 1), p, kappa, popsize, zgrid, egrid, zdist, edist,
     #  extendInt="yes", tol=1e-6, maxiter=200)$root
-		#p$stax <-  0.003699068
-		p$stax <- 0.003704888
+		p$stax <-  0.003699068
 		lval <- FnTaxParamNet(p$stax, p, kappa, popsize, zgrid, egrid, zdist, edist, FALSE)
 		ygrid      <- lval$ygrid
 		ypregrid   <- lval$ypregrid
@@ -272,7 +305,7 @@ comp.solveModel <- function(p) {
 			cat('Number of Chains: ',chainN,'\n')
 
 			clusterEvalQ( cl,require(Hmisc) )
-			clusterEvalQ( cl,source('~/git/abbg/R3/inc.modelsolver.nl.mpi.r') )
+			clusterEvalQ( cl,source('~/git/abbg/R3/inc.modelsolver.rw.mpi.r') )
 
 		} else if (mode == 'multicore'){
 			cat('[mode=multicore] YEAH !!!!! \n')

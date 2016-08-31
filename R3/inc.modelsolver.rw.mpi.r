@@ -38,98 +38,63 @@ FnGridTrans <- function(lx, p, moment=TRUE){
 }
 
 #####################################################
-trans.matrix <- function(x1, x2, prob=T){
-    tt <- table( x1, x2 )
-    if(prob) tt <- tt / rowSums(tt)
-    tt
-}
-
-#####################################################
-comp.eta.sim <- function(p, varz){
+FnGridPerm <- function(lx, p, varz, Vetavec, moment=TRUE){
   res <- with(p,{
+    lwidth <- rep(0,Twork)
+    lvar <- lwidth
+    zgrid    <- array( 0, dim=c(Twork,ngpz) ) #permanent component
+    zdist  <- zgrid
+    ztrans <- array( 0, dim=c(Twork-1,ngpz,ngpz) )
 
-    Vgrid<- (1:N) / (1+N) #quantile
-    V_draw <- array(0, dim = c(Twork,N)) #quantile draw for each period
-    for (i in 1:Twork) V_draw[i,] = sample(Vgrid)
-
-    #first period
-    Mateta = array(0, dim = c(Twork,N))
-    Mateta[1,] <- qnorm( V_draw[1,], sd=sqrt(Vz0) )
-
-    lc <- rep(0, Twork-1)
-    sig_v <- lc
-    b <- lc
-
-    for (it in 2:Twork){  #working age
-      lc[it-1] <- quantile(Mateta[it-1,], 1-tau)
-      iab = Mateta[it-1,] >  lc[it-1]
-      ibe = Mateta[it-1,] < -lc[it-1]
-      iyes = iab | ibe
-
-      # mean(eta_t|eta_t-1)
-      index = (1- delta * tau * iyes) * Mateta[it-1,]
-      #var(index)
-
-      #var(eta_t|eta_t-1) - Veta_rho1
-      index2 = tau * (1-tau) * delta^2 * Mateta[it-1,]^2 * iyes
-      #mean(index2)
-
-      sig_v[it-1]= sqrt( varz[it] - var(index) - mean(index2) )
-
-      shockperm <-  qnorm( V_draw[it,], sd=sig_v[it-1] )
-      b[it-1] <- sig_v[it-1] * qnorm(1-tau)
-      c <- sqrt(varz[it]) * qnorm(1-tau)
-
-      iab = (Mateta[it-1,] >  c) & (shockperm < -b[it-1])
-      ibe = (Mateta[it-1,] < -c) & (shockperm >  b[it-1])
-      iyes = iab | ibe
-
-      Mateta[it,] = (1-delta*iyes) * Mateta[it-1,] + shockperm
+    # get boundaries and fill in with equally spaced points
+    for(it in 1:Twork){
+      zgrid[it,1]    = -lx*sqrt(varz[it])
+      zgrid[it,ngpz] = lx*sqrt(varz[it])
+      lwidth[it] = (zgrid[it,ngpz]-zgrid[it,1])/(ngpz-1)
+      for( iz1 in 2:(ngpz-1)){
+        zgrid[it,iz1] = zgrid[it,1] + lwidth[it]*(iz1-1)
+      }
     }
 
-    save( sig_v, varz, file='sig_v.dat' )
-    Mateta
-  })
-  return(res)
-}
-
-#####################################################
-comp.eta.prob <- function(p, varz){
-  res <- with(p,{
-    # get the simulations of workers
-    Mateta <- comp.eta.sim(p,varz)
-    #load('~/git/abbg/R3/Mateta.dat')
-
-    # Quantiles of eta and epsilon, by age
-    zgrid <- array( 0, dim=c(Twork, ngpz) )  #bins
-    ztrans <- array( 0,dim=c(Twork-1, ngpz, ngpz) ) #last period to this period
-
-    veta <- seq(1/(2*ngpz), (2*ngpz-1)/(2*ngpz), l=ngpz) #median of each bin
-    age = 1:Twork
-    lvar <- rep(0,Twork)
-
-    for (i in 1:Twork){ #periods before retirement
-      zgrid[i,] <- quantile( Mateta[i,], veta, names=F, na.rm = T )
+    # fill in transition matrix using normal distribution
+    for( it in 1:(Twork-1) ){
+      for (iz1 in 1:ngpz){
+        ztrans[it,iz1,1] <- pnorm( zgrid[it+1,1]+0.5*lwidth[it+1]-rho*zgrid[it,iz1], sd=sqrt(Vetavec[it]) )
+        for( iz2 in 2:(ngpz-1) ){
+          ltemp1 = pnorm( zgrid[it+1,iz2]+0.5*lwidth[it+1]-rho*zgrid[it,iz1], sd=sqrt(Vetavec[it]) )
+          ltemp3 = pnorm( zgrid[it+1,iz2]-0.5*lwidth[it+1]-rho*zgrid[it,iz1], sd=sqrt(Vetavec[it]) )
+          ztrans[it,iz1,iz2] = ltemp1 - ltemp3
+        }
+        ztrans[it,iz1,ngpz] = pnorm( zgrid[it+1,ngpz]-0.5*lwidth[it+1]-rho*zgrid[it,iz1],
+          sd=sqrt(Vetavec[it]), lower.tail=FALSE )
+        ztrans[it,iz1,] = ztrans[it,iz1,]/sum(ztrans[it,iz1,])
+      }
     }
 
-    long <- data.table( pid = 1:N, age=rep(age, each=N), income = c(t(Mateta)) )
-    setkey(long, pid, age)
-    long[, q:=as.numeric(cut_number(income, n = ngpz)), age] #give a bin # for each person each age
-    long$income <- NULL
-    wide <- reshape(long, idvar='pid', timevar='age', direction='wide') #each person has all age in a row
-
-    for ( t in 1:(Twork-1) ){ #today
-      x1 <- paste('q',age[t  ],sep='.')
-      x2 <- paste('q',age[t+1],sep='.')
-      ztrans[t,,] <- trans.matrix( wide[[x1]], wide[[x2]] ) #today
+    #find distribution at first period
+    zdist[1,1] = pnorm( zgrid[1,1]+0.5*lwidth[1], sd=sqrt(Vz0) )
+    for (iz1 in 2:(ngpz-1) ){
+      ltemp1 = pnorm( zgrid[1,iz1]+0.5*lwidth[1], sd=sqrt(Vz0) )
+      ltemp3 = pnorm( zgrid[1,iz1]-0.5*lwidth[1], sd=sqrt(Vz0) )
+      zdist[1,iz1] = ltemp1 - ltemp3
     }
+    zdist[1,ngpz] = pnorm( zgrid[1,ngpz]-0.5*lwidth[1], sd=sqrt(Vz0), lower.tail=FALSE )
+    zdist[1,] = zdist[1,]/sum(zdist[1,])
 
-    zdist <- array( 1/ngpz, dim=c(Twork, ngpz) ) #first period, same prob
+    #find unconditional distributions
+    for (it in 2:Twork) {
+      zdist[it,] = zdist[it-1,] %*% ztrans[it-1,,]
+      zdist[it,] = zdist[it,] /sum(zdist[it,])
+    }
 
     #find variance
     for (it in 1:Twork) lvar[it] = sum(zgrid[it,]^2 * zdist[it,]) - sum(zgrid[it,] * zdist[it,])^2
 
-    rr=list(zdist=zdist, zgrid=zgrid, ztrans=ztrans, varzapprox=lvar)
+    if(moment){
+      rr = sum((varz -lvar)^2)
+    }else{
+      rr=list(zdist=zdist, zgrid=zgrid, ztrans=ztrans, varzapprox=lvar)
+    }
   })
   return(res)
 }
