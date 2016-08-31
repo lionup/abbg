@@ -62,7 +62,7 @@ application="mpirun -np 1 Rscript"
 #options="run.betaKY.rw.r"
 #options="run.betaKY.nl.r"
 #options="run.model.nl.mpi.r"
-options="run.model.nl.ir.r"
+options="run.model.nl.mpi.r"
 
 #! Work directory (i.e. where the job will run):
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
