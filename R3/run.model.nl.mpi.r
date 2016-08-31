@@ -38,10 +38,10 @@ p$T          = T
 detach(data)
 
 # GRIDS DIMENSION - STATE VARIABLES
-p$ngpe = 100 #99 #19 #7 			    #transitory component
-p$ngpz = 100 #11 			    #permanent component
-p$ngpa = 50#100#50 		    #asset points
-p$ngpm = 100 			    #average earnings points
+p$ngpe = 50 #100 #99 #19 #7 			    #transitory component
+p$ngpz = 100 #100 #11 			    #permanent component
+p$ngpa = 50 #50#100#50 		    #asset points
+p$ngpm = 50 #100 			    #average earnings points
 #p$ngpp = p$ngpm * p$ngpz * p$ngpe      #pension points
 
 #DEMOGRAPHIC PARAMETERS PARAMETERS
@@ -91,10 +91,10 @@ p$Rnet = 1.0 + (1.0-p$rtax)*(p$R-1)      #annual after tax interest rate
 
 #OPTIONS
 p$Display  = 1
-p$mode <- 'multicore' #'serial' #'multicore' #'mpi'
+p$mode <- 'serial' #'serial' #'multicore' #'mpi'
 
 start_time = proc.time()[3]
 moments  <- comp.solveModel(p)
 cat(paste('\ntotal seconds to solve the program: ' , proc.time()[3] -  start_time ))
 
-save(p, moments, file='nl_nbl_full.dat')
+save(p, moments, file='nl_nbl_ser.dat')
