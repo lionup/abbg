@@ -1,6 +1,7 @@
 #!/bin/bash -l
 
-#BSUB -q cowles
+##BSUB -q cowles
+#BSUB -q shared
 #BSUB -W 24:00
 #BSUB -J abbg_R3
 
