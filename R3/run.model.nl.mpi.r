@@ -65,14 +65,6 @@ p$amax  = 300000
 p$nsim = 50000 #5000
 p$N = 999999
 
-#EARNINGS PROCESS
-p$Veps =  0.05
-p$Vz0  =  0.15
-p$rho  =  1
-p$delta =  0.2
-p$Veta_rho1 =  0.01   #Veta if rho==1
-p$tau   = 0.15
-
 #INTEREST RATE
 p$R = 1.03^2      #biennial gross interest rate
 
