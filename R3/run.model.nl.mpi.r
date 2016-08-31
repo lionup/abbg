@@ -4,7 +4,7 @@ require(data.table)
 require(ggplot2)
 require(EQL)
 
-setwd('~/git/abbg/R3')
+#setwd('~/git/abbg/R3')
 source('~/git/abbg/R3/fun.model.solver.nl.mpi.r')
 set.seed(123)
 
@@ -91,10 +91,10 @@ p$Rnet = 1.0 + (1.0-p$rtax)*(p$R-1)      #annual after tax interest rate
 
 #OPTIONS
 p$Display  = 1
-p$mode <- 'serial' #'serial' #'multicore' #'mpi'
+p$mode <- 'multicore' #'serial' #'multicore' #'mpi'
 
 start_time = proc.time()[3]
 moments  <- comp.solveModel(p)
 cat(paste('\ntotal seconds to solve the program: ' , proc.time()[3] -  start_time ))
 
-save(p, moments, file='nl_nbl_ser.dat')
+save(p, moments, file='nl_nbl_50.dat')
