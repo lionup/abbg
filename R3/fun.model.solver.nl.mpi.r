@@ -74,8 +74,10 @@ comp.solveModel <- function(p) {
 		#zgrid      <- lval$zgrid
 		#ztrans     <- lval$ztrans
 		#varzapprox <- lval$varzapprox
+		#mineta     <- lval$mineta
+		#maxeta     <- lval$maxeta
 
-		#save(zdist,zgrid,ztrans,varzapprox,file='eta.dat')
+		#save(zdist,zgrid,ztrans,varzapprox,mineta, maxeta, file='eta.dat')
 		load('~/git/abbg/R3/eta.dat')
 
 		###################
@@ -270,6 +272,8 @@ comp.solveModel <- function(p) {
 			ypregrid =ypregrid,
 			ygrid    =ygrid   ,
 			ztrans   =ztrans  ,
+			mineta   =mineta ,
+		  maxeta   =maxeta ,
 			edist    =edist   ,
 			agridret =agridret,
 			agrid    =agrid   ,

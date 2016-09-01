@@ -111,7 +111,7 @@ comp.eta.prob <- function(p){
 
     # get the simulations of workers
     #Mateta <- comp.eta.sim(p)
-    save_Mateta_name <- paste('Mateta',age_min,'.dat',sep='')
+    save_Mateta_name <- paste('~/git/abbg/R3/Mateta',age_min,'.dat',sep='')
     load(save_Mateta_name)
 
     # Quantiles of eta and epsilon, by age
@@ -139,11 +139,33 @@ comp.eta.prob <- function(p){
 
     zdist <- 1/ngpz #unconditonal distribution, each bin is 0.01 of the population, so each node is with prob 0.01.
 
+    mineta <- array( 0, dim=c(Twork-1, ngpz) ) #this period and last eta
+    maxeta <- array( ngpz+1, dim=c(Twork-1, ngpz) )
+    for( t in 1:(Twork-1) ){ #today
+      for(w in 1:ngpz){   #for yesterday
+        for(ww in 1:ngpz){ #for today
+          if (ztrans[t,w,ww] > 0) {
+            break
+          }else{
+            mineta[t,w] = ww
+          }
+        }
+
+        for(ww in ngpz:1){ #for today
+          if (ztrans[t,w,ww] > 0) {
+            break
+          }else{
+            maxeta[t,w] = ww
+          }
+        }
+      }
+    }
+
     #find variance
     lvar <- rep(0,Twork)
     for (it in 1:Twork) lvar[it] <- sum(zgrid[it,]^2 * zdist) - sum(zgrid[it,] * zdist)^2
 
-    rr=list(zdist=zdist, zgrid=zgrid, ztrans=ztrans, varzapprox=lvar)
+    rr=list(zdist=zdist, zgrid=zgrid, ztrans=ztrans, mineta = mineta, maxeta = maxeta, varzapprox=lvar)
   })
   return(res)
 }
@@ -322,7 +344,7 @@ comp.ngpz <- function(iz, p, model, muc, it){
           lmuc1[,im,ie] = bet*Rnet*mucret[1,,im]      #euler equation
         }else{
           emuc[] = 0.0
-          for( iz2 in 1:ngpz ){
+          for( iz2 in (mineta[it,iz]+1) : (maxeta[it,iz]-1) ){
             for( ie2 in 1:ngpe ){
               #find two probabilities and average over:
               lnextm = ( it*mgrid[it,im] + min(ypregrid[it+1,iz2,ie2],pencap) )/(it+1)

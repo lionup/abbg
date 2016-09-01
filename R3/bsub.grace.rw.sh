@@ -2,7 +2,7 @@
 
 #BSUB -q cowles
 ##BSUB -q shared
-#BSUB -W 24:00
+#BSUB -W 1:00
 #BSUB -J abbg_R3
 
 #BSUB -n 20
