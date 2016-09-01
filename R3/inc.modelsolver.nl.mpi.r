@@ -1,3 +1,35 @@
+comp.eps <- function(p){
+  xeps <- array( 0, dim=c(p$Twork, p$ngpe) ) #income grid
+  VecTaue <- seq(1/(2*p$ngpe), (2*p$ngpe-1)/(2*p$ngpe), l=p$ngpe)  #get the quantile of interpolation node
+
+  # generate the age vector
+  xt  <- seq( p$age_min, p$age_re-2, by=2 )
+  xtL <- ( xt - p$meanAGE ) / p$stdAGE #standardize AGE
+
+  # Create MatAGE which is the hermite of AGE
+  MatAGE <- array( 0,dim=c(p$K4+1, p$Twork) )
+  for (kk4 in 0:p$K4){
+    MatAGE[kk4+1,]=hermite(xtL,kk4)
+  }
+
+  for (l in 1:p$Twork){
+    xeps[l,] = ( t(MatAGE[,l]) %*% p$Resqtrue_eps[,1] )*( VecTaue <= p$Vectau[1] )
+    for (jtau in 2:p$Ntau){
+        xeps[l,] = xeps[l,] + ( (t(MatAGE[,l]) %*% (p$Resqtrue_eps[,jtau] - p$Resqtrue_eps[,jtau-1])) /
+          (p$Vectau[jtau] - p$Vectau[jtau-1]) * (VecTaue - p$Vectau[jtau-1]) +
+          t(MatAGE[,l]) %*% p$Resqtrue_eps[,jtau-1] ) * (VecTaue > p$Vectau[jtau-1]) * (VecTaue <= p$Vectau[jtau])
+    }
+    #Last quantile.
+    xeps[l,] = xeps[l,] + ( t(MatAGE[,l]) %*% p$Resqtrue_eps[,p$Ntau] )*( VecTaue > p$Vectau[p$Ntau] )
+
+    # Laplace tails
+    xeps[l,] = xeps[l,] + ( (1 / p$b1true_eps * log(VecTaue / p$Vectau[1])) * (VecTaue <= p$Vectau[1]) ) -
+      ( 1 / p$bLtrue_eps * log((1-VecTaue) / (1-p$Vectau[p$Ntau])) * (VecTaue > p$Vectau[p$Ntau]) )
+  }
+  return(xeps)
+}
+
+#####################################################
 trans.matrix <- function(x1, x2, prob=T){
     tt <- table( x1, x2 )
     if(prob) tt <- tt / rowSums(tt)
@@ -109,47 +141,12 @@ comp.eta.prob <- function(p){
 
     #find variance
     lvar <- rep(0,Twork)
-    for (it in 1:Twork) {
-      lvar[it] <- sum(zgrid[it,]^2 * zdist) - sum(zgrid[it,] * zdist)^2
-    }
+    for (it in 1:Twork) lvar[it] <- sum(zgrid[it,]^2 * zdist) - sum(zgrid[it,] * zdist)^2
 
     rr=list(zdist=zdist, zgrid=zgrid, ztrans=ztrans, varzapprox=lvar)
   })
   return(res)
 }
-
-#####################################################
-comp.eps <- function(p){
-  xeps <- array( 0, dim=c(p$Twork, p$ngpe) ) #income grid
-  VecTaue <- seq(1/(2*p$ngpe), (2*p$ngpe-1)/(2*p$ngpe), l=p$ngpe)  #get the quantile of interpolation node
-
-  # generate the age vector
-  xt  <- seq( p$age_min, p$age_re-2, by=2 )
-  xtL <- ( xt - p$meanAGE ) / p$stdAGE #standardize AGE
-
-  # Create MatAGE which is the hermite of AGE
-  MatAGE <- array( 0,dim=c(p$K4+1, p$Twork) )
-  for (kk4 in 0:p$K4){
-    MatAGE[kk4+1,]=hermite(xtL,kk4)
-  }
-
-  for (l in 1:p$Twork){
-    xeps[l,] = ( t(MatAGE[,l]) %*% p$Resqtrue_eps[,1] )*( VecTaue <= p$Vectau[1] )
-    for (jtau in 2:p$Ntau){
-        xeps[l,] = xeps[l,] + ( (t(MatAGE[,l]) %*% (p$Resqtrue_eps[,jtau] - p$Resqtrue_eps[,jtau-1])) /
-          (p$Vectau[jtau] - p$Vectau[jtau-1]) * (VecTaue - p$Vectau[jtau-1]) +
-          t(MatAGE[,l]) %*% p$Resqtrue_eps[,jtau-1] ) * (VecTaue > p$Vectau[jtau-1]) * (VecTaue <= p$Vectau[jtau])
-    }
-    #Last quantile.
-    xeps[l,] = xeps[l,] + ( t(MatAGE[,l]) %*% p$Resqtrue_eps[,p$Ntau] )*( VecTaue > p$Vectau[p$Ntau] )
-
-    # Laplace tails
-    xeps[l,] = xeps[l,] + ( (1 / p$b1true_eps * log(VecTaue / p$Vectau[1])) * (VecTaue <= p$Vectau[1]) ) -
-      ( 1 / p$bLtrue_eps * log((1-VecTaue) / (1-p$Vectau[p$Ntau])) * (VecTaue > p$Vectau[p$Ntau]) )
-  }
-  return(xeps)
-}
-
 
 #####################################################
 #Ygross - tax function - Ynet
@@ -176,7 +173,7 @@ FnTaxParamNet <- function(lstax, p, kappa, popsize, zgrid, egrid, zdist, edist, 
     ltotlabincpre <- 0.0
     #ltotlabincpost = 0.0
 
-    ygrid    <- array( 0, dim=c(Twork,ngpz,ngpe) ) #earnings grid
+    ygrid    <- array( 0, dim=c(Twork,ngpz,ngpe) ) #earnings
     ypregrid <- ygrid
 
     for(it in 1:Twork){

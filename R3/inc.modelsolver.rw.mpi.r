@@ -119,11 +119,11 @@ FnTaxParamNet <- function(lstax, p, kappa, popsize, zgrid, egrid, zdist, edist, 
     #avlearnspre2   <- avearnspre
     #avlearnspost2  <- avearnspre
 
-    ltottax = 0.0
-    ltotlabincpre = 0.0
+    ltottax <- 0.0
+    ltotlabincpre <- 0.0
     #ltotlabincpost = 0.0
 
-    ygrid    <- array( 0, dim=c(Twork,ngpz,ngpe) ) #earnings
+    ygrid    <- array( 0, dim=c(Twork,ngpz,ngpe) ) #earnings grid
     ypregrid <- ygrid
 
     for(it in 1:Twork){
@@ -132,7 +132,7 @@ FnTaxParamNet <- function(lstax, p, kappa, popsize, zgrid, egrid, zdist, edist, 
           ygrid[it,iz,ie] = exp( kappa[it] + zgrid[it,iz] + egrid[it,ie] )
 
           #get implied gross income at this point, to use in constructtion of soc sec system
-          lygross = ygrid[it,iz,ie]/(1.0-pentax-btax)
+          lygross <- ygrid[it,iz,ie]/(1.0-pentax-btax)
           ypregrid[it,iz,ie] <- uniroot(FnGrossInc, c(0, lygross*3), ygrid[it,iz,ie], p, lstax,
             extendInt="yes", tol=1, maxiter=30)$root
 
@@ -161,9 +161,9 @@ FnTaxParamNet <- function(lstax, p, kappa, popsize, zgrid, egrid, zdist, edist, 
     if (Display==1) cat('Tax revenue / Pre-tax labor income: ', (ltottax/ltotlabincpre)*100, '%\n')
 
     if(moment){
-      rr = ltottax/ltotlabincpre - targetTaxToLabinc
+      rr <- ltottax/ltotlabincpre - targetTaxToLabinc
     }else{
-      rr = list(ygrid = ygrid,
+      rr <- list(ygrid = ygrid,
                 ypregrid = ypregrid,
                 avearnspre   = avearnspre)
     }
@@ -182,11 +182,11 @@ FnSSParam <- function(lsspar, p, avearnspre, mgrid, moment=TRUE){
   res <- with(p,{
     if (Display==1) cat('SS benefit parameter: ', lsspar, '\n')
 
-    lavearns = sum(avearnspre)/Twork
-    ssbend1 = 0.18*lavearns
-    ssbend2 = 1.1*lavearns
+    lavearns <- sum(avearnspre)/Twork
+    ssbend1  <- 0.18*lavearns
+    ssbend2  <- 1.1*lavearns
 
-    ltotpen = 0.0
+    ltotpen  <- 0.0
     ppregrid <- array( 0, dim=c(Tret,ngpm) ) #pension grid
     pgrid    <- ppregrid
 

@@ -1,7 +1,7 @@
 #!/bin/bash -l
 
-##BSUB -q cowles
-#BSUB -q shared
+#BSUB -q cowles
+##BSUB -q shared
 #BSUB -W 24:00
 #BSUB -J abbg_R3
 
@@ -20,4 +20,4 @@ echo "Slot distribution: $LSB_MCPU_HOSTS"
 module load Apps/R/3.2.2-generic
 module load Libs/GSL/1.16
 
-R --no-save --slave < ~/git/abbg/R3/run.model.nl.mpi.r > grace.$LSB_JOBID.out
+R --no-save --slave < ~/git/abbg/R3/run.model.rw.mpi.r > grace.$LSB_JOBID.out
