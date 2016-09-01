@@ -18,20 +18,20 @@ p$ngpm = 19  			    #average earnings points
 #p$ngpp = p$ngpm * p$ngpz * p$ngpe      #pension points
 
 #DEMOGRAPHIC PARAMETERS PARAMETERS
-p$Twork    = 35		#working years
-p$Tret     = 35        #retirement years
-p$Ttot     = p$Twork + p$Tret        #total years
+p$Twork  = 35		#working years
+p$Tret   = 35        #retirement years
+p$Ttot   = p$Twork + p$Tret        #total years
 
 #TARGET MOMENTS
 p$targetKY = 2.5
-p$targetTaxToLabinc = 0.25 #0.17 
-p$targetSSAvReplacement = 0.45 
+p$targetTaxToLabinc = 0.25 #0.17
+p$targetSSAvReplacement = 0.45
 
 #PARAMETERS FOR GRID CONSTRUCTION
 p$pexpgrid = 0.18       #approaches linear as goes to 0, approaches L shaped as goes to Inf
 p$amax  = 300000
 
-#SIMULATION PARAMETERS	
+#SIMULATION PARAMETERS
 p$nsim = 50000 #5000
 p$N = 999999
 
@@ -54,25 +54,25 @@ p$bet =   1/p$R
 p$borrowlim = 0 #0.0 #-100000000.0
 
 #GOVERNMENT PARAMETERS
-#gouveia strauss 
+#gouveia strauss
 #p$stax = 2.0e-4   #guess: is chosen optimally
 p$ptax = 0.768
 p$btax = 0.258
 
 #other taxes and benefits
-p$cfloor = -100000000000.0  
-p$pentax  = 0.0    #payroll tax   
+p$cfloor = -100000000000.0
+p$pentax  = 0.0    #payroll tax
 p$rtax = 0.0 #tax on interest income
 p$otax = 0.0 #tax on old age pensions, check option in Parameters
-p$pencapfrac = 2.2 #cap on (pre-tax) earnings that contribute to pension index, 
+p$pencapfrac = 2.2 #cap on (pre-tax) earnings that contribute to pension index,
 p$Rnet = 1.0 + (1.0-p$rtax)*(p$R-1)      #annual after tax interest rate
 
 #OPTIONS
 p$Display  = 1
-p$mode <- 'multicore' #'serial' #'multicore' #'mpi' 
+p$mode <- 'multicore' #'serial' #'multicore' #'mpi'
 
-start_time = proc.time()[3]  
+start_time = proc.time()[3]
 moments  <- comp.solveModel(p)
 cat(paste('\ntotal seconds to solve the program: ' , proc.time()[3] -  start_time ))
 
-save(p, moments, file='nl_zbl.dat') 
+save(p, moments, file='nl_zbl.dat')
