@@ -21,9 +21,6 @@ comp.solveModel <- function(p) {
 		incpro <- incpro[J(age_full)]
 		kappa <- incpro$kappa
 
-		load('~/git/abbg/R3/meaneta.dat')
-		kappa <- kappa + meaneta
-
 		#load survival probabilities
 		#suvive prob from 59 to 60 is 1
 		#these are suvive prob from 60 to 61 and afterwards

@@ -148,9 +148,9 @@ Mat_rw=cov(ypresim(:,1:20));
 
 
 figure
-plot((25:2:93),vect_meany_nl(1:35),'--','Linewidth',3,'Color','b');
+plot((25:2:93),vect_meanc_nl(1:35),'--','Linewidth',3,'Color','b');
 hold on
-plot((25:2:93),vect_meany_rw(1:35),'-','Linewidth',3,'Color','g');
+plot((25:2:93),vect_meanc_rw(1:35),'-','Linewidth',3,'Color','g');
 axis([25 93 20000 34000])
 xlabel('age','FontSize',20)
 ylabel('consumption','FontSize',20)
