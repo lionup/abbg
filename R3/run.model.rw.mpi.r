@@ -40,9 +40,9 @@ p$nsim = 50000 #5000
 #p$N = 999999
 
 #EARNINGS PROCESS
-p$Veps      =  0.04458632  #0.0887
-p$Vz0       =  0.1444097   #0.1127
-p$Veta_rho1 =  0.01326759  #0.0183   #Veta if rho==1
+p$Veps      =  0.0887  #0.0887
+p$Vz0       =  0.1127  #0.1127
+p$Veta_rho1 =  0.0183  #0.0183   #Veta if rho==1
 
 p$rho  =  1
 #p$delta =  0.2

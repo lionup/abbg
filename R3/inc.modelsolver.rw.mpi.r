@@ -48,7 +48,8 @@ FnGridPerm <- function(lx, p, varz, Vetavec, moment=TRUE){
 
     # get boundaries and fill in with equally spaced points
     for(it in 1:Twork){
-      load('meaneta.dat')
+      #load('meaneta.dat')
+      meaneta <- rep(0, Twork)
       zgrid[it,1]    = meaneta[it] - lx*sqrt(varz[it])
       zgrid[it,ngpz] = meaneta[it] + lx*sqrt(varz[it])
       lwidth[it] = (zgrid[it,ngpz]-zgrid[it,1])/(ngpz-1)
