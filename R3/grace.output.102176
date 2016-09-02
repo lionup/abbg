@@ -1,0 +1,19 @@
+Slot count: 20
+Slot distribution: c09n03 20 
+Loading required package: ggplot2
+Loading required package: data.table
+Loading required package: EQL
+Loading required package: ttutils
+Loading required package: parallel
+Loading required package: MASS
+Loading required package: plot3D
+The following objects are masked _by_ .GlobalEnv:
+
+    K1, K2, K3
+
+The following object is masked from package:base:
+
+    T
+
+Error in library(arm) : there is no package called ‘arm’
+Execution halted

@@ -1,0 +1,90 @@
+Tax function parameter:  0 
+Tax revenue / Pre-tax labor income:  1.081239e-14 %
+Tax function parameter:  1 
+Tax revenue / Pre-tax labor income:  25.79979 %
+Tax function parameter:  0.969 
+Tax revenue / Pre-tax labor income:  25.79979 %
+Tax function parameter:  0.4845 
+Tax revenue / Pre-tax labor income:  25.79947 %
+Tax function parameter:  0.24225 
+Tax revenue / Pre-tax labor income:  25.7987 %
+Tax function parameter:  0.121125 
+Tax revenue / Pre-tax labor income:  25.7968 %
+Tax function parameter:  0.0605625 
+Tax revenue / Pre-tax labor income:  25.79212 %
+Tax function parameter:  0.03028125 
+Tax revenue / Pre-tax labor income:  25.78063 %
+Tax function parameter:  0.01514062 
+Tax revenue / Pre-tax labor income:  25.75252 %
+Tax function parameter:  0.007570312 
+Tax revenue / Pre-tax labor income:  25.68429 %
+Tax function parameter:  0.003785156 
+Tax revenue / Pre-tax labor income:  25.52112 %
+Tax function parameter:  0.001892578 
+Tax revenue / Pre-tax labor income:  25.1416 %
+Tax function parameter:  0.001200678 
+Tax revenue / Pre-tax labor income:  24.66443 %
+Tax function parameter:  0.001687263 
+Tax revenue / Pre-tax labor income:  25.04319 %
+Tax function parameter:  0.001607414 
+Tax revenue / Pre-tax labor income:  24.99762 %
+Tax function parameter:  0.001611589 
+Tax revenue / Pre-tax labor income:  25.00012 %
+Tax function parameter:  0.001611089 
+Tax revenue / Pre-tax labor income:  24.99982 %
+Tax function parameter:  0.001611589 
+Tax revenue / Pre-tax labor income:  25.00012 %
+Tax function parameter:  0.001611589 
+Tax revenue / Pre-tax labor income:  25.00012 %
+SS benefit parameter:  0.1 
+SS Ben for Mean AIME/ Av Pre-tax Earns:  4.244 %
+SS benefit parameter:  1.5 
+SS Ben for Mean AIME/ Av Pre-tax Earns:  63.66 %
+SS benefit parameter:  1.06032 
+SS Ben for Mean AIME/ Av Pre-tax Earns:  45 %
+SS benefit parameter:  1.06082 
+SS Ben for Mean AIME/ Av Pre-tax Earns:  45.02122 %
+SS benefit parameter:  1.06032 
+SS Ben for Mean AIME/ Av Pre-tax Earns:  45 %
+SS benefit parameter:  1.06032 
+SS Ben for Mean AIME/ Av Pre-tax Earns:  45 %
+Finished forming grids
+Solving for decision rules at age  35 
+Solving for decision rules at age  34 
+Solving for decision rules at age  33 
+Solving for decision rules at age  32 
+Solving for decision rules at age  31 
+Solving for decision rules at age  30 
+Solving for decision rules at age  29 
+Solving for decision rules at age  28 
+Solving for decision rules at age  27 
+Solving for decision rules at age  26 
+Solving for decision rules at age  25 
+Solving for decision rules at age  24 
+Solving for decision rules at age  23 
+Solving for decision rules at age  22 
+Solving for decision rules at age  21 
+Solving for decision rules at age  20 
+Solving for decision rules at age  19 
+[mode=multicore] YEAH !!!!! 
+Number of Chains:  20 
+Solving for decision rules at age  18 
+Solving for decision rules at age  17 
+Solving for decision rules at age  16 
+Solving for decision rules at age  15 
+Solving for decision rules at age  14 
+Solving for decision rules at age  13 
+Solving for decision rules at age  12 
+Solving for decision rules at age  11 
+Solving for decision rules at age  10 
+Solving for decision rules at age  9 
+Solving for decision rules at age  8 
+Solving for decision rules at age  7 
+Solving for decision rules at age  6 
+Solving for decision rules at age  5 
+Solving for decision rules at age  4 
+Solving for decision rules at age  3 
+Solving for decision rules at age  2 
+Solving for decision rules at age  1 
+
+total seconds to solve the program:  408.5
