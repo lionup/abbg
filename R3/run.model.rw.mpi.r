@@ -40,11 +40,11 @@ p$nsim = 50000 #5000
 #p$N = 999999
 
 #EARNINGS PROCESS
-p$Veps =  0.0887
-p$Vz0  =  0.1127
+p$Veps =  0.04458632  #0.0887
+p$Vz0  =  0.1444097 #0.1127
 p$rho  =  1
 #p$delta =  0.2
-p$Veta_rho1 =  0.0183   #Veta if rho==1
+p$Veta_rho1 =  0.01326759  #0.0183   #Veta if rho==1
 #p$tau   = 0.15
 
 #INTEREST RATE
@@ -79,4 +79,4 @@ start_time = proc.time()[3]
 moments  <- comp.solveModel(p)
 cat(paste('\ntotal seconds to solve the program: ' , proc.time()[3] -  start_time ))
 
-save(p, moments, file='rw_nbl_full.dat')
+save(p, moments, file='rw_nbl_yparam.dat')
