@@ -72,7 +72,7 @@ Dectau=10*Vectau;
 plot(Dectau,[meanC_nl],'--','Linewidth',3,'Color','b')
 hold on
 plot(Dectau,[meanC_rw],'-','Linewidth',3,'Color','g')
-axis([1 9 30000 200000])
+axis([1 9 35000 190000])
 xlabel('decile of \eta_{t-1}','FontSize',20)
 ylabel('consumption','FontSize',20)
 hold off
@@ -151,7 +151,7 @@ figure
 plot((25:2:93),vect_meanc_nl(1:35),'--','Linewidth',3,'Color','b');
 hold on
 plot((25:2:93),vect_meanc_rw(1:35),'-','Linewidth',3,'Color','g');
-axis([25 93 20000 34000])
+axis([25 93 67000 95000])
 xlabel('age','FontSize',20)
 ylabel('consumption','FontSize',20)
 hold off
@@ -162,7 +162,7 @@ figure
 plot((25:2:93),vect_varc_nl(1:35),'--','Linewidth',3,'Color','b')
 hold on
 plot((25:2:93),vect_varc_rw(1:35),'-','Linewidth',3,'Color','g')
-axis([25 93 0 400000000])
+axis([25 93 0 3000000000])
 xlabel('age','FontSize',20)
 ylabel('consumption variance','FontSize',20)
 hold off
@@ -176,7 +176,7 @@ figure
 plot((25:2:93),vect_vara_nl(1:35),'--','Linewidth',3,'Color','b')
 hold on
 plot((25:2:93),vect_vara_rw(1:35),'-','Linewidth',3,'Color','g')
-axis([25 93 0 45000000000])
+axis([25 93 0 90000000000])
 xlabel('age','FontSize',20)
 ylabel('assets variance','FontSize',20)
 hold off
