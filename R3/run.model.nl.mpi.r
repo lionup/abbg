@@ -4,7 +4,7 @@ require(data.table)
 require(ggplot2)
 require(EQL)
 
-#setwd('~/git/abbg/R3')
+setwd('~/git/abbg/R3')
 source('~/git/abbg/R3/fun.model.solver.nl.mpi.r')
 set.seed(123)
 
