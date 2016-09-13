@@ -40,7 +40,7 @@ meanC_a_nl(Ntau,2)=sum(csim(:,age_ref).*(zsim(:,age_ref)>Vect(Ntau)).*(asim(:,ag
 
 
 % Canonical earnings process
-load('rw_nbl_yparam.mat')
+load('rw_nbl_full.mat')
 Vect=quantile(zsim(:,age_ref),Vectau);
 
 % Average consumption

@@ -9,6 +9,9 @@ with(moments,writeMat('rw_nbl_yparam.mat',zsim=zsim,esim=esim,asim=asim,csim=csi
 load('nl_nbl_e50m50.dat')
 with(moments,writeMat('nl_nbl_e50m50.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim))
 
+load('persis_nl_nbl_e50m50_parallel.dat')
+writeMat('persis_nl_nbl_e50m50_parallel.mat',persis=t(persis))
+
 #get the parameters from nl simulations
 load('~/git/abbg/R3/eta.dat')
 p$Vz0       =  varzapprox[1]

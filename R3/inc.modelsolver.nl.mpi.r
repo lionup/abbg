@@ -65,39 +65,47 @@ comp.eta.sim <- function(p){
   Mateta[1,] <- Mateta[1,]+( (1/p$b1true_e0*log(V_draw[1,]/p$Vectau[1]))*(V_draw[1,]<=p$Vectau[1]) -
     (1/p$bLtrue_e0*log((1-V_draw[1,])/(1-p$Vectau[p$Ntau]))) * (V_draw[1,]>p$Vectau[p$Ntau]))
 
-  for (jj in 1:p$Twork){  #periods before retirement
+  ##demean
+  #temp_eta_mean <- rep(0,p$Twork)
+  #temp_eta_mean[1] <- mean(Mateta[1,],na.rm=T)
+  #Mateta[1,] <- Mateta[1,] - temp_eta_mean[1]
 
+  for ( jj in 1:(p$Twork-1) ){  #periods before retirement
     aa=aa_ref+(jj-1)*2 #age last period
 
     # Eta
-    if (jj <= p$Twork-1){ #already have eta at period 1, need eta for the rest Twork-1 period
-                       #this period is jj+1
-      Mat <- array( 0, dim=c(p$N, (p$K1+1)*(p$K2+1)) )
-      for (kk1 in 0:p$K1){
-        for (kk2 in 0:p$K2) {
-          Mat[,kk1*(p$K2+1)+kk2+1] <- hermite( (Mateta[jj,]-p$meanY)/p$stdY, kk1 ) *
-            hermite( ((aa+2)-p$meanAGE)/p$stdAGE, kk2 )
-        }
+    #already have eta at period 1, need eta for the rest Twork-1 period
+    #this period is jj+1
+    Mat <- array( 0, dim=c(p$N, (p$K1+1)*(p$K2+1)) )
+    for (kk1 in 0:p$K1){
+      for (kk2 in 0:p$K2) {
+        Mat[,kk1*(p$K2+1)+kk2+1] <- hermite( (Mateta[jj,]-p$meanY)/p$stdY, kk1 ) *
+          hermite( ((aa+2)-p$meanAGE)/p$stdAGE, kk2 )
       }
-
-      #V_draw <- runif(N)
-      #First quantile
-      Mateta[jj+1,] <- ( Mat %*% p$Resqtrue[,1] ) * ( V_draw[jj+1,] <= p$Vectau[1] )
-
-      for (jtau in 2:p$Ntau){
-        Mateta[jj+1,] <- Mateta[jj+1,] +
-          ( (Mat %*% (p$Resqtrue[,jtau]-p$Resqtrue[,jtau-1])) /
-          (p$Vectau[jtau]-p$Vectau[jtau-1]) *
-          (V_draw[jj+1,] - p$Vectau[jtau-1]) + Mat %*% p$Resqtrue[,jtau-1] ) *
-          (V_draw[jj+1,] > p$Vectau[jtau-1]) * (V_draw[jj+1,] <= p$Vectau[jtau])
-      }
-      Mateta[jj+1,] <- Mateta[jj+1,] + (Mat %*% p$Resqtrue[,p$Ntau]) * (V_draw[jj+1,]>p$Vectau[p$Ntau])
-
-      Mateta[jj+1,] <- Mateta[jj+1,] + ( (1 / p$b1true * log(V_draw[jj+1,]/p$Vectau[1])) * (V_draw[jj+1,] <= p$Vectau[1]) -
-          (1 / p$bLtrue * log((1-V_draw[jj+1,])/(1-p$Vectau[p$Ntau]))) * (V_draw[jj+1,] > p$Vectau[p$Ntau]) )
     }
+
+    #V_draw <- runif(N)
+    #First quantile
+    Mateta[jj+1,] <- ( Mat %*% p$Resqtrue[,1] ) * ( V_draw[jj+1,] <= p$Vectau[1] )
+
+    for (jtau in 2:p$Ntau){
+      Mateta[jj+1,] <- Mateta[jj+1,] +
+        ( (Mat %*% (p$Resqtrue[,jtau]-p$Resqtrue[,jtau-1])) /
+        (p$Vectau[jtau]-p$Vectau[jtau-1]) *
+        (V_draw[jj+1,] - p$Vectau[jtau-1]) + Mat %*% p$Resqtrue[,jtau-1] ) *
+        (V_draw[jj+1,] > p$Vectau[jtau-1]) * (V_draw[jj+1,] <= p$Vectau[jtau])
+    }
+    Mateta[jj+1,] <- Mateta[jj+1,] + (Mat %*% p$Resqtrue[,p$Ntau]) * (V_draw[jj+1,]>p$Vectau[p$Ntau])
+
+    Mateta[jj+1,] <- Mateta[jj+1,] + ( (1 / p$b1true * log(V_draw[jj+1,]/p$Vectau[1])) * (V_draw[jj+1,] <= p$Vectau[1]) -
+        (1 / p$bLtrue * log((1-V_draw[jj+1,])/(1-p$Vectau[p$Ntau]))) * (V_draw[jj+1,] > p$Vectau[p$Ntau]) )
+
+    ##demean
+    #temp_eta_mean[jj+1] <- mean(Mateta[jj+1,],na.rm=T)
+    #Mateta[jj+1,] <- Mateta[jj+1,] - temp_eta_mean[jj+1]
   }
 
+  #save(temp_eta_mean, file='temp_eta_mean.dat')
   save_Mateta_name <- paste('Mateta',aa_ref,'.dat',sep='')
   save(Mateta, file=save_Mateta_name)
 
@@ -124,6 +132,9 @@ comp.eta.prob <- function(p){
     for (i in 1:Twork){ #periods before retirement
       zgrid[i,] <- quantile( Mateta[i,], veta, names=F, na.rm = T )
     }
+
+    ##demean
+    zgrid <- zgrid - array( rowMeans(zgrid),dim=c(Twork,ngpz) )
 
     long <- data.table( pid = 1:N, age=rep(age, each=N), income = c(t(Mateta)) )
     setkey(long, pid, age)

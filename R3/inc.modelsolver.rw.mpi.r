@@ -128,7 +128,8 @@ FnTaxParamNet <- function(lstax, p, kappa, popsize, zgrid, egrid, zdist, edist, 
     ygrid    <- array( 0, dim=c(Twork,ngpz,ngpe) ) #earnings grid
     ypregrid <- ygrid
 
-    load('~/git/abbg/R3/meaneta.dat')
+    #load('~/git/abbg/R3/meaneta.dat')
+    meaneta <- rep(0, Twork)
 
     for(it in 1:Twork){
       for(iz in 1:ngpz){

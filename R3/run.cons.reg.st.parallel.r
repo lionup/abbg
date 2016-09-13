@@ -123,6 +123,6 @@ persp3D(x=VecTau,y=VecTau,z=persis,
 
 dev.off()
 
-#require(R.matlab)
-#writeMat(paste('persis_',names,ename,'.mat',sep=''), persis=t(persis))
+require(R.matlab)
+writeMat(paste('persis_',names,ename,'.mat',sep=''), persis=t(persis))
 #readMat(paste('persis_',names,ename,'.mat',sep=''))
