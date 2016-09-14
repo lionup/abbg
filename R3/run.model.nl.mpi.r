@@ -41,7 +41,7 @@ detach(data)
 p$ngpe = 50 #100 #99 #19 #7 			    #transitory component
 p$ngpz = 100 #100 #11 			    #permanent component
 p$ngpa = 50 #50#100#50 		    #asset points
-p$ngpm = 50 #100 			    #average earnings points
+p$ngpm = 40 #100 			    #average earnings points
 #p$ngpp = p$ngpm * p$ngpz * p$ngpe      #pension points
 
 #DEMOGRAPHIC PARAMETERS PARAMETERS
@@ -63,7 +63,7 @@ p$amax  = 300000
 
 #SIMULATION PARAMETERS
 p$nsim = 50000 #5000
-p$N = 999999+1
+p$N = 999999
 
 #INTEREST RATE
 p$R = 1.03^2      #biennial gross interest rate

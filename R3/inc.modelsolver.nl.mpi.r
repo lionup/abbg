@@ -39,11 +39,11 @@ trans.matrix <- function(x1, x2, prob=T){
 #####################################################
 comp.eta.sim <- function(p){
 
-  #Vgrid <- (1:p$N) / (1+p$N)
+  Vgrid <- (1:p$N) / (1+p$N)
   V_draw <- array(0, dim = c(p$Twork,p$N))
   for (i in 1:p$Twork) {
-    #V_draw[i,] = sample(Vgrid)
-    V_draw[i,] = runif( p$N, 1e-4, 1-(1e-4) )
+    V_draw[i,] = sample(Vgrid)
+    #V_draw[i,] = runif( p$N, 1e-4, 1-(1e-4) )
   }
 
   aa_ref = p$age_min
@@ -66,10 +66,10 @@ comp.eta.sim <- function(p){
   Mateta[1,] <- Mateta[1,]+( (1/p$b1true_e0*log(V_draw[1,]/p$Vectau[1]))*(V_draw[1,]<=p$Vectau[1]) -
     (1/p$bLtrue_e0*log((1-V_draw[1,])/(1-p$Vectau[p$Ntau]))) * (V_draw[1,]>p$Vectau[p$Ntau]))
 
-  #demean
-  temp_eta_mean <- rep(0,p$Twork)
-  temp_eta_mean[1] <- mean(Mateta[1,],na.rm=T)
-  Mateta[1,] <- Mateta[1,] - temp_eta_mean[1]
+  ##demean
+  #temp_eta_mean <- rep(0,p$Twork)
+  #temp_eta_mean[1] <- mean(Mateta[1,],na.rm=T)
+  #Mateta[1,] <- Mateta[1,] - temp_eta_mean[1]
 
   for ( jj in 1:(p$Twork-1) ){  #periods before retirement
     aa=aa_ref+(jj-1)*2 #age last period
@@ -101,12 +101,12 @@ comp.eta.sim <- function(p){
     Mateta[jj+1,] <- Mateta[jj+1,] + ( (1 / p$b1true * log(V_draw[jj+1,]/p$Vectau[1])) * (V_draw[jj+1,] <= p$Vectau[1]) -
         (1 / p$bLtrue * log((1-V_draw[jj+1,])/(1-p$Vectau[p$Ntau]))) * (V_draw[jj+1,] > p$Vectau[p$Ntau]) )
 
-    #demean
-    temp_eta_mean[jj+1] <- mean(Mateta[jj+1,],na.rm=T)
-    Mateta[jj+1,] <- Mateta[jj+1,] - temp_eta_mean[jj+1]
+    ##demean
+    #temp_eta_mean[jj+1] <- mean(Mateta[jj+1,],na.rm=T)
+    #Mateta[jj+1,] <- Mateta[jj+1,] - temp_eta_mean[jj+1]
   }
 
-  save(temp_eta_mean, file='temp_eta_mean.dat')
+  #save(temp_eta_mean, file='temp_eta_mean.dat')
   save_Mateta_name <- paste('Mateta',aa_ref,'.dat',sep='')
   save(Mateta, file=save_Mateta_name)
 

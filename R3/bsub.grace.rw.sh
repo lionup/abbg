@@ -10,7 +10,7 @@
 ##BSUB -n 40
 ##BSUB -R "span[ptile=20]"
 
-#BSUB -o grace.output.%J   # output file name in which %J is replaced by the job ID
+#BSUB -o grace.%J.sys   # output file name in which %J is replaced by the job ID
 #BSUB -N                   # sent email
 
 # 9. load modules
@@ -20,4 +20,4 @@ echo "Slot distribution: $LSB_MCPU_HOSTS"
 module load Apps/R/3.2.2-generic
 module load Libs/GSL/1.16
 
-R --no-save --slave < ~/git/abbg/R3/run.model.rw.mpi.r > grace.$LSB_JOBID.out
+R --no-save --slave < ~/git/abbg/R3/run.model.rw.mpi.r > grace.$LSB_JOBID
