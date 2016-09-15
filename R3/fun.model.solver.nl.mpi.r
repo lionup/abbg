@@ -82,8 +82,8 @@ comp.solveModel <- function(p) {
 
 		###################
 		#Earnings
-		#p$stax <- uniroot(FnTaxParamNet, c(0, 1), p, kappa, popsize, zgrid, egrid, zdist, edist, extendInt="yes", tol=1e-6, maxiter=200)$root
-		p$stax <- 0.001613022
+		p$stax <- uniroot(FnTaxParamNet, c(0, 1), p, kappa, popsize, zgrid, egrid, zdist, edist, extendInt="yes", tol=1e-6, maxiter=200)$root
+		#p$stax <- 0.001613022
 		lval <- FnTaxParamNet(p$stax, p, kappa, popsize, zgrid, egrid, zdist, edist, FALSE)
 		ygrid      <- lval$ygrid
 		ypregrid   <- lval$ypregrid
@@ -125,8 +125,8 @@ comp.solveModel <- function(p) {
 
 		###################
 		#Pensions
-		#sspar <- uniroot(FnSSParam, c(0.1,1.5), p, avearnspre, mgrid, extendInt="yes", tol=1e-3, maxiter=30)$root
-		sspar <- 1.06032
+		sspar <- uniroot(FnSSParam, c(0.1,1.5), p, avearnspre, mgrid, extendInt="yes", tol=1e-3, maxiter=30)$root
+		#sspar <- 1.06032
 		lval <- FnSSParam(sspar, p, avearnspre, mgrid,FALSE)
 		ppregrid <- lval$ppregrid
 		pgrid    <- lval$pgrid
