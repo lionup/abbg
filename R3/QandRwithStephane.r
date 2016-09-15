@@ -53,7 +53,7 @@ moments_rw$ze <- moments_rw$zsim #+ moments_rw$esim
 mean_ze_rw <- apply(moments_rw$ze[,1:18],2,mean)
 var_ze_rw <- apply(moments_rw$ze[,1:18],2,var)
 
-load('~/git/abbg/R3/nl_nbl_e50m50.dat')
+load('~/git/abbg/R3/nl_nbl_demean.dat')
 moments_nl <- moments
 moments_nl$ze <- moments_nl$zsim #+ moments_nl$esim
 mean_ze_nl <- apply(moments_nl$ze[,1:18],2,mean)

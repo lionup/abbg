@@ -10,7 +10,7 @@
 ##BSUB -n 40
 ##BSUB -R "span[ptile=20]"
 
-#BSUB -o grace.%J.sys   # output file name in which %J is replaced by the job ID
+#BSUB -o grace.sys.%J   # output file name in which %J is replaced by the job ID
 #BSUB -N                   # sent email
 
 # 9. load modules
