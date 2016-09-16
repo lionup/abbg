@@ -38,7 +38,7 @@ p$T          = T
 detach(data)
 
 # GRIDS DIMENSION - STATE VARIABLES
-p$ngpe = 90 #99 #19 #7 			    #transitory component
+p$ngpe = 80 #99 #19 #7 			    #transitory component
 p$ngpz = 100 #100 #11 			    #permanent component
 p$ngpa = 40 #50#100#50 		    #asset points
 p$ngpm = 20 #100 			    #average earnings points
