@@ -83,7 +83,7 @@ p_y <- ggplot(mean_y_long, aes(x=age,y=Value)) +
 
 ggsave('~/git/abbg/R3/figure/var_ze.eps')
 
-
+#get eps variance from simulation of eps
 rm(list=ls())
 require(R.matlab)
 temp <- readMat('~/git/abbg/R3/Mateps_true.mat')
@@ -92,7 +92,11 @@ save(Mateps, file='~/git/abbg/R3/Mateps_true.dat')
 
 colMeans(Mateps)
 veps_nl <- apply(Mateps,2,var)
+#veps_nl <- lvar
 save(veps_nl,file='veps_nl.dat')
 
 mm <- data.table(age = seq(25,59,l=18),
   var_z_rw  = varzapprox ,  var_ze_nl  = varze_nl  )
+
+veta_nl <- varzapprox
+save(veta_nl,file='veta_nl.dat')
