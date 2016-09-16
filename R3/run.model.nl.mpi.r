@@ -38,7 +38,7 @@ p$T          = T
 detach(data)
 
 # GRIDS DIMENSION - STATE VARIABLES
-p$ngpe = 100 #99 #19 #7 			    #transitory component
+p$ngpe = 90 #99 #19 #7 			    #transitory component
 p$ngpz = 100 #100 #11 			    #permanent component
 p$ngpa = 40 #50#100#50 		    #asset points
 p$ngpm = 20 #100 			    #average earnings points
@@ -97,4 +97,4 @@ start_time = proc.time()[3]
 moments  <- comp.solveModel(p)
 cat(paste('\ntotal seconds to solve the program: ' , proc.time()[3] -  start_time ))
 
-save(p, moments, file='nl_nbl_demean100_uniroot.dat')
+save(p, moments, file='nl_nbl_eps90_uniroot.dat')

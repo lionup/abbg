@@ -65,10 +65,23 @@ comp.solveModel <- function(p) {
 		###################
 		#Transitory shocks
 		#lm <- optimize(FnGridTrans, c(0,4), p, tol=1e-4)$minimum
-		ensd <- uniroot(FnGridTrans, c(1,4), p, extendInt="yes", tol=1e-2, maxiter=30)$root
-		lval = FnGridTrans(ensd, p, FALSE)
-		edist <- lval$edist
-		egrid <- lval$egrid
+		#ensd <- uniroot(FnGridTrans, c(1,4), p, extendInt="yes", tol=1e-2, maxiter=30)$root
+		#lval = FnGridTrans(ensd, p, FALSE)
+		#edist <- lval$edist
+		#egrid <- lval$egrid
+
+		#variance varies by age
+		load('~/git/abbg/R3/nlveps.dat')
+		edist <- array( 0, dim=c(Twork,ngpe) )
+		egrid <- array( 0, dim=c(Twork,ngpe) )
+		for (it in 1:Twork){
+			ensd <- uniroot(FnGridTrans, c(1,4), p, nlveps[it], extendInt="yes", tol=1e-2, maxiter=30)$root
+			lval = FnGridTrans(ensd, p, nlveps[it], FALSE)
+			edist[it,] <- lval$edisti
+			egrid[it,] <- lval$egridi
+		}
+
+
 
 		###################
 		#Permanent component

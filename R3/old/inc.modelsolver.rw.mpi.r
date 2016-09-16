@@ -1,33 +1,36 @@
-FnGridTrans <- function(lx, p, vepsi, moment=TRUE){
+FnGridTrans <- function(lx, p, moment=TRUE){
   res <- with(p,{
     legrid <- rep(0,ngpe)
     ledist <- legrid
 
     # get boundaries and fill in with equally spaced points
-    legrid[1]    = -lx*sqrt(vepsi)
-    legrid[ngpe] = lx*sqrt(vepsi)
+    legrid[1]    = -lx*sqrt(Veps)
+    legrid[ngpe] = lx*sqrt(Veps)
     lwidth = (legrid[ngpe]-legrid[1])/(ngpe-1)
     for(ij in 2:(ngpe-1)){
       legrid[ij] = legrid[1] + lwidth*(ij-1)
     }
 
     # fill in probabilities using normal distribution
-    ledist[1] = pnorm( legrid[1]+0.5*lwidth, sd=sqrt(vepsi) )
+    ledist[1] = pnorm( legrid[1]+0.5*lwidth, sd=sqrt(Veps) )
     for( ij in 2:(ngpe-1) ){
-      ltemp1 = pnorm( legrid[ij]+0.5*lwidth, sd=sqrt(vepsi) )
-      ltemp3 = pnorm( legrid[ij]-0.5*lwidth, sd=sqrt(vepsi) )
+      ltemp1 = pnorm( legrid[ij]+0.5*lwidth, sd=sqrt(Veps) )
+      ltemp3 = pnorm( legrid[ij]-0.5*lwidth, sd=sqrt(Veps) )
       ledist[ij] = ltemp1 - ltemp3
     }
-    ledist[ngpe] = pnorm( legrid[ngpe]-0.5*lwidth, sd=sqrt(vepsi), lower.tail=FALSE )
+    ledist[ngpe] = pnorm( legrid[ngpe]-0.5*lwidth, sd=sqrt(Veps), lower.tail=FALSE )
     ledist = ledist/sum(ledist)
 
     #find variance
     lvar = sum(legrid^2 * ledist) - sum(legrid*ledist)^2
 
     if(moment){
-      rr = vepsi -lvar
+      #rr = (Veps -lvar)^2
+      rr = Veps -lvar
     }else{
-      rr=list(edisti=ledist, egridi=legrid)
+      edist <- array( rep(ledist,each=Twork), dim=c(Twork,ngpe) )
+      egrid <- array( rep(legrid,each=Twork), dim=c(Twork,ngpe) )
+      rr=list(edist=edist, egrid=egrid)
     }
   })
 
