@@ -6,7 +6,7 @@ require(EQL)
 
 setwd('~/git/abbg/R3')
 source('~/git/abbg/R3/fun.model.solver.nl.mpi.r')
-set.seed(123)
+set.seed(42)
 
 # SETTIG PARAMETERS
 load('~/git/abbg/R3/mat_new.dat')
@@ -63,7 +63,7 @@ p$amax  = 300000
 
 #SIMULATION PARAMETERS
 p$nsim = 50000 #5000
-p$N = 999999
+p$N = 999999+1
 
 #INTEREST RATE
 p$R = 1.03^2      #biennial gross interest rate

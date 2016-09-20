@@ -39,11 +39,12 @@ trans.matrix <- function(x1, x2, prob=T){
 #####################################################
 comp.eta.sim <- function(p){
 
-  Vgrid <- (1:p$N) / (1+p$N)
+  set.seed(42)
+  #Vgrid <- (1:p$N) / (1+p$N)
   V_draw <- array(0, dim = c(p$Twork,p$N))
   for (i in 1:p$Twork) {
-    V_draw[i,] = sample(Vgrid)
-    #V_draw[i,] = runif( p$N, 1e-4, 1-(1e-4) )
+    #V_draw[i,] = sample(Vgrid)
+    V_draw[i,] = runif( p$N, 0, 1 )
   }
 
   aa_ref = p$age_min
@@ -85,7 +86,6 @@ comp.eta.sim <- function(p){
       }
     }
 
-    #V_draw <- runif(N)
     #First quantile
     Mateta[jj+1,] <- ( Mat %*% p$Resqtrue[,1] ) * ( V_draw[jj+1,] <= p$Vectau[1] )
 
@@ -100,6 +100,12 @@ comp.eta.sim <- function(p){
 
     Mateta[jj+1,] <- Mateta[jj+1,] + ( (1 / p$b1true * log(V_draw[jj+1,]/p$Vectau[1])) * (V_draw[jj+1,] <= p$Vectau[1]) -
         (1 / p$bLtrue * log((1-V_draw[jj+1,])/(1-p$Vectau[p$Ntau]))) * (V_draw[jj+1,] > p$Vectau[p$Ntau]) )
+
+    # Restrict support of simulated eta's
+    emax <- 10
+    emin <- -10
+    Mateta[jj+1,] <- Mateta[jj+1,]*(Mateta[jj+1,]<=emax)*(Mateta[jj+1,]>=emin) +
+                     emax*(Mateta[jj+1,]>emax) + emin*(Mateta[jj+1,]<emin)
 
     ##demean
     #temp_eta_mean[jj+1] <- mean(Mateta[jj+1,],na.rm=T)
@@ -134,7 +140,7 @@ comp.eta.prob <- function(p){
       zgrid[i,] <- quantile( Mateta[i,], veta, names=F, na.rm = T )
     }
 
-    ##demean
+    #demean
     zgrid <- zgrid - array( rowMeans(zgrid),dim=c(Twork,ngpz) )
 
     long <- data.table( pid = 1:N, age=rep(age, each=N), income = c(t(Mateta)) )

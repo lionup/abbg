@@ -85,20 +85,17 @@ comp.solveModel <- function(p) {
 
 		###################
 		#Permanent component
-		#if (rho==1) {
-    #	Veta = Veta_rho1
-		#}else {
-    #	Veta = (1-rho^2)*(Twork*Veta_rho1 - Vz0*(rho^(2*Twork)-1) ) /(1-rho^(2*Twork))
-    #}
-		#Vetavec  <- rep(Veta, Twork-1)
+		if (rho==1) {
+    	Veta = Veta_rho1
+		}else {
+    	Veta = (1-rho^2)*(Twork*Veta_rho1 - Vz0*(rho^(2*Twork)-1) ) /(1-rho^(2*Twork))
+    }
+		Vetavec  <- rep(Veta, Twork-1)
 
-		#varz   <- rep( Vz0, Twork	)
-		#for(it in 2:Twork){
-		#  varz[it] = (rho^2)*varz[it-1] + Vetavec[it-1]
-		#}
-
-		load('~/git/abbg/R3/veta_nl.dat')
-		#if var decreasing,set it as equal
+		varz   <- rep( Vz0, Twork	)
+		for(it in 2:Twork){
+		  varz[it] = (rho^2)*varz[it-1] + Vetavec[it-1]
+		}
 
 		znsd = optimize(FnGridPerm, c(1,4), p, varz, Vetavec, tol=1e-2)$minimum
 		#znsd <- 2.775511 #39

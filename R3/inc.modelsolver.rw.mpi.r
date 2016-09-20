@@ -45,10 +45,8 @@ FnGridPerm <- function(lx, p, varz, Vetavec, moment=TRUE){
 
     # get boundaries and fill in with equally spaced points
     for(it in 1:Twork){
-      #load('meaneta.dat')
-      meaneta <- rep(0, Twork)
-      zgrid[it,1]    = meaneta[it] - lx*sqrt(varz[it])
-      zgrid[it,ngpz] = meaneta[it] + lx*sqrt(varz[it])
+      zgrid[it,1]    = - lx*sqrt(varz[it])
+      zgrid[it,ngpz] = lx*sqrt(varz[it])
       lwidth[it] = (zgrid[it,ngpz]-zgrid[it,1])/(ngpz-1)
       for( iz1 in 2:(ngpz-1)){
         zgrid[it,iz1] = zgrid[it,1] + lwidth[it]*(iz1-1)
@@ -125,13 +123,10 @@ FnTaxParamNet <- function(lstax, p, kappa, popsize, zgrid, egrid, zdist, edist, 
     ygrid    <- array( 0, dim=c(Twork,ngpz,ngpe) ) #earnings grid
     ypregrid <- ygrid
 
-    #load('~/git/abbg/R3/meaneta.dat')
-    meaneta <- rep(0, Twork)
-
     for(it in 1:Twork){
       for(iz in 1:ngpz){
         for(ie in 1:ngpe){
-          ygrid[it,iz,ie] = exp( kappa[it] + zgrid[it,iz] + egrid[it,ie] ) + meaneta[it]
+          ygrid[it,iz,ie] = exp( kappa[it] + zgrid[it,iz] + egrid[it,ie] )
 
           #get implied gross income at this point, to use in constructtion of soc sec system
           lygross <- ygrid[it,iz,ie]/(1.0-pentax-btax)
