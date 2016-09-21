@@ -1,0 +1,17 @@
+lm(formula = cres ~ yres + age + ares + yres * age + yres * ares + 
+    age * ares + yres * age * ares, data = nl_fu)
+              coef.est coef.se t value Pr(>|t|)
+(Intercept)      0.02     0.00   29.98    0.00 
+yres             0.62     0.00  409.02    0.00 
+age              0.00     0.00  -54.13    0.00 
+ares            -0.35     0.00 -519.31    0.00 
+yres:age        -0.01     0.00 -177.99    0.00 
+yres:ares       -0.01     0.00  -10.40    0.00 
+age:ares         0.01     0.00  779.89    0.00 
+yres:age:ares    0.00     0.00   76.60    0.00 
+---
+n = 697598, k = 8
+residual sd = 0.11, R-Squared = 0.90
+Number of Chains:  20 
+null device 
+          1 
