@@ -123,10 +123,14 @@ FnTaxParamNet <- function(lstax, p, kappa, popsize, zgrid, egrid, zdist, edist, 
     ygrid    <- array( 0, dim=c(Twork,ngpz,ngpe) ) #earnings grid
     ypregrid <- ygrid
 
+    load('~/git/abbg/R3/difeta.dat')
+    #difeta <- rep(0, Twork)
+
     for(it in 1:Twork){
       for(iz in 1:ngpz){
         for(ie in 1:ngpe){
-          ygrid[it,iz,ie] = exp( kappa[it] + zgrid[it,iz] + egrid[it,ie] )
+          ygrid[it,iz,ie] = exp( kappa[it] + zgrid[it,iz] + egrid[it,ie] ) + difeta[it]
+
 
           #get implied gross income at this point, to use in constructtion of soc sec system
           lygross <- ygrid[it,iz,ie]/(1.0-pentax-btax)

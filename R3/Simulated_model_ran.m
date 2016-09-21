@@ -11,7 +11,7 @@ Vectau=(1/(Ntau+1):1/(Ntau+1):Ntau/(Ntau+1))';
 
 
 % Nonlinear earnings process
-load('nl_nbl_e50m50.mat')
+load('nl_nbl_eps80.mat')
 age_ref=37-24;
 Vect=quantile(zsim(:,age_ref),Vectau);
 
@@ -40,7 +40,7 @@ meanC_a_nl(Ntau,2)=sum(csim(:,age_ref).*(zsim(:,age_ref)>Vect(Ntau)).*(asim(:,ag
 
 
 % Canonical earnings process
-load('rw_nbl_full.mat')
+load('rw_nbl_copynl.mat')
 Vect=quantile(zsim(:,age_ref),Vectau);
 
 % Average consumption
@@ -98,7 +98,7 @@ hold off
 % plot(Vectau,[meanC_a_nl(:,2) meanC_a_rw(:,2)])
 
 % Life-cycle evolution: mean, variance, quantiles
-load('nl_nbl_e50m50.mat')
+load('nl_nbl_eps80.mat')
 vect_meany_nl=mean(ypresim);
 vect_vary_nl=var(ypresim);
 vect_quanty_nl=quantile(ypresim,(.1:.1:.9));
@@ -113,7 +113,7 @@ N=50000;
 vect_ginia_nl=(N+1)/N-2*sum(sort(asim).*(N+1-(1:1:N)'*ones(1,36)))./(N*sum(asim));
 vect_quanta_nl=quantile(asim,(.1:.1:.9));
 Mat_nl=cov(ypresim(:,1:20));
-load('rw_nbl_yparam.mat')
+load('rw_nbl_copynl.mat')
 vect_meany_rw=mean(ypresim);
 vect_vary_rw=var(ypresim);
 vect_quanty_rw=quantile(ypresim,(.1:.1:.9));

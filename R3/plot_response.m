@@ -6,7 +6,7 @@ close all
 
 %%3d plot consumption response conditional on asset and age
 
-load('~/git/abbg/R3/persis_nl_nbl_e50m50_parallel.mat')
+load('~/git/abbg/R3/persis_nl_nbl_eps80_parallel.mat')
 load('~/git/abbg/R3/StephaneNew/data_hermite_cons2.mat')
 
 figure

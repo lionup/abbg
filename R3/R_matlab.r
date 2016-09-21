@@ -3,14 +3,14 @@ require(R.matlab)
 data <- readMat('~/git/abbg/R3/StephaneNew/data_hermite_cons2.mat')
 save(data, file='~/git/abbg/R3/mat_new.dat')
 
-load('rw_nbl_yparam.dat')
-with(moments,writeMat('rw_nbl_yparam.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim))
+load('rw_nbl_copynl.dat')
+with(moments,writeMat('rw_nbl_copynl.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim))
 
-load('nl_nbl_e50m50.dat')
-with(moments,writeMat('nl_nbl_e50m50.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim))
+load('nl_nbl_eps80.dat')
+with(moments,writeMat('nl_nbl_eps80.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim))
 
-load('persis_nl_nbl_e50m50_parallel.dat')
-writeMat('persis_nl_nbl_e50m50_parallel.mat',persis=t(persis))
+load('persis_nl_nbl_eps80_parallel.dat')
+writeMat('persis_nl_nbl_eps80_parallel.mat',persis=t(persis))
 
 #get the parameters from nl simulations
 load('~/git/abbg/R3/eta.dat')

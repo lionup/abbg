@@ -80,4 +80,4 @@ start_time = proc.time()[3]
 moments  <- comp.solveModel(p)
 cat(paste('\ntotal seconds to solve the program: ' , proc.time()[3] -  start_time ))
 
-save(p, moments, file='rw_nbl_copynl.dat')
+save(p, moments, file='rw_nbl_samey.dat')
