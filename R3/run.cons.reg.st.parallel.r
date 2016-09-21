@@ -10,7 +10,7 @@ require(MASS)
 require(plot3D)
 
 #parameters
-names <- 'nl_nbl_e50m50'
+names <- 'nl_nbl_eps80'
 #ename <- '_30'
 ename <-'_parallel'
 K1 <- 2 #second order hermite for income

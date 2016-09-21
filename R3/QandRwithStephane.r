@@ -15,7 +15,7 @@ mean_switch <- data.table(age = 25:59, y_switch=mean_y_switch, c_switch=mean_c_s
 
 
 #mean and variance of income
-load('~/git/abbg/R3/rw_nbl_yparam.dat')
+load('~/git/abbg/R3/rw_nbl_copynl.dat')
 moments_rw <- moments
 
 mean_y_rw <- apply(moments_rw$ysim[,1:18],2,mean)
@@ -26,7 +26,7 @@ var_y_rw <- apply(moments_rw$ysim[,1:18],2,var)
 var_c_rw <- apply(moments_rw$csim[,1:18],2,var)
 var_a_rw <- apply(moments_rw$asim[,1:18],2,var)
 
-load('~/git/abbg/R3/nl_nbl_e50m50.dat')
+load('~/git/abbg/R3/nl_nbl_eps80.dat')
 moments_nl <- moments
 
 mean_y_nl <- apply(moments_nl$ysim[,1:18],2,mean)
@@ -47,10 +47,18 @@ mm <- data.table(age = seq(25,59,l=18),
 
 
 #mean and variance of eta, eps, y
-load('~/git/abbg/R3/rw_nbl_yparam.dat')
+load('~/git/abbg/R3/rw_nbl_copynl.dat')
 moments_rw <- moments
-moments_rw$ze <- moments_rw$zsim #+ moments_rw$esim
+moments_rw$z  <- moments_rw$zsim #+ moments_rw$esim
+moments_rw$e  <- moments_rw$esim #+ moments_rw$esim
+moments_rw$ze <- moments_rw$zsim + moments_rw$esim
+
+mean_z_rw  <- apply(moments_rw$z[,1:18],2,mean)
+mean_e_rw  <- apply(moments_rw$e[,1:18],2,mean)
 mean_ze_rw <- apply(moments_rw$ze[,1:18],2,mean)
+
+var_z_rw  <- apply(moments_rw$z[,1:18],2,var)
+var_e_rw  <- apply(moments_rw$e[,1:18],2,var)
 var_ze_rw <- apply(moments_rw$ze[,1:18],2,var)
 
 load('~/git/abbg/R3/nl_nbl_eps80.dat')
@@ -68,12 +76,18 @@ var_e_nl  <- apply(moments_nl$e[,1:18],2,var)
 var_ze_nl <- apply(moments_nl$ze[,1:18],2,var)
 
 mm <- data.table(age = seq(25,59,l=18),
-  #mean_ze_rw = mean_ze_rw,
+  mean_z_rw  = mean_z_rw,
+  mean_e_rw  = mean_e_rw,
+  mean_ze_rw = mean_ze_rw,
+
   mean_z_nl  = mean_z_nl,
   mean_e_nl  = mean_e_nl,
   mean_ze_nl = mean_ze_nl,
 
-  #var_ze_rw  = var_ze_rw ,
+  var_z_rw   = var_z_rw,
+  var_e_rw   = var_e_rw,
+  var_ze_rw  = var_ze_rw,
+
   var_z_nl   = var_z_nl,
   var_e_nl   = var_e_nl,
   var_ze_nl  = var_ze_nl
