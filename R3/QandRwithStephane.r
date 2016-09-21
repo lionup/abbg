@@ -46,22 +46,39 @@ mm <- data.table(age = seq(25,59,l=18),
   var_a_rw  = var_a_rw ,  var_a_nl  = var_a_nl  )
 
 
-#mean and variance of eta + eps
+#mean and variance of eta, eps, y
 load('~/git/abbg/R3/rw_nbl_yparam.dat')
 moments_rw <- moments
 moments_rw$ze <- moments_rw$zsim #+ moments_rw$esim
 mean_ze_rw <- apply(moments_rw$ze[,1:18],2,mean)
 var_ze_rw <- apply(moments_rw$ze[,1:18],2,var)
 
-load('~/git/abbg/R3/nl_nbl_demean.dat')
+load('~/git/abbg/R3/nl_nbl_eps80.dat')
 moments_nl <- moments
-moments_nl$ze <- moments_nl$zsim #+ moments_nl$esim
+moments_nl$z  <- moments_nl$zsim #+ moments_nl$esim
+moments_nl$e  <- moments_nl$esim #+ moments_nl$esim
+moments_nl$ze <- moments_nl$zsim + moments_nl$esim
+
+mean_z_nl  <- apply(moments_nl$z[,1:18],2,mean)
+mean_e_nl  <- apply(moments_nl$e[,1:18],2,mean)
 mean_ze_nl <- apply(moments_nl$ze[,1:18],2,mean)
+
+var_z_nl  <- apply(moments_nl$z[,1:18],2,var)
+var_e_nl  <- apply(moments_nl$e[,1:18],2,var)
 var_ze_nl <- apply(moments_nl$ze[,1:18],2,var)
 
 mm <- data.table(age = seq(25,59,l=18),
-  mean_ze_rw = mean_ze_rw, mean_ze_nl = mean_ze_nl,
-  var_ze_rw  = var_ze_rw ,  var_ze_nl  = var_ze_nl  )
+  #mean_ze_rw = mean_ze_rw,
+  mean_z_nl  = mean_z_nl,
+  mean_e_nl  = mean_e_nl,
+  mean_ze_nl = mean_ze_nl,
+
+  #var_ze_rw  = var_ze_rw ,
+  var_z_nl   = var_z_nl,
+  var_e_nl   = var_e_nl,
+  var_ze_nl  = var_ze_nl
+
+)
 
 mean_y <- mm[,1:3, with = FALSE]
 mean_y_long <- reshape(mean_y, direction="long", varying=list(names(mean_y)[2:3]), v.names="Value",

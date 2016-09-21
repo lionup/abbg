@@ -71,12 +71,12 @@ comp.solveModel <- function(p) {
 		#egrid <- lval$egrid
 
 		#variance varies by age
-		load('~/git/abbg/R3/veps_nl.dat')
+		load('~/git/abbg/R3/var_e_nl.dat')
 		edist <- array( 0, dim=c(Twork,ngpe) )
 		egrid <- array( 0, dim=c(Twork,ngpe) )
 		for (it in 1:Twork){
-			ensd <- uniroot(FnGridTrans, c(1,4), p, veps_nl[it], extendInt="yes", tol=1e-2, maxiter=30)$root
-			lval = FnGridTrans(ensd, p, veps_nl[it], FALSE)
+			ensd <- uniroot(FnGridTrans, c(1,4), p, var_e_nl[it], extendInt="yes", tol=1e-2, maxiter=30)$root
+			lval = FnGridTrans(ensd, p, var_e_nl[it], FALSE)
 			edist[it,] <- lval$edisti
 			egrid[it,] <- lval$egridi
 		}
@@ -85,31 +85,28 @@ comp.solveModel <- function(p) {
 
 		###################
 		#Permanent component
-		#if (rho==1) {
-    #	Veta = Veta_rho1
-		#}else {
-    #	Veta = (1-rho^2)*(Twork*Veta_rho1 - Vz0*(rho^(2*Twork)-1) ) /(1-rho^(2*Twork))
-    #}
-		#Vetavec  <- rep(Veta, Twork-1)
+		if (rho==1) {
+    	Veta = Veta_rho1
+		}else {
+    	Veta = (1-rho^2)*(Twork*Veta_rho1 - Vz0*(rho^(2*Twork)-1) ) /(1-rho^(2*Twork))
+    }
+		Vetavec  <- rep(Veta, Twork-1)
 
-		#varz   <- rep( Vz0, Twork	)
-		#for(it in 2:Twork){
-		#  varz[it] = (rho^2)*varz[it-1] + Vetavec[it-1]
-		#}
-
-		load('~/git/abbg/R3/veta_nl.dat')
-		#take the first period from nl as that in can
-		varz <- rep(veta_nl[1], Twork)
-
-		#get the update every period
-		Vetavec <- veta_nl[-1] - veta_nl[-Twork]
-
-		#if var decreasing,set it as equal
-		Vetavec[Vetavec < 0] <- 0
-
+		varz   <- rep( Vz0, Twork	)
 		for(it in 2:Twork){
 		  varz[it] = (rho^2)*varz[it-1] + Vetavec[it-1]
 		}
+
+		##take the first period from nl as that in can
+		#load('~/git/abbg/R3/var_z_nl.dat')
+		#varz <- rep(var_z_nl[1], Twork)
+		##get the update every period
+		#Vetavec <- var_z_nl[-1] - var_z_nl[-Twork]
+		##if var decreasing,set it as equal
+		#Vetavec[Vetavec < 0] <- 0
+		#for(it in 2:Twork){
+		#  varz[it] = (rho^2)*varz[it-1] + Vetavec[it-1]
+		#}
 
 		znsd = optimize(FnGridPerm, c(1,4), p, varz, Vetavec, tol=1e-2)$minimum
 		#znsd <- 2.775511 #39
