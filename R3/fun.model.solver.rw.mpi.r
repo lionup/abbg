@@ -98,7 +98,18 @@ comp.solveModel <- function(p) {
 		#}
 
 		load('~/git/abbg/R3/veta_nl.dat')
+		#take the first period from nl as that in can
+		varz <- rep(veta_nl[1], Twork)
+
+		#get the update every period
+		Vetavec <- veta_nl[-1] - veta_nl[-Twork]
+
 		#if var decreasing,set it as equal
+		Vetavec[Vetavec < 0] <- 0
+
+		for(it in 2:Twork){
+		  varz[it] = (rho^2)*varz[it-1] + Vetavec[it-1]
+		}
 
 		znsd = optimize(FnGridPerm, c(1,4), p, varz, Vetavec, tol=1e-2)$minimum
 		#znsd <- 2.775511 #39
