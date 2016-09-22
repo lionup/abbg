@@ -1,0 +1,86 @@
+Tax function parameter:  0 
+Tax revenue / Pre-tax labor income:  1.064359e-14 %
+Tax function parameter:  1 
+Tax revenue / Pre-tax labor income:  25.79977 %
+Tax function parameter:  0.9690008 
+Tax revenue / Pre-tax labor income:  25.79976 %
+Tax function parameter:  0.4845004 
+Tax revenue / Pre-tax labor income:  25.79942 %
+Tax function parameter:  0.2422502 
+Tax revenue / Pre-tax labor income:  25.79856 %
+Tax function parameter:  0.1211251 
+Tax revenue / Pre-tax labor income:  25.79646 %
+Tax function parameter:  0.06056255 
+Tax revenue / Pre-tax labor income:  25.79129 %
+Tax function parameter:  0.03028127 
+Tax revenue / Pre-tax labor income:  25.7786 %
+Tax function parameter:  0.01514064 
+Tax revenue / Pre-tax labor income:  25.74755 %
+Tax function parameter:  0.007570318 
+Tax revenue / Pre-tax labor income:  25.67223 %
+Tax function parameter:  0.003785159 
+Tax revenue / Pre-tax labor income:  25.49227 %
+Tax function parameter:  0.00189258 
+Tax revenue / Pre-tax labor income:  25.07445 %
+Tax function parameter:  0.001561757 
+Tax revenue / Pre-tax labor income:  24.8851 %
+Tax function parameter:  0.001762509 
+Tax revenue / Pre-tax labor income:  25.00905 %
+Tax function parameter:  0.001745819 
+Tax revenue / Pre-tax labor income:  24.9999 %
+Tax function parameter:  0.001746319 
+Tax revenue / Pre-tax labor income:  25.00018 %
+Tax function parameter:  0.001745819 
+Tax revenue / Pre-tax labor income:  24.9999 %
+Tax function parameter:  0.001745819 
+Tax revenue / Pre-tax labor income:  24.9999 %
+SS benefit parameter:  0.1 
+SS Ben for Mean AIME/ Av Pre-tax Earns:  4.244 %
+SS benefit parameter:  1.5 
+SS Ben for Mean AIME/ Av Pre-tax Earns:  63.66 %
+SS benefit parameter:  1.06032 
+SS Ben for Mean AIME/ Av Pre-tax Earns:  45 %
+SS benefit parameter:  1.06032 
+SS Ben for Mean AIME/ Av Pre-tax Earns:  45 %
+SS benefit parameter:  1.06032 
+SS Ben for Mean AIME/ Av Pre-tax Earns:  45 %
+Finished forming grids
+Solving for decision rules at age  35 
+Solving for decision rules at age  34 
+Solving for decision rules at age  33 
+Solving for decision rules at age  32 
+Solving for decision rules at age  31 
+Solving for decision rules at age  30 
+Solving for decision rules at age  29 
+Solving for decision rules at age  28 
+Solving for decision rules at age  27 
+Solving for decision rules at age  26 
+Solving for decision rules at age  25 
+Solving for decision rules at age  24 
+Solving for decision rules at age  23 
+Solving for decision rules at age  22 
+Solving for decision rules at age  21 
+Solving for decision rules at age  20 
+Solving for decision rules at age  19 
+[mode=multicore] YEAH !!!!! 
+Number of Chains:  20 
+Solving for decision rules at age  18 
+Solving for decision rules at age  17 
+Solving for decision rules at age  16 
+Solving for decision rules at age  15 
+Solving for decision rules at age  14 
+Solving for decision rules at age  13 
+Solving for decision rules at age  12 
+Solving for decision rules at age  11 
+Solving for decision rules at age  10 
+Solving for decision rules at age  9 
+Solving for decision rules at age  8 
+Solving for decision rules at age  7 
+Solving for decision rules at age  6 
+Solving for decision rules at age  5 
+Solving for decision rules at age  4 
+Solving for decision rules at age  3 
+Solving for decision rules at age  2 
+Solving for decision rules at age  1 
+
+total seconds to solve the program:  404.504
