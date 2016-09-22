@@ -12,7 +12,7 @@ Vectau=(1/(Ntau+1):1/(Ntau+1):Ntau/(Ntau+1))';
 
 % Nonlinear earnings process
 load('nl_nbl_eps80.mat')
-age_ref=37-24;
+age_ref=(37-23)/2;
 Vect=quantile(zsim(:,age_ref),Vectau);
 
 % Average consumption
@@ -40,7 +40,7 @@ meanC_a_nl(Ntau,2)=sum(csim(:,age_ref).*(zsim(:,age_ref)>Vect(Ntau)).*(asim(:,ag
 
 
 % Canonical earnings process
-load('rw_nbl_copynl.mat')
+load('rw_nbl_samey.mat')
 Vect=quantile(zsim(:,age_ref),Vectau);
 
 % Average consumption
@@ -72,7 +72,7 @@ Dectau=10*Vectau;
 plot(Dectau,[meanC_nl],'--','Linewidth',3,'Color','b')
 hold on
 plot(Dectau,[meanC_rw],'-','Linewidth',3,'Color','g')
-axis([1 9 35000 190000])
+axis([1 9 30000 150000])
 xlabel('decile of \eta_{t-1}','FontSize',20)
 ylabel('consumption','FontSize',20)
 hold off
@@ -113,7 +113,7 @@ N=50000;
 vect_ginia_nl=(N+1)/N-2*sum(sort(asim).*(N+1-(1:1:N)'*ones(1,36)))./(N*sum(asim));
 vect_quanta_nl=quantile(asim,(.1:.1:.9));
 Mat_nl=cov(ypresim(:,1:20));
-load('rw_nbl_copynl.mat')
+load('rw_nbl_samey.mat')
 vect_meany_rw=mean(ypresim);
 vect_vary_rw=var(ypresim);
 vect_quanty_rw=quantile(ypresim,(.1:.1:.9));
@@ -151,7 +151,7 @@ figure
 plot((25:2:93),vect_meanc_nl(1:35),'--','Linewidth',3,'Color','b');
 hold on
 plot((25:2:93),vect_meanc_rw(1:35),'-','Linewidth',3,'Color','g');
-axis([25 93 67000 95000])
+axis([25 93 62000 88000])
 xlabel('age','FontSize',20)
 ylabel('consumption','FontSize',20)
 hold off
@@ -162,7 +162,7 @@ figure
 plot((25:2:93),vect_varc_nl(1:35),'--','Linewidth',3,'Color','b')
 hold on
 plot((25:2:93),vect_varc_rw(1:35),'-','Linewidth',3,'Color','g')
-axis([25 93 0 3000000000])
+axis([25 93 0 2800000000])
 xlabel('age','FontSize',20)
 ylabel('consumption variance','FontSize',20)
 hold off
@@ -176,7 +176,7 @@ figure
 plot((25:2:93),vect_vara_nl(1:35),'--','Linewidth',3,'Color','b')
 hold on
 plot((25:2:93),vect_vara_rw(1:35),'-','Linewidth',3,'Color','g')
-axis([25 93 0 90000000000])
+axis([25 93 0 72000000000])
 xlabel('age','FontSize',20)
 ylabel('assets variance','FontSize',20)
 hold off

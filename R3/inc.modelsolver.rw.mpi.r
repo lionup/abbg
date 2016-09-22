@@ -69,13 +69,13 @@ FnGridPerm <- function(lx, p, varz, Vetavec, moment=TRUE){
     }
 
     #find distribution at first period
-    zdist[1,1] = pnorm( zgrid[1,1]+0.5*lwidth[1], sd=sqrt(Vz0) )
+    zdist[1,1] = pnorm( zgrid[1,1]+0.5*lwidth[1], sd=sqrt(varz[1]) )
     for (iz1 in 2:(ngpz-1) ){
-      ltemp1 = pnorm( zgrid[1,iz1]+0.5*lwidth[1], sd=sqrt(Vz0) )
-      ltemp3 = pnorm( zgrid[1,iz1]-0.5*lwidth[1], sd=sqrt(Vz0) )
+      ltemp1 = pnorm( zgrid[1,iz1]+0.5*lwidth[1], sd=sqrt(varz[1]) )
+      ltemp3 = pnorm( zgrid[1,iz1]-0.5*lwidth[1], sd=sqrt(varz[1]) )
       zdist[1,iz1] = ltemp1 - ltemp3
     }
-    zdist[1,ngpz] = pnorm( zgrid[1,ngpz]-0.5*lwidth[1], sd=sqrt(Vz0), lower.tail=FALSE )
+    zdist[1,ngpz] = pnorm( zgrid[1,ngpz]-0.5*lwidth[1], sd=sqrt(varz[1]), lower.tail=FALSE )
     zdist[1,] = zdist[1,]/sum(zdist[1,])
 
     #find unconditional distributions

@@ -3,8 +3,8 @@ require(R.matlab)
 data <- readMat('~/git/abbg/R3/StephaneNew/data_hermite_cons2.mat')
 save(data, file='~/git/abbg/R3/mat_new.dat')
 
-load('rw_nbl_copynl.dat')
-with(moments,writeMat('rw_nbl_copynl.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim))
+load('rw_nbl_samey.dat')
+with(moments,writeMat('rw_nbl_samey.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim))
 
 load('nl_nbl_eps80.dat')
 with(moments,writeMat('nl_nbl_eps80.mat',zsim=zsim,esim=esim,asim=asim,csim=csim,ysim=ysim,ypresim=ypresim))

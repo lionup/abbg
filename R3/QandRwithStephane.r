@@ -15,7 +15,7 @@ mean_switch <- data.table(age = 25:59, y_switch=mean_y_switch, c_switch=mean_c_s
 
 
 #mean and variance of income
-load('~/git/abbg/R3/rw_nbl_copynl.dat')
+load('~/git/abbg/R3/rw_nbl_samey.dat')
 moments_rw <- moments
 
 mean_y_rw <- apply(moments_rw$ysim[,1:18],2,mean)
@@ -47,7 +47,7 @@ mm <- data.table(age = seq(25,59,l=18),
 
 
 #mean and variance of eta, eps, y
-load('~/git/abbg/R3/rw_nbl_copynl.dat')
+load('~/git/abbg/R3/rw_nbl_samey.dat')
 moments_rw <- moments
 moments_rw$z  <- moments_rw$zsim #+ moments_rw$esim
 moments_rw$e  <- moments_rw$esim #+ moments_rw$esim
